@@ -15,6 +15,11 @@ A browser-based network topology editor for quickly documenting routers, ISP mod
 
 > Security note: credential fields are stored in browser local storage and are not a password vault. Do not store production passwords on shared or untrusted computers.
 
+## Project abilities
+
+- `.codex/abilities/topology-ui.json`: machine-readable ability mount for `@xyflow/react`, `elkjs`, and `react-resizable-panels`
+- `.codex/abilities/topology-ui.md`: implementation guidance for using those packages in this topology editor
+
 ## Run locally
 
 Requirements: Node.js 22.13 or newer.

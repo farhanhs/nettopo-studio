@@ -16,10 +16,13 @@
     "db:generate": "bash scripts/sites-env.sh -- drizzle-kit generate"
   },
   "dependencies": {
+    "@xyflow/react": "12.11.2",
     "drizzle-orm": "0.45.2",
+    "elkjs": "0.11.1",
     "next": "16.2.6",
     "react": "19.2.6",
-    "react-dom": "19.2.6"
+    "react-dom": "19.2.6",
+    "react-resizable-panels": "4.9.0"
   },
   "devDependencies": {
     "@cloudflare/vite-plugin": "1.37.1",
