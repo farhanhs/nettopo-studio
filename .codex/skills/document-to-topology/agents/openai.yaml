@@ -1,0 +1,4 @@
+interface:
+  display_name: "Document to Topology"
+  short_description: "Turn customer equipment notes into NetTopo Studio topology data."
+  default_prompt: "Use this skill to convert customer equipment information into NetTopo Studio devices, links, groups, masked credentials, and a test report."
