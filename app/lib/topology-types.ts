@@ -7,7 +7,13 @@ export type DeviceType =
   | "nas"
   | "erp"
   | "access-point"
-  | "client";
+  | "client"
+  | "ssid"
+  | "mesh-node"
+  | "printer"
+  | "camera"
+  | "pos"
+  | "iot";
 
 export type Device = {
   id: string;
@@ -20,6 +26,7 @@ export type Device = {
   url?: string;
   username?: string;
   password?: string;
+  quantity?: number;
   x: number;
   y: number;
   groupId?: string;
@@ -41,11 +48,48 @@ export type Group = {
   name: string;
   kind: "site" | "domain" | "vlan";
   color: string;
+  collapsed?: boolean;
 };
 
 export type Project = { devices: Device[]; links: Link[]; groups: Group[] };
 
 export type RoleCode = "boss" | "site_manager" | "engineer" | "sales_procurement";
+
+export type CredentialKind = "device_admin" | "device_readonly" | "wifi" | "vpn" | "external_service";
+
+export type DeviceCredentialRecord = {
+  id: string;
+  topologyId: string;
+  projectDeviceId: string;
+  kind: CredentialKind;
+  usernameMasked?: string;
+  secretMasked: string;
+  keyVersion?: string;
+  lastRotatedAt?: string;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type DeviceCredentialWriteInput = {
+  topologyId: string;
+  projectDeviceId: string;
+  kind: CredentialKind;
+  username?: string;
+  secret: string;
+};
+
+export type AuditLogRecord = {
+  id: string;
+  actorUserId?: string;
+  action: string;
+  entityType: string;
+  entityId?: string;
+  siteId?: string;
+  customerId?: string;
+  topologyId?: string;
+  metadata?: Record<string, unknown>;
+  createdAt: string;
+};
 
 export type SiteRecord = {
   id: string;

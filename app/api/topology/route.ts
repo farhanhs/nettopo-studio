@@ -12,6 +12,7 @@ import {
   saveTopologyProject,
 } from "@/db/topology-postgres";
 import type { Project } from "@/app/lib/topology-types";
+import { validateProject } from "@/app/lib/topology-validation";
 
 type TopologyAction =
   | { action: "createCustomer"; name: string; siteId?: string }
@@ -99,16 +100,7 @@ function optionalText(value: unknown) {
 }
 
 function requiredProject(value: unknown): Project {
-  if (
-    !value ||
-    typeof value !== "object" ||
-    !Array.isArray((value as Project).devices) ||
-    !Array.isArray((value as Project).links) ||
-    !Array.isArray((value as Project).groups)
-  ) {
-    throw new Error("project is required.");
-  }
-  return value as Project;
+  return validateProject(value);
 }
 
 function topologyError(error: unknown) {
