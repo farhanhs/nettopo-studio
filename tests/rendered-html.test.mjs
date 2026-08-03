@@ -30,11 +30,10 @@ function executionContext() {
 
 async function fetchWorker(path, init) {
   const worker = await loadWorker();
-  return worker.fetch(
-    new Request(`http://localhost${path}`, init),
-    workerEnv(),
-    executionContext(),
-  );
+  const request = new Request(`http://localhost${path}`, init);
+  return typeof worker === "function"
+    ? worker(request)
+    : worker.fetch(request, workerEnv(), executionContext());
 }
 
 test("renders development preview metadata", async () => {
@@ -48,6 +47,24 @@ test("renders development preview metadata", async () => {
     /^text\/html\b/i,
   );
   assert.match(await response.text(), developmentPreviewMeta);
+});
+
+test("renders login guidance on the root path without a URL suffix", async () => {
+  const response = await fetchWorker("/", {
+    headers: { accept: "text/html" },
+  });
+  const html = await response.text();
+
+  assert.equal(response.status, 200);
+  assert.match(html, /數位聯合服務網路設備拓樸工具/);
+  assert.match(html, /登入工作平台/);
+  assert.match(html, /帳號/);
+  assert.match(html, /密碼/);
+  assert.doesNotMatch(html, /action=["'][^"']+/i);
+  assert.match(html, /<form[^>]*class=["'][^"']*login-card/i);
+  assert.match(html, /<button[^>]*type=["']submit["'][^>]*>登入系統/i);
+  assert.doesNotMatch(html, /\/login\b/i);
+  assert.doesNotMatch(html, /sean002002dus/);
 });
 
 test("topology API rejects unsupported actions", async () => {
@@ -87,7 +104,7 @@ test("topology API validates project structure before storage access", async () 
   });
 
   assert.equal(response.status, 400);
-  assert.deepEqual(await response.json(), { error: "project is required." });
+  assert.deepEqual(await response.json(), { error: "Invalid project: groups: Invalid input" });
 });
 
 test("topology API returns a client error for malformed JSON", async () => {
@@ -106,7 +123,12 @@ test("storage-backed endpoints report missing database configuration", async () 
   delete process.env.DATABASE_URL;
 
   try {
-    for (const path of ["/api/topology", "/api/session"]) {
+    for (const path of [
+      "/api/topology",
+      "/api/session",
+      "/api/credentials?topologyId=topology-1",
+      "/api/audit-logs",
+    ]) {
       const response = await fetchWorker(path, {
         headers: { "x-nettopo-user-email": "engineer@company.local" },
       });

@@ -1,0 +1,57 @@
+{
+  "schemaVersion": 1,
+  "kind": "nettopo-project",
+  "sharing": "full",
+  "exportedAt": "2026-08-03T00:00:00.000Z",
+  "topologyName": "Sean Spine-Leaf 示範拓樸",
+  "ownerAccount": "sean.sie",
+  "project": {
+    "groups": [
+      { "id": "group-edge", "name": "Edge Router", "kind": "domain", "color": "#f59e0b" },
+      { "id": "group-spine", "name": "Spine Fabric", "kind": "domain", "color": "#526cf5" },
+      { "id": "group-leaf", "name": "Server Leaf", "kind": "domain", "color": "#18a674" }
+    ],
+    "devices": [
+      { "id": "router-01", "name": "Edge Router 01", "type": "router", "ip": "10.0.0.1", "model": "Virtual Edge Router", "x": 760, "y": 620, "groupId": "group-edge" },
+      { "id": "spine-01", "name": "Main Switch 01 (Spine)", "type": "switch", "ip": "10.0.1.1", "model": "100G Main Switch", "x": 120, "y": 500, "groupId": "group-spine" },
+      { "id": "spine-02", "name": "Main Switch 02 (Spine)", "type": "switch", "ip": "10.0.1.2", "model": "100G Main Switch", "x": 420, "y": 120, "groupId": "group-spine" },
+      { "id": "main-server-01", "name": "Main Server 01", "type": "server", "ip": "10.10.0.11", "model": "Compute Main", "x": 80, "y": 80, "groupId": "group-leaf" },
+      { "id": "main-server-02", "name": "Main Server 02", "type": "server", "ip": "10.10.0.12", "model": "Compute Main", "x": 240, "y": 660, "groupId": "group-leaf" },
+      { "id": "main-server-03", "name": "Main Server 03", "type": "server", "ip": "10.10.0.13", "model": "Compute Main", "x": 920, "y": 160, "groupId": "group-leaf" },
+      { "id": "node-server-01", "name": "Node Server 01", "type": "server", "ip": "10.10.1.21", "model": "Compute Node", "x": 1080, "y": 520, "groupId": "group-leaf" },
+      { "id": "node-server-02", "name": "Node Server 02", "type": "server", "ip": "10.10.1.22", "model": "Compute Node", "x": 560, "y": 700, "groupId": "group-leaf" },
+      { "id": "node-server-03", "name": "Node Server 03", "type": "server", "ip": "10.10.1.23", "model": "Compute Node", "x": 1120, "y": 260, "groupId": "group-leaf" },
+      { "id": "node-server-04", "name": "Node Server 04", "type": "server", "ip": "10.10.1.24", "model": "Compute Node", "x": 400, "y": 400, "groupId": "group-leaf" },
+      { "id": "node-server-05", "name": "Node Server 05", "type": "server", "ip": "10.10.1.25", "model": "Compute Node", "x": 840, "y": 400, "groupId": "group-leaf" },
+      { "id": "node-server-06", "name": "Node Server 06", "type": "server", "ip": "10.10.1.26", "model": "Compute Node", "x": 200, "y": 280, "groupId": "group-leaf" },
+      { "id": "node-server-07", "name": "Node Server 07", "type": "server", "ip": "10.10.1.27", "model": "Compute Node", "x": 640, "y": 240, "groupId": "group-leaf" },
+      { "id": "node-server-08", "name": "Node Server 08", "type": "server", "ip": "10.10.1.28", "model": "Compute Node", "x": 1000, "y": 700, "groupId": "group-leaf" }
+    ],
+    "links": [
+      { "id": "link-router-spine-01", "from": "router-01", "to": "spine-01", "kind": "wired", "fromPort": "WAN1", "toPort": "Ethernet1/1", "speed": "100 Gbps" },
+      { "id": "link-router-spine-02", "from": "router-01", "to": "spine-02", "kind": "wired", "fromPort": "WAN2", "toPort": "Ethernet1/1", "speed": "100 Gbps" },
+      { "id": "link-spine-01-main-01", "from": "spine-01", "to": "main-server-01", "kind": "wired", "fromPort": "Ethernet1/2", "toPort": "eth0", "speed": "25 Gbps" },
+      { "id": "link-spine-02-main-01", "from": "spine-02", "to": "main-server-01", "kind": "wired", "fromPort": "Ethernet1/2", "toPort": "eth1", "speed": "25 Gbps" },
+      { "id": "link-spine-01-main-02", "from": "spine-01", "to": "main-server-02", "kind": "wired", "fromPort": "Ethernet1/3", "toPort": "eth0", "speed": "25 Gbps" },
+      { "id": "link-spine-02-main-02", "from": "spine-02", "to": "main-server-02", "kind": "wired", "fromPort": "Ethernet1/3", "toPort": "eth1", "speed": "25 Gbps" },
+      { "id": "link-spine-01-main-03", "from": "spine-01", "to": "main-server-03", "kind": "wired", "fromPort": "Ethernet1/4", "toPort": "eth0", "speed": "25 Gbps" },
+      { "id": "link-spine-02-main-03", "from": "spine-02", "to": "main-server-03", "kind": "wired", "fromPort": "Ethernet1/4", "toPort": "eth1", "speed": "25 Gbps" },
+      { "id": "link-spine-01-node-01", "from": "spine-01", "to": "node-server-01", "kind": "wired", "fromPort": "Ethernet1/5", "toPort": "eth0", "speed": "25 Gbps" },
+      { "id": "link-spine-02-node-01", "from": "spine-02", "to": "node-server-01", "kind": "wired", "fromPort": "Ethernet1/5", "toPort": "eth1", "speed": "25 Gbps" },
+      { "id": "link-spine-01-node-02", "from": "spine-01", "to": "node-server-02", "kind": "wired", "fromPort": "Ethernet1/6", "toPort": "eth0", "speed": "25 Gbps" },
+      { "id": "link-spine-02-node-02", "from": "spine-02", "to": "node-server-02", "kind": "wired", "fromPort": "Ethernet1/6", "toPort": "eth1", "speed": "25 Gbps" },
+      { "id": "link-spine-01-node-03", "from": "spine-01", "to": "node-server-03", "kind": "wired", "fromPort": "Ethernet1/7", "toPort": "eth0", "speed": "25 Gbps" },
+      { "id": "link-spine-02-node-03", "from": "spine-02", "to": "node-server-03", "kind": "wired", "fromPort": "Ethernet1/7", "toPort": "eth1", "speed": "25 Gbps" },
+      { "id": "link-spine-01-node-04", "from": "spine-01", "to": "node-server-04", "kind": "wired", "fromPort": "Ethernet1/8", "toPort": "eth0", "speed": "25 Gbps" },
+      { "id": "link-spine-02-node-04", "from": "spine-02", "to": "node-server-04", "kind": "wired", "fromPort": "Ethernet1/8", "toPort": "eth1", "speed": "25 Gbps" },
+      { "id": "link-spine-01-node-05", "from": "spine-01", "to": "node-server-05", "kind": "wired", "fromPort": "Ethernet1/9", "toPort": "eth0", "speed": "25 Gbps" },
+      { "id": "link-spine-02-node-05", "from": "spine-02", "to": "node-server-05", "kind": "wired", "fromPort": "Ethernet1/9", "toPort": "eth1", "speed": "25 Gbps" },
+      { "id": "link-spine-01-node-06", "from": "spine-01", "to": "node-server-06", "kind": "wired", "fromPort": "Ethernet1/10", "toPort": "eth0", "speed": "25 Gbps" },
+      { "id": "link-spine-02-node-06", "from": "spine-02", "to": "node-server-06", "kind": "wired", "fromPort": "Ethernet1/10", "toPort": "eth1", "speed": "25 Gbps" },
+      { "id": "link-spine-01-node-07", "from": "spine-01", "to": "node-server-07", "kind": "wired", "fromPort": "Ethernet1/11", "toPort": "eth0", "speed": "25 Gbps" },
+      { "id": "link-spine-02-node-07", "from": "spine-02", "to": "node-server-07", "kind": "wired", "fromPort": "Ethernet1/11", "toPort": "eth1", "speed": "25 Gbps" },
+      { "id": "link-spine-01-node-08", "from": "spine-01", "to": "node-server-08", "kind": "wired", "fromPort": "Ethernet1/12", "toPort": "eth0", "speed": "25 Gbps" },
+      { "id": "link-spine-02-node-08", "from": "spine-02", "to": "node-server-08", "kind": "wired", "fromPort": "Ethernet1/12", "toPort": "eth1", "speed": "25 Gbps" }
+    ]
+  }
+}

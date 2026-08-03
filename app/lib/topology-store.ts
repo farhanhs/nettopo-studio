@@ -3,6 +3,11 @@
 import { create } from "zustand";
 import { topologyDb } from "./topology-db";
 import {
+  SEAN_SPINE_LEAF_PROJECT,
+  SEAN_SPINE_LEAF_TOPOLOGY_ID,
+  SEAN_SPINE_LEAF_TOPOLOGY_NAME,
+} from "./demo-topologies";
+import {
   cloneProject,
   EMPTY_PROJECT,
   SAMPLE_PROJECT,
@@ -12,6 +17,7 @@ import {
   type TopologyRecord,
   type UserRecord,
 } from "./topology-types";
+import { stripProjectCredentials } from "./topology-validation";
 
 const LEGACY_STORAGE_KEY = "nettopo-studio-v1";
 const ACTIVE_CUSTOMER_KEY = "nettopo-active-customer-id";
@@ -40,10 +46,12 @@ type TopologyStore = {
   initialize: () => Promise<void>;
   setDevUserEmail: (email: string) => Promise<void>;
   setProject: (updater: ProjectUpdater) => void;
+  saveDeviceCredential: (projectDeviceId: string, username?: string, secret?: string) => Promise<void>;
   selectCustomer: (customerId: string) => Promise<void>;
   selectTopology: (topologyId: string) => Promise<void>;
   createCustomer: (name: string, siteId?: string) => Promise<void>;
   createTopology: (name: string, copyCurrent?: boolean, siteId?: string) => Promise<void>;
+  importProject: (project: Project, strategy: "new" | "merge" | "replace", name?: string, siteId?: string) => Promise<void>;
   renameCustomer: (customerId: string, name: string) => Promise<void>;
   renameTopology: (topologyId: string, name: string) => Promise<void>;
   duplicateCustomer: (customerId: string) => Promise<void>;
@@ -88,16 +96,16 @@ type RepositoryDataset = {
 };
 
 const LOCAL_ADMIN_USER: UserRecord = {
-  id: "local-admin",
-  email: "local@indexeddb",
-  name: "本機管理者",
-  role: "boss",
+  id: "user-sean-sie",
+  email: "sean.sie@dus.local",
+  name: "謝慶宣",
+  role: "engineer",
   siteIds: [],
   createdAt: new Date(0).toISOString(),
   updatedAt: new Date(0).toISOString(),
 };
 
-const DEFAULT_DEV_USER_EMAIL = "manner@company.local";
+const DEFAULT_DEV_USER_EMAIL = "sean.sie@dus.local";
 
 function readDevUserEmail() {
   if (typeof window === "undefined") return DEFAULT_DEV_USER_EMAIL;
@@ -122,6 +130,23 @@ async function serverAction(body: Record<string, unknown>) {
   });
   if (!response.ok) throw new Error(await topologyResponseMessage(response));
   return await response.json() as RepositoryDataset;
+}
+
+let serverWriteQueue: Promise<unknown> = Promise.resolve();
+
+function queueServerWrite<T>(write: () => Promise<T>) {
+  const pending = serverWriteQueue.then(write, write);
+  serverWriteQueue = pending.then(() => undefined, () => undefined);
+  return pending;
+}
+
+async function serverCredentialAction(body: Record<string, unknown>) {
+  const response = await fetch("/api/credentials", {
+    method: "POST",
+    headers: { "content-type": "application/json", ...topologyHeaders() },
+    body: JSON.stringify(body),
+  });
+  if (!response.ok) throw new Error(await topologyResponseMessage(response));
 }
 
 async function topologyResponseMessage(response: Response) {
@@ -182,6 +207,9 @@ async function seedInitialData() {
   const topology: TopologyRecord = {
     id: uid("topology"),
     customerId: customer.id,
+    ownerUserId: LOCAL_ADMIN_USER.id,
+    createdByUserId: LOCAL_ADMIN_USER.id,
+    updatedByUserId: LOCAL_ADMIN_USER.id,
     name: "我的網路架構",
     versionLabel: "v1",
     project: cloneProject(safeLegacyProject(localStorage.getItem(LEGACY_STORAGE_KEY)) ?? SAMPLE_PROJECT),
@@ -199,6 +227,23 @@ async function seedInitialData() {
   });
 
   return { customer, topology };
+}
+
+async function ensureSeanSpineLeafDemo(customerId: string) {
+  if (await topologyDb.topologies.get(SEAN_SPINE_LEAF_TOPOLOGY_ID)) return;
+  const timestamp = nowIso();
+  await topologyDb.topologies.add({
+    id: SEAN_SPINE_LEAF_TOPOLOGY_ID,
+    customerId,
+    ownerUserId: LOCAL_ADMIN_USER.id,
+    createdByUserId: LOCAL_ADMIN_USER.id,
+    updatedByUserId: LOCAL_ADMIN_USER.id,
+    name: SEAN_SPINE_LEAF_TOPOLOGY_NAME,
+    versionLabel: "v1",
+    project: cloneProject(SEAN_SPINE_LEAF_PROJECT),
+    createdAt: timestamp,
+    updatedAt: timestamp,
+  });
 }
 
 function makeEmptyCustomer(name = "示範客戶") {
@@ -234,6 +279,9 @@ async function readActiveData() {
     activeCustomerId = seeded.customer.id;
     activeTopologyId = seeded.topology.id;
   }
+
+  await ensureSeanSpineLeafDemo(activeCustomerId ?? customers[0].id);
+  topologies = await topologyDb.topologies.toArray();
 
   let activeTopology = topologies.find((topology) => topology.id === activeTopologyId);
   if (!activeTopology) activeTopology = sortByUpdatedAt(topologies)[0];
@@ -295,25 +343,44 @@ export const useTopologyStore = create<TopologyStore>((set, get) => ({
   setProject: (updater) => {
     const current = get();
     const nextProject = typeof updater === "function" ? updater(current.project) : updater;
+    const persistedProject = USE_SERVER_STORAGE ? stripProjectCredentials(nextProject) : cloneProject(nextProject);
     const activeTopologyId = current.activeTopologyId;
     const timestamp = nowIso();
     const nextTopologies = current.topologies.map((topology) =>
       topology.id === activeTopologyId
-        ? { ...topology, project: cloneProject(nextProject), updatedAt: timestamp }
+        ? { ...topology, project: cloneProject(persistedProject), updatedAt: timestamp }
         : topology,
     );
 
-    set({ project: cloneProject(nextProject), topologies: sortByUpdatedAt(nextTopologies), saving: true });
+    set({ project: cloneProject(persistedProject), topologies: sortByUpdatedAt(nextTopologies), saving: true });
     if (!activeTopologyId) return;
     if (USE_SERVER_STORAGE) {
-      void serverAction({ action: "saveProject", topologyId: activeTopologyId, project: cloneProject(nextProject) })
+      void queueServerWrite(() => serverAction({
+        action: "saveProject",
+        topologyId: activeTopologyId,
+        project: cloneProject(persistedProject),
+      }))
         .then((dataset) => set((state) => ({ ...readStoredActiveState(dataset), project: state.project })))
         .finally(() => set({ saving: false }));
       return;
     }
 
-    void topologyDb.topologies.update(activeTopologyId, { project: cloneProject(nextProject), updatedAt: timestamp })
+    void topologyDb.topologies.update(activeTopologyId, { project: cloneProject(persistedProject), updatedAt: timestamp })
       .finally(() => set({ saving: false }));
+  },
+
+  saveDeviceCredential: async (projectDeviceId, username, secret) => {
+    if (!USE_SERVER_STORAGE || !secret) return;
+    const topologyId = get().activeTopologyId;
+    if (!topologyId) throw new Error("No active topology is available for this credential.");
+    await queueServerWrite(() => serverCredentialAction({
+      action: "upsert",
+      topologyId,
+      projectDeviceId,
+      kind: "device_admin",
+      username: username?.trim() || undefined,
+      secret,
+    }));
   },
 
   selectCustomer: async (customerId) => {
@@ -419,7 +486,7 @@ export const useTopologyStore = create<TopologyStore>((set, get) => ({
         action: "createTopology",
         customerId: current.activeCustomerId,
         name: name.trim() || "新拓樸",
-        project: cloneProject(copyCurrent ? current.project : EMPTY_PROJECT),
+        project: stripProjectCredentials(copyCurrent ? current.project : EMPTY_PROJECT),
         siteId,
       });
       const newestTopology = sortByUpdatedAt(dataset.topologies.filter((topology) => topology.customerId === current.activeCustomerId))[0];
@@ -431,6 +498,9 @@ export const useTopologyStore = create<TopologyStore>((set, get) => ({
     const topology: TopologyRecord = {
       id: uid("topology"),
       customerId: current.activeCustomerId,
+      ownerUserId: current.currentUser?.id,
+      createdByUserId: current.currentUser?.id,
+      updatedByUserId: current.currentUser?.id,
       name: name.trim() || `拓樸 ${siblingCount + 1}`,
       versionLabel: `v${siblingCount + 1}`,
       project: cloneProject(copyCurrent ? current.project : EMPTY_PROJECT),
@@ -451,6 +521,88 @@ export const useTopologyStore = create<TopologyStore>((set, get) => ({
       activeTopologyId: topology.id,
       project: cloneProject(topology.project),
     }));
+  },
+
+  importProject: async (project, strategy, name, siteId) => {
+    const current = get();
+    const importedProject = cloneProject(project);
+    if (!current.activeCustomerId) throw new Error("匯入前必須先選擇客戶。");
+
+    if (strategy === "new") {
+      const topologyName = name?.trim() || `匯入拓樸 ${current.topologies.length + 1}`;
+      if (USE_SERVER_STORAGE) {
+        const dataset = await serverAction({
+          action: "createTopology",
+          customerId: current.activeCustomerId,
+          name: topologyName,
+          project: stripProjectCredentials(importedProject),
+          siteId,
+        });
+        const newestTopology = sortByUpdatedAt(
+          dataset.topologies.filter((topology) => topology.customerId === current.activeCustomerId),
+        )[0];
+        set(buildActiveState(dataset, newestTopology?.id, current.activeCustomerId));
+        return;
+      }
+
+      const timestamp = nowIso();
+      const siblingCount = current.topologies.filter((topology) => topology.customerId === current.activeCustomerId).length;
+      const topology: TopologyRecord = {
+        id: uid("topology"),
+        customerId: current.activeCustomerId,
+        ownerUserId: current.currentUser?.id,
+        createdByUserId: current.currentUser?.id,
+        updatedByUserId: current.currentUser?.id,
+        name: topologyName,
+        versionLabel: `v${siblingCount + 1}`,
+        project: importedProject,
+        createdAt: timestamp,
+        updatedAt: timestamp,
+      };
+      await topologyDb.transaction("rw", topologyDb.topologies, topologyDb.meta, async () => {
+        await topologyDb.topologies.add(topology);
+        await topologyDb.meta.bulkPut([
+          { key: "activeCustomerId", value: topology.customerId },
+          { key: "activeTopologyId", value: topology.id },
+        ]);
+      });
+      set((state) => ({
+        topologies: sortByUpdatedAt([topology, ...state.topologies]),
+        activeTopologyId: topology.id,
+        project: cloneProject(topology.project),
+      }));
+      return;
+    }
+
+    if (!current.activeTopologyId) throw new Error("沒有可更新的目前拓樸。");
+    set({ saving: true });
+    try {
+      if (USE_SERVER_STORAGE) {
+        const dataset = await serverAction({
+          action: "saveProject",
+          topologyId: current.activeTopologyId,
+          project: stripProjectCredentials(importedProject),
+        });
+        set(buildActiveState(dataset, current.activeTopologyId, current.activeCustomerId));
+        return;
+      }
+
+      const timestamp = nowIso();
+      await topologyDb.topologies.update(current.activeTopologyId, {
+        project: importedProject,
+        updatedAt: timestamp,
+      });
+      set((state) => ({
+        project: cloneProject(importedProject),
+        topologies: sortByUpdatedAt(state.topologies.map((topology) =>
+          topology.id === current.activeTopologyId
+            ? { ...topology, project: cloneProject(importedProject), updatedAt: timestamp }
+            : topology,
+        )),
+      }));
+    } finally {
+      set({ saving: false });
+    }
   },
 
   renameCustomer: async (customerId, name) => {

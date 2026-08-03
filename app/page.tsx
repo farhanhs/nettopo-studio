@@ -18,8 +18,35 @@ import {
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
 import { Group as PanelGroup, Panel, Separator as PanelResizeHandle } from "react-resizable-panels";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { type FormEvent, type ReactNode, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { LOGIN_PROFILE, validateLogin } from "./lib/login-auth";
+import {
+  LAYOUT_DESCRIPTIONS,
+  orderLayersByConnectivity,
+  resolveLayoutMode,
+} from "./lib/topology-layout";
+import {
+  linkVisualClass,
+  routePath,
+  routeTopologyLink,
+  TOPOLOGY_NODE_HEIGHT as NODE_HEIGHT,
+  TOPOLOGY_NODE_WIDTH as NODE_WIDTH,
+} from "./lib/topology-routing";
 import { useTopologyStore } from "./lib/topology-store";
+import {
+  buildImportPlan,
+  materializeImport,
+  projectExportToJson,
+  projectToCsvFiles,
+  type ImportPlan,
+  type ImportStrategy,
+} from "./lib/topology-transfer";
+import {
+  buildCanvasProject,
+  deviceQuantity,
+  type CanvasDevice,
+  type CanvasLink,
+} from "./lib/topology-visibility";
 import type { Device, DeviceType, Group, Link, Project, SiteRecord, TopologyRecord, UserRecord } from "./lib/topology-types";
 type Selection = { kind: "device"; id: string } | { kind: "link"; id: string };
 type LayoutMode = "auto-detect" | "three-tier" | "spine-leaf" | "layered";
@@ -39,10 +66,16 @@ const TYPES: { value: DeviceType; label: string; glyph: string }[] = [
   { value: "erp", label: "ERP", glyph: "E" },
   { value: "access-point", label: "無線 AP", glyph: "AP" },
   { value: "client", label: "終端設備", glyph: "C" },
+  { value: "ssid", label: "SSID", glyph: "Wi" },
+  { value: "mesh-node", label: "Mesh 節點", glyph: "MN" },
+  { value: "printer", label: "印表機", glyph: "P" },
+  { value: "camera", label: "監視器", glyph: "CAM" },
+  { value: "pos", label: "POS", glyph: "POS" },
+  { value: "iot", label: "IoT 設備", glyph: "IoT" },
 ];
 
 const TYPE_MAP = Object.fromEntries(TYPES.map((item) => [item.value, item])) as Record<DeviceType, (typeof TYPES)[number]>;
-const DEVICE_ORDER: DeviceType[] = ["modem", "router", "firewall", "switch", "access-point", "server", "nas", "erp", "client"];
+const DEVICE_ORDER: DeviceType[] = ["modem", "router", "firewall", "switch", "access-point", "mesh-node", "ssid", "server", "nas", "erp", "pos", "printer", "camera", "iot", "client"];
 const LAYOUT_LABELS: Record<LayoutMode, string> = {
   "auto-detect": "自動偵測",
   "three-tier": "三層式",
@@ -56,6 +89,7 @@ const ROLE_LABELS: Record<UserRecord["role"], string> = {
   sales_procurement: "採購與業務",
 };
 const DEV_IDENTITIES = [
+  { email: "sean.sie@dus.local", label: "sean.sie / 謝慶宣" },
   { email: "manner@company.local", label: "manner / 老闆" },
   { email: "north1.manager@company.local", label: "北一站站長" },
   { email: "north2.manager@company.local", label: "北二站站長" },
@@ -63,14 +97,7 @@ const DEV_IDENTITIES = [
   { email: "sales@company.local", label: "採購與業務" },
 ];
 const PANEL_LAYOUT_KEY = "nettopo-panel-layout-v1";
-const NODE_WIDTH = 178;
-const NODE_HEIGHT = 112;
-const EDGE_MARGIN = 18;
-const EDGE_LANE_GAP = 52;
-
-type Point = { x: number; y: number };
-type Rect = { left: number; right: number; top: number; bottom: number };
-type OrthogonalRoute = { points: Point[]; labelPoint: Point };
+const MAX_DEVICE_QUANTITY = 10_000;
 
 const DEFAULT_PANEL_LAYOUT = { sidebar: 24, canvas: 52, inspector: 24 };
 const PANEL_LIMITS = {
@@ -80,6 +107,7 @@ const PANEL_LIMITS = {
 };
 
 const elk = new ELK();
+const LOGIN_SESSION_KEY = "nettopo-login-session";
 
 function uid(prefix: string) {
   return `${prefix}-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 7)}`;
@@ -87,6 +115,15 @@ function uid(prefix: string) {
 
 function clean(value: FormDataEntryValue | null) {
   return String(value ?? "").trim();
+}
+
+function downloadText(filename: string, content: string, type: string) {
+  const url = URL.createObjectURL(new Blob([content], { type }));
+  const anchor = document.createElement("a");
+  anchor.href = url;
+  anchor.download = filename;
+  anchor.click();
+  URL.revokeObjectURL(url);
 }
 
 function normalizePort(value?: string) {
@@ -159,7 +196,34 @@ function isSafePanelLayout(layout: Record<string, number>) {
   return safePanelLayout(JSON.stringify(layout)) !== DEFAULT_PANEL_LAYOUT;
 }
 
-function deviceToNode(device: Device, selected: boolean): Node {
+function deviceToNode(device: CanvasDevice, selected: boolean): Node {
+  if (device.collapsedGroup) {
+    return {
+      id: device.id,
+      type: "default",
+      position: { x: device.x, y: device.y },
+      sourcePosition: Position.Right,
+      targetPosition: Position.Left,
+      width: NODE_WIDTH,
+      height: NODE_HEIGHT,
+      selected: false,
+      draggable: false,
+      data: {
+        label: (
+          <div className="flow-device flow-group-summary">
+            <span className="flow-group-mark" style={{ background: device.collapsedGroup.color }} />
+            <strong>{device.collapsedGroup.name}</strong>
+            <small>{device.memberCount} 個節點 · {device.totalQuantity} 台設備</small>
+            <span className="flow-group-action">點擊展開</span>
+          </div>
+        ),
+      },
+      className: "flow-node flow-group-node",
+      style: { borderColor: device.collapsedGroup.color },
+    };
+  }
+
+  const quantity = deviceQuantity(device);
   return {
     id: device.id,
     type: "default",
@@ -175,6 +239,7 @@ function deviceToNode(device: Device, selected: boolean): Node {
           <span className={`flow-glyph type-${device.type}`}>{TYPE_MAP[device.type].glyph}</span>
           <strong>{device.name}</strong>
           <small>{device.ip || TYPE_MAP[device.type].label}</small>
+          {quantity > 1 && <span className="flow-quantity">x{quantity}</span>}
         </div>
       ),
     },
@@ -182,10 +247,10 @@ function deviceToNode(device: Device, selected: boolean): Node {
   };
 }
 
-function linkToEdge(link: Link, selected: boolean, project: Project): Edge {
+function linkToEdge(link: CanvasLink, selected: boolean, project: Project): Edge {
   const fromDevice = project.devices.find((device) => device.id === link.from);
   const toDevice = project.devices.find((device) => device.id === link.to);
-  const labelParts = [link.speed, link.vlan && `VLAN ${link.vlan}`].filter(Boolean);
+  const labelParts = [link.aggregateCount && link.aggregateCount > 1 ? `${link.aggregateCount} 條連線` : undefined, link.speed, link.vlan && `VLAN ${link.vlan}`].filter(Boolean);
 
   return {
     id: link.id,
@@ -201,139 +266,8 @@ function linkToEdge(link: Link, selected: boolean, project: Project): Edge {
       fromName: fromDevice?.name,
       toName: toDevice?.name,
     },
-    className: link.kind === "wireless" ? "flow-edge-wireless" : "flow-edge-wired",
+    className: `${link.kind === "wireless" ? "flow-edge-wireless" : "flow-edge-wired"} ${linkVisualClass(link)}`,
   };
-}
-
-function deviceRect(device: Device, margin = EDGE_MARGIN): Rect {
-  return {
-    left: device.x - margin,
-    right: device.x + NODE_WIDTH + margin,
-    top: device.y - margin,
-    bottom: device.y + NODE_HEIGHT + margin,
-  };
-}
-
-function horizontalSegmentIntersectsRect(a: Point, b: Point, rect: Rect) {
-  if (Math.abs(a.y - b.y) > 0.1) return false;
-  const minX = Math.min(a.x, b.x);
-  const maxX = Math.max(a.x, b.x);
-  return a.y >= rect.top && a.y <= rect.bottom && maxX >= rect.left && minX <= rect.right;
-}
-
-function verticalSegmentIntersectsRect(a: Point, b: Point, rect: Rect) {
-  if (Math.abs(a.x - b.x) > 0.1) return false;
-  const minY = Math.min(a.y, b.y);
-  const maxY = Math.max(a.y, b.y);
-  return a.x >= rect.left && a.x <= rect.right && maxY >= rect.top && minY <= rect.bottom;
-}
-
-function routeIntersections(points: Point[], obstacles: Rect[]) {
-  let intersections = 0;
-  for (let index = 0; index < points.length - 1; index += 1) {
-    const a = points[index];
-    const b = points[index + 1];
-    for (const rect of obstacles) {
-      if (horizontalSegmentIntersectsRect(a, b, rect) || verticalSegmentIntersectsRect(a, b, rect)) intersections += 1;
-    }
-  }
-  return intersections;
-}
-
-function routePath(points: Point[]) {
-  return points.map((point, index) => `${index === 0 ? "M" : "L"} ${point.x} ${point.y}`).join(" ");
-}
-
-function longestSegmentLabelPoint(points: Point[]): Point {
-  let best = { length: -1, point: points[0] ?? { x: 0, y: 0 } };
-  for (let index = 0; index < points.length - 1; index += 1) {
-    const a = points[index];
-    const b = points[index + 1];
-    const length = Math.abs(a.x - b.x) + Math.abs(a.y - b.y);
-    if (length > best.length) {
-      const horizontal = Math.abs(a.y - b.y) <= Math.abs(a.x - b.x);
-      best = {
-        length,
-        point: {
-          x: (a.x + b.x) / 2,
-          y: (a.y + b.y) / 2 + (horizontal ? -14 : 0),
-        },
-      };
-    }
-  }
-  return best.point;
-}
-
-function compactRoute(points: Point[]) {
-  return points.filter((point, index) => {
-    const previous = points[index - 1];
-    const next = points[index + 1];
-    if (!previous) return true;
-    if (previous.x === point.x && previous.y === point.y) return false;
-    if (!next) return true;
-    const sameVertical = previous.x === point.x && point.x === next.x;
-    const sameHorizontal = previous.y === point.y && point.y === next.y;
-    return !sameVertical && !sameHorizontal;
-  });
-}
-
-function orthogonalRoute(link: Link, project: Project): OrthogonalRoute | null {
-  const from = project.devices.find((device) => device.id === link.from);
-  const to = project.devices.find((device) => device.id === link.to);
-  if (!from || !to) return null;
-
-  const fromCenter = { x: from.x + NODE_WIDTH / 2, y: from.y + NODE_HEIGHT / 2 };
-  const toCenter = { x: to.x + NODE_WIDTH / 2, y: to.y + NODE_HEIGHT / 2 };
-  const horizontalFirst = Math.abs(toCenter.x - fromCenter.x) >= Math.abs(toCenter.y - fromCenter.y);
-  const fromRight = toCenter.x >= fromCenter.x;
-  const fromBelow = toCenter.y >= fromCenter.y;
-  const start = horizontalFirst
-    ? { x: fromRight ? from.x + NODE_WIDTH : from.x, y: fromCenter.y }
-    : { x: fromCenter.x, y: fromBelow ? from.y + NODE_HEIGHT : from.y };
-  const end = horizontalFirst
-    ? { x: fromRight ? to.x : to.x + NODE_WIDTH, y: toCenter.y }
-    : { x: toCenter.x, y: fromBelow ? to.y : to.y + NODE_HEIGHT };
-  const obstacles = project.devices
-    .filter((device) => device.id !== from.id && device.id !== to.id)
-    .map((device) => deviceRect(device));
-  const allRects = project.devices.map((device) => deviceRect(device));
-  const minX = Math.min(...allRects.map((rect) => rect.left));
-  const maxX = Math.max(...allRects.map((rect) => rect.right));
-  const minY = Math.min(...allRects.map((rect) => rect.top));
-  const maxY = Math.max(...allRects.map((rect) => rect.bottom));
-  const routes: Point[][] = [];
-
-  if (horizontalFirst) {
-    const midX = (start.x + end.x) / 2;
-    const startLaneX = start.x + (fromRight ? EDGE_LANE_GAP : -EDGE_LANE_GAP);
-    const endLaneX = end.x + (fromRight ? -EDGE_LANE_GAP : EDGE_LANE_GAP);
-    const upperLaneY = minY - EDGE_LANE_GAP;
-    const lowerLaneY = maxY + EDGE_LANE_GAP;
-    routes.push(
-      [start, { x: midX, y: start.y }, { x: midX, y: end.y }, end],
-      [start, { x: startLaneX, y: start.y }, { x: startLaneX, y: upperLaneY }, { x: endLaneX, y: upperLaneY }, { x: endLaneX, y: end.y }, end],
-      [start, { x: startLaneX, y: start.y }, { x: startLaneX, y: lowerLaneY }, { x: endLaneX, y: lowerLaneY }, { x: endLaneX, y: end.y }, end],
-    );
-  } else {
-    const midY = (start.y + end.y) / 2;
-    const startLaneY = start.y + (fromBelow ? EDGE_LANE_GAP : -EDGE_LANE_GAP);
-    const endLaneY = end.y + (fromBelow ? -EDGE_LANE_GAP : EDGE_LANE_GAP);
-    const leftLaneX = minX - EDGE_LANE_GAP;
-    const rightLaneX = maxX + EDGE_LANE_GAP;
-    routes.push(
-      [start, { x: start.x, y: midY }, { x: end.x, y: midY }, end],
-      [start, { x: start.x, y: startLaneY }, { x: leftLaneX, y: startLaneY }, { x: leftLaneX, y: endLaneY }, { x: end.x, y: endLaneY }, end],
-      [start, { x: start.x, y: startLaneY }, { x: rightLaneX, y: startLaneY }, { x: rightLaneX, y: endLaneY }, { x: end.x, y: endLaneY }, end],
-    );
-  }
-
-  const points = compactRoute(
-    routes
-      .map((route) => ({ route, intersections: routeIntersections(route, obstacles) }))
-      .sort((a, b) => a.intersections - b.intersections || a.route.length - b.route.length)[0].route,
-  );
-
-  return { points, labelPoint: longestSegmentLabelPoint(points) };
 }
 
 function deviceName(device: Device) {
@@ -367,7 +301,7 @@ function buildDeviceGraph(project: Project): DeviceGraph {
 }
 
 function isEndpointDevice(device: Device) {
-  return ["server", "nas", "erp", "client", "access-point"].includes(device.type);
+  return ["server", "nas", "erp", "client", "access-point", "mesh-node", "ssid", "printer", "camera", "pos", "iot"].includes(device.type);
 }
 
 function canWriteTopology(user: UserRecord | undefined, topology: TopologyRecord | undefined) {
@@ -402,7 +336,7 @@ function applyColumnLayout(project: Project, layers: Device[][]) {
   const devices = project.devices.map((device) => ({ ...device }));
   const byId = new Map(devices.map((device) => [device.id, device]));
 
-  layers.forEach((layer, layerIndex) => {
+  orderLayersByConnectivity(layers, project).forEach((layer, layerIndex) => {
     const layerHeight = Math.max(0, (layer.length - 1) * rowGap);
     layer.forEach((device, rowIndex) => {
       const target = byId.get(device.id);
@@ -423,7 +357,7 @@ function applyRowLayout(project: Project, rows: Device[][]) {
   const devices = project.devices.map((device) => ({ ...device }));
   const byId = new Map(devices.map((device) => [device.id, device]));
 
-  rows.forEach((row, rowIndex) => {
+  orderLayersByConnectivity(rows, project).forEach((row, rowIndex) => {
     const rowWidth = Math.max(0, (row.length - 1) * columnGap);
     row.forEach((device, columnIndex) => {
       const target = byId.get(device.id);
@@ -458,24 +392,15 @@ function classifyThreeTier(project: Project) {
   const access = sortDevices(
     devices.filter((device) =>
       (device.type === "switch" && !coreIds.has(device.id) && !distributionIds.has(device.id)) ||
-      device.type === "access-point",
+      ["access-point", "mesh-node", "ssid"].includes(device.type),
     ),
     graph,
   );
-  const endpoint = sortDevices(devices.filter((device) => ["server", "nas", "erp", "client"].includes(device.type)), graph);
+  const endpoint = sortDevices(devices.filter((device) => ["server", "nas", "erp", "client", "printer", "camera", "pos", "iot"].includes(device.type)), graph);
   const used = new Set([...source, ...edge, ...core, ...distribution, ...access, ...endpoint].map((device) => device.id));
   const other = sortDevices(devices.filter((device) => !used.has(device.id)), graph);
 
   return [source, edge, core, distribution, access, endpoint, other].filter((layer) => layer.length > 0);
-}
-
-function spineLeafScore(project: Project) {
-  const graph = buildDeviceGraph(project);
-  const switches = project.devices.filter((device) => device.type === "switch");
-  const possibleSpines = switches.filter((device) => (graph.switchDegree.get(device.id) ?? 0) >= 2 && (graph.endpointDegree.get(device.id) ?? 0) === 0);
-  const possibleLeaves = switches.filter((device) => (graph.endpointDegree.get(device.id) ?? 0) > 0);
-  if (switches.length < 3 || possibleSpines.length < 1 || possibleLeaves.length < 2) return 0;
-  return possibleSpines.length * 2 + possibleLeaves.length + switches.length;
 }
 
 function classifySpineLeaf(project: Project) {
@@ -496,21 +421,18 @@ function classifySpineLeaf(project: Project) {
   const leafIds = new Set(leaves.map((device) => device.id));
   const edge = sortDevices(project.devices.filter((device) => device.type === "modem" || device.type === "router" || device.type === "firewall"), graph);
   const endpoints = sortDevices(project.devices.filter((device) => isEndpointDevice(device)), graph);
+  const endpointRows = Array.from({ length: Math.ceil(endpoints.length / 6) }, (_, index) =>
+    endpoints.slice(index * 6, index * 6 + 6),
+  );
   const other = sortDevices(project.devices.filter((device) => !spineIds.has(device.id) && !leafIds.has(device.id) && !edge.includes(device) && !endpoints.includes(device)), graph);
 
-  return [edge, spines, leaves, endpoints, other].filter((row) => row.length > 0);
+  return [edge, spines, leaves, ...endpointRows, other].filter((row) => row.length > 0);
 }
 
 async function layoutByMode(project: Project, mode: LayoutMode) {
-  if (mode === "layered") return layoutWithElk(project);
-  if (mode === "three-tier") return applyColumnLayout(project, classifyThreeTier(project));
-  if (mode === "spine-leaf") return applyRowLayout(project, classifySpineLeaf(project));
-
-  if (spineLeafScore(project) >= 7) return applyRowLayout(project, classifySpineLeaf(project));
-  const hasThreeTierShape = project.devices.some((device) => device.type === "modem") &&
-    project.devices.some((device) => device.type === "firewall" || device.type === "router") &&
-    project.devices.some((device) => device.type === "switch");
-  if (hasThreeTierShape) return applyColumnLayout(project, classifyThreeTier(project));
+  const resolved = resolveLayoutMode(project, mode);
+  if (resolved === "three-tier") return applyColumnLayout(project, classifyThreeTier(project));
+  if (resolved === "spine-leaf") return applyRowLayout(project, classifySpineLeaf(project));
   return layoutWithElk(project);
 }
 
@@ -543,7 +465,138 @@ async function layoutWithElk(project: Project) {
   };
 }
 
+function LoginGate({ children }: { children: ReactNode }) {
+  const [authenticated, setAuthenticated] = useState(false);
+  const [account, setAccount] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    queueMicrotask(() => {
+      setAuthenticated(sessionStorage.getItem(LOGIN_SESSION_KEY) === "authenticated");
+    });
+  }, []);
+
+  function submitLogin(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const form = new FormData(event.currentTarget);
+    const submittedAccount = String(form.get("account") ?? "");
+    const submittedPassword = String(form.get("password") ?? "");
+    if (!validateLogin(submittedAccount, submittedPassword)) {
+      setError("帳號或密碼錯誤，請重新輸入。");
+      setPassword("");
+      return;
+    }
+
+    sessionStorage.setItem(LOGIN_SESSION_KEY, "authenticated");
+    setAuthenticated(true);
+    setPassword("");
+    setError("");
+  }
+
+  function logout() {
+    sessionStorage.removeItem(LOGIN_SESSION_KEY);
+    setAuthenticated(false);
+    setAccount("");
+    setPassword("");
+  }
+
+  if (!authenticated) {
+    return (
+      <main className="login-shell">
+        <section className="login-intro" aria-label="系統介紹">
+          <div className="login-brand-mark" aria-hidden="true">
+            <span />
+            <span />
+            <span />
+            <i />
+            <i />
+          </div>
+          <p className="login-eyebrow">DIGITAL UNITED SERVICE</p>
+          <h1>數位聯合服務網路設備拓樸工具</h1>
+          <p className="login-description">
+            集中管理網路設備、連線關係與站點拓樸，讓維運資訊更清楚、更容易追蹤。
+          </p>
+          <ul className="login-features" aria-label="系統功能">
+            <li><span>01</span>視覺化設備與連線關係</li>
+            <li><span>02</span>集中管理客戶與站點資料</li>
+            <li><span>03</span>快速掌握拓樸異動狀態</li>
+          </ul>
+        </section>
+
+        <section className="login-panel">
+          <form
+            className="login-card"
+            aria-label="登入工作平台"
+            onSubmit={submitLogin}
+          >
+            <header>
+              <p>歡迎使用</p>
+              <h2>登入工作平台</h2>
+              <span>請輸入您的員工帳號與密碼</span>
+            </header>
+
+            <label>
+              帳號
+              <input
+                autoComplete="username"
+                autoFocus
+                name="account"
+                onChange={(event) => setAccount(event.target.value)}
+                placeholder="請輸入帳號"
+                required
+                value={account}
+              />
+            </label>
+
+            <label>
+              密碼
+              <input
+                autoComplete="current-password"
+                name="password"
+                onChange={(event) => setPassword(event.target.value)}
+                placeholder="請輸入密碼"
+                required
+                type="password"
+                value={password}
+              />
+            </label>
+
+            {error && <p className="login-error" role="alert">{error}</p>}
+
+            <button className="login-submit" type="submit">登入系統</button>
+            <small className="login-security-note">帳密僅用於本次系統登入，不會出現在網址列。</small>
+          </form>
+        </section>
+      </main>
+    );
+  }
+
+  return (
+    <>
+      {children}
+      <aside className="session-profile" aria-label="登入者資料">
+        <span className="session-avatar" aria-hidden="true">{LOGIN_PROFILE.name.slice(0, 1)}</span>
+        <span>
+          <small>登入者</small>
+          <strong>{LOGIN_PROFILE.name}</strong>
+          <em>員工編號 {LOGIN_PROFILE.employeeId}</em>
+        </span>
+        <button onClick={logout} type="button">登出</button>
+      </aside>
+    </>
+  );
+}
+
 export default function Home() {
+  return (
+    <LoginGate>
+      <TopologyApp />
+    </LoginGate>
+  );
+}
+
+function TopologyApp() {
   const {
     customers,
     topologies,
@@ -559,10 +612,12 @@ export default function Home() {
     initialize,
     setDevUserEmail,
     setProject,
+    saveDeviceCredential,
     selectCustomer,
     selectTopology,
     createCustomer,
     createTopology,
+    importProject,
     renameCustomer,
     renameTopology,
     duplicateCustomer,
@@ -579,9 +634,15 @@ export default function Home() {
   const [showGroupForm, setShowGroupForm] = useState(false);
   const [showCustomerForm, setShowCustomerForm] = useState(false);
   const [showTopologyForm, setShowTopologyForm] = useState(false);
+  const [showTransfer, setShowTransfer] = useState<"import" | "export">();
+  const [importPlan, setImportPlan] = useState<ImportPlan>();
+  const [importStrategy, setImportStrategy] = useState<ImportStrategy>("new");
+  const [importName, setImportName] = useState("匯入拓樸");
+  const [importBusy, setImportBusy] = useState(false);
   const [customerAction, setCustomerAction] = useState<"rename" | "duplicate" | "delete">();
   const [topologyAction, setTopologyAction] = useState<"rename" | "duplicate" | "delete">();
   const [layoutMode, setLayoutMode] = useState<LayoutMode>("auto-detect");
+  const [groupCollapseOverrides, setGroupCollapseOverrides] = useState<Record<string, Record<string, boolean>>>({});
   const [notice, setNotice] = useState("資料儲存在這台裝置的 IndexedDB");
   const loadedRef = useRef(false);
 
@@ -618,15 +679,36 @@ export default function Home() {
 
   const selectedDevice = selection?.kind === "device" ? project.devices.find((device) => device.id === selection.id) : undefined;
   const selectedLink = selection?.kind === "link" ? project.links.find((link) => link.id === selection.id) : undefined;
+  const topologyCollapseOverrides = useMemo(
+    () => groupCollapseOverrides[activeTopologyId ?? ""] ?? {},
+    [activeTopologyId, groupCollapseOverrides],
+  );
+  const effectiveProject = useMemo<Project>(() => ({
+    ...project,
+    groups: project.groups.map((group) => topologyCollapseOverrides[group.id] === undefined
+      ? group
+      : { ...group, collapsed: topologyCollapseOverrides[group.id] }),
+  }), [project, topologyCollapseOverrides]);
+  const canvasProject = useMemo(() => buildCanvasProject(effectiveProject), [effectiveProject]);
+  const totalDeviceQuantity = useMemo(
+    () => project.devices.reduce((sum, device) => sum + deviceQuantity(device), 0),
+    [project.devices],
+  );
 
   const nodes = useMemo(
-    () => project.devices.map((device) => deviceToNode(device, selection?.kind === "device" && selection.id === device.id)),
-    [project.devices, selection],
+    () => canvasProject.devices.map((device) => deviceToNode(device, selection?.kind === "device" && selection.id === device.id)),
+    [canvasProject.devices, selection],
   );
 
   const edges = useMemo(
-    () => project.links.map((link) => linkToEdge(link, selection?.kind === "link" && selection.id === link.id, project)),
-    [project, selection],
+    () => canvasProject.links.map((link) => linkToEdge(link, selection?.kind === "link" && selection.id === link.id, canvasProject)),
+    [canvasProject, selection],
+  );
+  const renderedCanvasLinks = useMemo(
+    () => [...canvasProject.links].sort((left, right) =>
+      Number(selection?.kind === "link" && selection.id === left.id)
+      - Number(selection?.kind === "link" && selection.id === right.id)),
+    [canvasProject.links, selection],
   );
 
   const onNodesChange = useCallback((changes: NodeChange[]) => {
@@ -646,33 +728,42 @@ export default function Home() {
     applyEdgeChanges(changes, edges);
   }, [edges]);
 
-  function addDevice(data: FormData) {
+  async function addDevice(data: FormData) {
     if (!canWriteActiveTopology) {
       setNotice("目前身分沒有編輯此拓樸的權限");
       return;
     }
-    const count = Math.max(1, Math.min(20, Number(data.get("count")) || 1));
-    const baseName = clean(data.get("name")) || "新設備";
+    const quantity = Math.max(1, Math.min(MAX_DEVICE_QUANTITY, Math.trunc(Number(data.get("quantity")) || 1)));
+    const name = clean(data.get("name")) || "新設備";
     const type = (clean(data.get("type")) || "client") as DeviceType;
-    const additions = Array.from({ length: count }, (_, index): Device => ({
+    const username = clean(data.get("username"));
+    const password = clean(data.get("password"));
+    const addition: Device = {
       id: uid("dev"),
-      name: count > 1 ? `${baseName} ${index + 1}` : baseName,
+      name,
       type,
       ip: clean(data.get("ip")),
       mac: clean(data.get("mac")),
       model: clean(data.get("model")),
       location: clean(data.get("location")),
       url: clean(data.get("url")),
-      username: clean(data.get("username")),
-      password: clean(data.get("password")),
+      username,
+      password,
+      quantity,
       groupId: clean(data.get("groupId")) || undefined,
-      x: 80 + ((project.devices.length + index) % 4) * 240,
-      y: 100 + Math.floor((project.devices.length + index) / 4) * 170,
-    }));
-    setProject((current) => ({ ...current, devices: [...current.devices, ...additions] }));
-    setSelection({ kind: "device", id: additions[0].id });
+      x: 80 + (project.devices.length % 4) * 240,
+      y: 100 + Math.floor(project.devices.length / 4) * 170,
+    };
+    setProject((current) => ({ ...current, devices: [...current.devices, addition] }));
+    setSelection({ kind: "device", id: addition.id });
     setShowDeviceForm(false);
-    setNotice(`已新增 ${count} 台設備`);
+    try {
+      await saveDeviceCredential(addition.id, username, password);
+    } catch (error) {
+      setNotice(error instanceof Error ? error.message : "Credential save failed.");
+      return;
+    }
+    setNotice(`已新增數量型節點：${name} x${quantity}`);
   }
 
   function addLink(data: FormData) {
@@ -711,6 +802,7 @@ export default function Home() {
       name: clean(data.get("name")) || "新容器",
       kind: (clean(data.get("kind")) || "site") as Group["kind"],
       color: clean(data.get("color")) || "#526cf5",
+      collapsed: false,
     };
     setProject((current) => ({ ...current, groups: [...current.groups, group] }));
     setShowGroupForm(false);
@@ -723,9 +815,10 @@ export default function Home() {
       return;
     }
     setNotice("正在整理拓樸...");
-    const modeLabel = LAYOUT_LABELS[layoutMode];
+    const resolvedMode = resolveLayoutMode(project, layoutMode);
+    const modeLabel = LAYOUT_LABELS[resolvedMode];
     setProject(await layoutByMode(project, layoutMode));
-    setNotice(`已套用 ${modeLabel} 排版`);
+    setNotice(`${modeLabel} 整理完成。${LAYOUT_DESCRIPTIONS[resolvedMode]} 已分散共用端點與平行連線位置。`);
   }
 
   async function addCustomer(data: FormData) {
@@ -747,6 +840,65 @@ export default function Home() {
     setSelection(undefined);
     setShowTopologyForm(false);
     setNotice(`已建立拓樸：${name}`);
+  }
+
+  async function prepareImport(files: FileList | null) {
+    if (!files?.length) return;
+    setImportBusy(true);
+    try {
+      const sources = await Promise.all([...files].map(async (file) => ({
+        name: file.name,
+        text: await file.text(),
+      })));
+      const plan = buildImportPlan(sources);
+      setImportPlan(plan);
+      setImportName(plan.suggestedName);
+    } finally {
+      setImportBusy(false);
+    }
+  }
+
+  async function confirmImport() {
+    if (!importPlan?.canApply) return;
+    if (importStrategy === "new" && !canCreateRecords) {
+      setNotice("目前角色沒有建立新拓樸的權限。");
+      return;
+    }
+    if (importStrategy !== "new" && !canWriteActiveTopology) {
+      setNotice("目前角色沒有修改此拓樸的權限。");
+      return;
+    }
+
+    setImportBusy(true);
+    try {
+      const imported = materializeImport(project, importPlan, importStrategy);
+      await importProject(imported, importStrategy, importName, activeTopology?.siteId);
+      setSelection(undefined);
+      setShowTransfer(undefined);
+      setImportPlan(undefined);
+      setImportStrategy("new");
+      setNotice(`匯入完成：${importPlan.summary.devices} 個設備、${importPlan.summary.links} 條連線、${importPlan.summary.groups} 個群組。`);
+    } catch (error) {
+      setNotice(error instanceof Error ? error.message : "匯入失敗。");
+    } finally {
+      setImportBusy(false);
+    }
+  }
+
+  function exportJson(safe: boolean) {
+    const name = (activeTopology?.name || "topology").replace(/[\\/:*?"<>|]+/g, "-");
+    downloadText(
+      `${name}${safe ? "-safe" : ""}.json`,
+      projectExportToJson(project, { safe, topologyName: activeTopology?.name }),
+      "application/json;charset=utf-8",
+    );
+  }
+
+  function exportCsv(safe: boolean) {
+    const files = projectToCsvFiles(project, { safe });
+    for (const [filename, content] of Object.entries(files)) {
+      downloadText(filename, content, "text/csv;charset=utf-8");
+    }
   }
 
   async function renameActiveCustomer(data: FormData) {
@@ -807,12 +959,14 @@ export default function Home() {
     setNotice(`已刪除拓樸：${name}`);
   }
 
-  function updateDevice(id: string, data: FormData) {
+  async function updateDevice(id: string, data: FormData) {
     if (!canWriteActiveTopology) {
       setNotice("目前身分沒有編輯此拓樸的權限");
       return;
     }
     const nextType = (clean(data.get("type")) || "client") as DeviceType;
+    const username = clean(data.get("username"));
+    const password = clean(data.get("password"));
     setProject((current) => ({
       ...current,
       devices: current.devices.map((device) => device.id === id ? {
@@ -824,12 +978,38 @@ export default function Home() {
         model: clean(data.get("model")),
         location: clean(data.get("location")),
         url: clean(data.get("url")),
-        username: clean(data.get("username")),
-        password: clean(data.get("password")),
+        quantity: Math.max(1, Math.min(MAX_DEVICE_QUANTITY, Math.trunc(Number(data.get("quantity")) || 1))),
+        username,
+        password,
         groupId: clean(data.get("groupId")) || undefined,
       } : device),
     }));
+    try {
+      await saveDeviceCredential(id, username, password);
+    } catch (error) {
+      setNotice(error instanceof Error ? error.message : "Credential save failed.");
+      return;
+    }
     setNotice("設備資料已更新");
+  }
+
+  function toggleGroupCollapsed(groupId: string) {
+    const group = effectiveProject.groups.find((candidate) => candidate.id === groupId);
+    if (!group) return;
+    const collapsed = !group.collapsed;
+    const topologyId = activeTopologyId ?? "";
+    setGroupCollapseOverrides((current) => ({
+      ...current,
+      [topologyId]: { ...(current[topologyId] ?? {}), [groupId]: collapsed },
+    }));
+    if (canWriteActiveTopology) {
+      setProject((current) => ({
+        ...current,
+        groups: current.groups.map((candidate) => candidate.id === groupId ? { ...candidate, collapsed } : candidate),
+      }));
+    }
+    if (collapsed && selectedDevice?.groupId === groupId) setSelection(undefined);
+    setNotice(`${group.name} 已${collapsed ? "折疊" : "展開"}${canWriteActiveTopology ? "並儲存狀態" : "（僅套用於目前檢視）"}`);
   }
 
   function updateLink(id: string, data: FormData) {
@@ -962,6 +1142,8 @@ export default function Home() {
               <option value="layered">一般分層</option>
             </select>
           </label>
+          <button className="mini-action" onClick={() => setShowTransfer("import")}>匯入</button>
+          <button className="mini-action" onClick={() => setShowTransfer("export")}>匯出</button>
           <button className="secondary" onClick={autoLayout} disabled={!canWriteActiveTopology}>自動整理</button>
           <button className="primary" onClick={() => window.print()}>匯出 PDF</button>
         </div>
@@ -991,12 +1173,12 @@ export default function Home() {
 
             {tab === "devices" && (
               <>
-                <div className="panel-heading"><div><h2>設備清單</h2><p>{project.devices.length} 台設備</p></div>{canWriteActiveTopology && <button className="icon-button" onClick={() => setShowDeviceForm(true)}>+</button>}</div>
+                <div className="panel-heading"><div><h2>設備清單</h2><p>{project.devices.length} 個節點 · {totalDeviceQuantity} 台設備</p></div>{canWriteActiveTopology && <button className="icon-button" onClick={() => setShowDeviceForm(true)}>+</button>}</div>
                 <div className="device-list">
                   {project.devices.map((device) => (
                     <button key={device.id} className={`device-row ${selection?.kind === "device" && selection.id === device.id ? "selected" : ""}`} onClick={() => setSelection({ kind: "device", id: device.id })}>
                       <span className={`device-icon type-${device.type}`}>{TYPE_MAP[device.type].glyph}</span>
-                      <span><strong>{device.name}</strong><small>{TYPE_MAP[device.type].label} · {device.ip || "未設定 IP"}</small></span>
+                      <span><strong>{device.name}{deviceQuantity(device) > 1 && ` x${deviceQuantity(device)}`}</strong><small>{TYPE_MAP[device.type].label} · {device.ip || "未設定 IP"}</small></span>
                     </button>
                   ))}
                 </div>
@@ -1012,7 +1194,7 @@ export default function Home() {
                     const a = project.devices.find((device) => device.id === link.from);
                     const b = project.devices.find((device) => device.id === link.to);
                     return (
-                      <button className={`link-row ${selection?.kind === "link" && selection.id === link.id ? "selected" : ""}`} key={link.id} onClick={() => setSelection({ kind: "link", id: link.id })}>
+                      <button className={`link-row ${linkVisualClass(link)} ${selection?.kind === "link" && selection.id === link.id ? "selected" : ""}`} key={link.id} onClick={() => setSelection({ kind: "link", id: link.id })}>
                         <span>{link.kind === "wired" ? "--" : "~"}</span>
                         <div><strong>{a?.name} → {b?.name}</strong><small>{link.fromPort || "Port"} / {link.toPort || "Port"} · {link.speed || "未標示速率"} {link.vlan && `· VLAN ${link.vlan}`}</small></div>
                       </button>
@@ -1027,7 +1209,30 @@ export default function Home() {
               <>
                 <div className="panel-heading"><div><h2>架構容器</h2><p>分點、網域、VLAN</p></div>{canWriteActiveTopology && <button className="icon-button" onClick={() => setShowGroupForm(true)}>+</button>}</div>
                 <div className="group-list">
-                  {project.groups.map((group) => <div className="group-row" key={group.id}><span style={{ background: group.color }} /><div><strong>{group.name}</strong><small>{group.kind === "site" ? "分點" : group.kind === "domain" ? "網域" : "VLAN"}</small></div></div>)}
+                  {effectiveProject.groups.map((group) => {
+                    const members = project.devices.filter((device) => device.groupId === group.id);
+                    const quantity = members.reduce((sum, device) => sum + deviceQuantity(device), 0);
+                    return (
+                      <div className="group-row" key={group.id}>
+                        <span style={{ background: group.color }} />
+                        <div>
+                          <strong>{group.name}</strong>
+                          <small>{group.kind === "site" ? "分點" : group.kind === "domain" ? "網域" : "VLAN"} · {members.length} 節點 / {quantity} 台</small>
+                        </div>
+                        <button
+                          type="button"
+                          className="group-toggle"
+                          title={group.collapsed ? "展開群組" : "折疊群組"}
+                          aria-label={group.collapsed ? `展開 ${group.name}` : `折疊 ${group.name}`}
+                          aria-pressed={Boolean(group.collapsed)}
+                          onClick={() => toggleGroupCollapsed(group.id)}
+                          disabled={members.length === 0}
+                        >
+                          {group.collapsed ? "+" : "−"}
+                        </button>
+                      </div>
+                    );
+                  })}
                 </div>
                 {canWriteActiveTopology && <button className="wide-button" onClick={() => setShowGroupForm(true)}>+ 新增容器</button>}
             </>
@@ -1050,7 +1255,11 @@ export default function Home() {
                 edges={[]}
                 onNodesChange={onNodesChange}
                 onEdgesChange={onEdgesChange}
-                onNodeClick={(_, node) => setSelection({ kind: "device", id: node.id })}
+                onNodeClick={(_, node) => {
+                  const collapsedGroup = canvasProject.devices.find((device) => device.id === node.id)?.collapsedGroup;
+                  if (collapsedGroup) toggleGroupCollapsed(collapsedGroup.id);
+                  else setSelection({ kind: "device", id: node.id });
+                }}
                 onEdgeClick={(_, edge) => setSelection({ kind: "link", id: edge.id })}
                 fitView
                 minZoom={0.25}
@@ -1058,16 +1267,17 @@ export default function Home() {
               >
                 <ViewportPortal>
                   <svg className="flow-link-overlay" width="4000" height="2400">
-                    {project.links.map((link) => {
-                      const route = orthogonalRoute(link, project);
+                    {renderedCanvasLinks.map((link) => {
+                      const route = routeTopologyLink(link, canvasProject);
                       if (!route) return null;
-                      const label = [link.speed, link.vlan && `VLAN ${link.vlan}`].filter(Boolean).join(" · ");
+                      const label = [link.aggregateCount && link.aggregateCount > 1 ? `${link.aggregateCount} 條連線` : undefined, link.speed, link.vlan && `VLAN ${link.vlan}`].filter(Boolean).join(" · ");
                       const selected = selection?.kind === "link" && selection.id === link.id;
                       const labelWidth = Math.max(42, label.length * 6.5 + 16);
                       const path = routePath(route.points);
                       return (
-                        <g key={link.id} className={`flow-link ${link.kind === "wireless" ? "wireless" : "wired"} ${selected ? "selected" : ""}`}>
+                        <g key={link.id} data-link-id={link.id} data-route-kind={route.kind} className={`flow-link ${linkVisualClass(link)} ${route.kind} ${selected ? "selected" : ""}`}>
                           <path className="hit-line" d={path} onClick={() => setSelection({ kind: "link", id: link.id })} />
+                          {selected && <path className="selection-line" d={path} />}
                           <path className="visible-line" d={path} onClick={() => setSelection({ kind: "link", id: link.id })} />
                           {label && (
                             <g className="flow-link-label" transform={`translate(${route.labelPoint.x} ${route.labelPoint.y})`}>
@@ -1141,6 +1351,97 @@ export default function Home() {
         </form>
       </Modal>}
 
+      {showTransfer === "import" && <Modal title="匯入拓樸資料" onClose={() => {
+        setShowTransfer(undefined);
+        setImportPlan(undefined);
+        setImportStrategy("new");
+      }}>
+        <div className="transfer-panel">
+          <div className="transfer-drop">
+            <strong>選擇 JSON 或 CSV 檔案</strong>
+            <p>JSON 一次一個；CSV 請使用 devices.csv、links.csv、groups.csv，可同時選取。</p>
+            <input
+              type="file"
+              accept=".json,.csv,application/json,text/csv"
+              multiple
+              onChange={(event) => void prepareImport(event.target.files)}
+            />
+          </div>
+
+          {importBusy && <p className="transfer-loading">正在解析與驗證檔案…</p>}
+
+          {importPlan && <>
+            <div className="import-summary">
+              <span><strong>{importPlan.summary.devices}</strong>設備</span>
+              <span><strong>{importPlan.summary.links}</strong>連線</span>
+              <span><strong>{importPlan.summary.groups}</strong>群組</span>
+              <span className={importPlan.canApply ? "summary-ok" : "summary-error"}>
+                {importPlan.canApply ? "可匯入" : "需修正"}
+              </span>
+            </div>
+
+            <div className="import-issues" aria-live="polite">
+              {importPlan.issues.length === 0
+                ? <p className="issue-ok">資料與跨表關聯驗證通過。</p>
+                : importPlan.issues.map((issue, index) => (
+                  <p className={`issue-${issue.severity}`} key={`${issue.code}-${index}`}>
+                    <strong>{issue.severity === "error" ? "錯誤" : "警告"}</strong>
+                    {issue.message}
+                    {issue.path && <small>{issue.path}</small>}
+                  </p>
+                ))}
+            </div>
+
+            <div className="import-options">
+              <label>
+                套用策略
+                <select value={importStrategy} onChange={(event) => setImportStrategy(event.target.value as ImportStrategy)}>
+                  <option value="new">建立新拓樸（預設）</option>
+                  <option value="merge">合併到目前拓樸</option>
+                  <option value="replace">取代目前拓樸</option>
+                </select>
+              </label>
+              {importStrategy === "new" && <label>
+                新拓樸名稱
+                <input value={importName} onChange={(event) => setImportName(event.target.value)} />
+              </label>}
+            </div>
+
+            {importStrategy === "replace" && <p className="replace-warning">取代會完整覆蓋目前拓樸的設備、連線與群組。</p>}
+
+            <div className="form-actions">
+              <button type="button" className="secondary" onClick={() => setShowTransfer(undefined)}>取消</button>
+              <button type="button" className="primary" disabled={!importPlan.canApply || importBusy} onClick={() => void confirmImport()}>
+                {importBusy ? "匯入中…" : "確認匯入"}
+              </button>
+            </div>
+          </>}
+        </div>
+      </Modal>}
+
+      {showTransfer === "export" && <Modal title="匯出拓樸資料" onClose={() => setShowTransfer(undefined)}>
+        <div className="transfer-panel export-options">
+          <div>
+            <h3>JSON 完整備份</h3>
+            <p>包含 schemaVersion 與所有設備欄位，適合備份及還原。</p>
+            <button className="primary" type="button" onClick={() => exportJson(false)}>下載完整 JSON</button>
+          </div>
+          <div>
+            <h3>JSON 安全分享版</h3>
+            <p>自動移除帳密、管理網址、IP、MAC 與設備位置。</p>
+            <button className="secondary" type="button" onClick={() => exportJson(true)}>下載安全 JSON</button>
+          </div>
+          <div>
+            <h3>CSV 三檔</h3>
+            <p>輸出 devices.csv、links.csv、groups.csv，適合試算表編輯。</p>
+            <div className="export-buttons">
+              <button className="secondary" type="button" onClick={() => exportCsv(false)}>完整 CSV</button>
+              <button className="secondary" type="button" onClick={() => exportCsv(true)}>安全 CSV</button>
+            </div>
+          </div>
+        </div>
+      </Modal>}
+
       {customerAction === "rename" && <Modal title="重新命名客戶" onClose={() => setCustomerAction(undefined)}>
         <form action={renameActiveCustomer} className="form-grid">
           <label className="full">客戶名稱<input name="name" required defaultValue={activeCustomer?.name} /></label>
@@ -1203,7 +1504,7 @@ function DeviceFields({ device, groups }: { device?: Device; groups: Group[] }) 
     <>
       <label>設備名稱<input name="name" required defaultValue={device?.name} placeholder="例如：核心交換器" /></label>
       <label>設備類型<select name="type" defaultValue={device?.type}>{TYPES.map((type) => <option key={type.value} value={type.value}>{type.label}</option>)}</select></label>
-      {!device && <label>數量<input name="count" type="number" min="1" max="20" defaultValue="1" /></label>}
+      <label>代表數量<input name="quantity" type="number" min="1" max={MAX_DEVICE_QUANTITY} defaultValue={device?.quantity ?? 1} /></label>
       <label>所屬容器<select name="groupId" defaultValue={device?.groupId ?? ""}><option value="">未分類</option>{groups.map((group) => <option key={group.id} value={group.id}>{group.name}</option>)}</select></label>
       <label>IP 位址<input name="ip" defaultValue={device?.ip} placeholder="192.168.1.1" /></label>
       <label>MAC 位址<input name="mac" defaultValue={device?.mac} placeholder="00:00:00:00:00:00" /></label>
@@ -1223,7 +1524,7 @@ function LinkFields({ link, devices }: { link?: Link; devices: Device[] }) {
       <label>來源設備<select name="from" required defaultValue={link?.from ?? ""}><option value="">請選擇</option>{devices.map((device) => <option key={device.id} value={device.id}>{device.name}</option>)}</select></label>
       <label>目的設備<select name="to" required defaultValue={link?.to ?? ""}><option value="">請選擇</option>{devices.map((device) => <option key={device.id} value={device.id}>{device.name}</option>)}</select></label>
       <label>連線方式<select name="kind" defaultValue={link?.kind ?? "wired"}><option value="wired">實體有線</option><option value="wireless">無線連線</option></select></label>
-      <label>連線速率<select name="speed" defaultValue={link?.speed ?? ""}><option value="">未標示</option><option>100 Mbps</option><option>1 Gbps</option><option>2.5 Gbps</option><option>10 Gbps</option><option>40 Gbps</option></select></label>
+      <label>連線速率<select name="speed" defaultValue={link?.speed ?? ""}><option value="">未標示</option><option>100 Mbps</option><option>1 Gbps</option><option>2.5 Gbps</option><option>5 Gbps</option><option>10 Gbps</option><option>25 Gbps</option><option>40 Gbps</option><option>100 Gbps</option></select></label>
       <label>來源介面／Port<input name="fromPort" defaultValue={link?.fromPort} placeholder="WAN1 / Port 1" /></label>
       <label>目的介面／Port<input name="toPort" defaultValue={link?.toPort} placeholder="LAN1 / Port 24" /></label>
       <label className="full">VLAN<input name="vlan" defaultValue={link?.vlan} placeholder="例如：10、20 或 Trunk" /></label>
