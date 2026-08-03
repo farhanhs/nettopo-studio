@@ -13,7 +13,7 @@ A browser-based network topology editor for quickly documenting routers, ISP mod
 - Export the topology through the browser's Print to PDF flow
 - Mask credential fields in the interface
 
-> Security note: credential fields are not a password vault. Do not store production passwords until role permissions, audit logs, and encrypted secret handling are added.
+> Security note: PostgreSQL server mode encrypts credential secrets with AES-256-GCM, returns masked values only, and records credential changes in the audit log. Keep the encryption key outside Git and require HTTPS before storing production credentials.
 
 ## Project abilities
 
@@ -46,21 +46,36 @@ The app defaults to browser IndexedDB:
 NEXT_PUBLIC_TOPOLOGY_STORAGE=indexeddb
 ```
 
-For a shared internal deployment, start PostgreSQL and switch the frontend store to the server-backed API:
+This Windows workspace includes a project-local PostgreSQL 17.10 runtime under the ignored `.local` directory. Initialize it, start it, and apply the migrations with:
 
 ```powershell
-docker compose up -d postgres
-copy .env.example .env.local
+npm.cmd run db:local:setup
 ```
 
-Set this in `.env.local`:
+The ignored `.env.local` must contain:
 
 ```env
 NEXT_PUBLIC_TOPOLOGY_STORAGE=server
-DATABASE_URL=postgres://nettopo:nettopo_dev_password@localhost:5432/nettopo_studio
+DATABASE_URL=postgres://nettopo:nettopo_dev_password@127.0.0.1:5432/nettopo_studio
+POSTGRES_POOL_MAX=1
+NETTOPO_CREDENTIAL_ENCRYPTION_KEY=<32-byte base64 key>
 ```
 
-The first request to `/api/topology` creates the required `customers` and `topologies` tables if they do not exist.
+Build and run the Node-targeted local production server:
+
+```powershell
+npm.cmd run build:local
+npm.cmd run start:local
+```
+
+Open `http://127.0.0.1:3000`. Use `npm.cmd run db:local:status` to check PostgreSQL and `npm.cmd run db:local:stop` after the application server has stopped. The schema is managed only through versioned files in `db/migrations`; API requests no longer own ad hoc table creation.
+
+Docker remains an alternative when Docker Desktop is installed:
+
+```powershell
+docker compose up -d postgres
+npm.cmd run db:migrate
+```
 
 ## Internal role model
 

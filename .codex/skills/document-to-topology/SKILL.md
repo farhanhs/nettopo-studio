@@ -11,6 +11,11 @@ Use this skill to turn customer network notes into NetTopo Studio project data w
 
 ## Workflow
 
+0. Treat `app/lib/topology-transfer.ts` as the single authoritative product contract:
+   - produce a `TopologyDraft` using the exported `ProjectSchema` field names and enums
+   - pass the draft through `buildImportPlan` before any product write
+   - surface the returned errors and warnings; never create a parallel schema or validation rule set in this skill
+   - write only through the product's confirmed import flow and Zustand action after the user reviews the plan
 1. Read the source document with the correct encoding. For Traditional Chinese text files, try UTF-8 before Windows default encoding.
 2. Extract facts into five buckets:
    - internet/WAN sources
@@ -23,7 +28,7 @@ Use this skill to turn customer network notes into NetTopo Studio project data w
 5. Write project-local customer artifacts under `private/` unless the user explicitly asks for a commit-safe public example.
 6. Mask credentials. Never copy plaintext passwords into project files that may be committed.
 7. Generate or update:
-   - topology JSON that matches the `Project` schema used by the IndexedDB topology store
+   - topology JSON that matches `ProjectSchema` and the versioned export envelope in `app/lib/topology-transfer.ts`
    - masked credential JSON
    - test report
    - optional screenshot/PDF artifacts
