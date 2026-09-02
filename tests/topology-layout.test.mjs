@@ -3,8 +3,6 @@ import { readFile } from "node:fs/promises";
 import test from "node:test";
 
 import {
-  linkChannelOffset,
-  linkEndpointOffset,
   orderLayersByConnectivity,
   resolveLayoutMode,
 } from "../app/lib/topology-layout.ts";
@@ -91,34 +89,4 @@ test("connectivity ordering puts linked nodes near their upstream neighbor", () 
 
   assert.deepEqual(ordered[0].map(({ id }) => id), ["a", "b"]);
   assert.deepEqual(ordered[1].map(({ id }) => id), ["x", "y"]);
-});
-
-test("shared endpoints and parallel routes receive stable visual offsets", () => {
-  const project = {
-    devices: [
-      device("core", "switch"),
-      device("a", "server"),
-      device("b", "server"),
-      device("c", "server"),
-    ],
-    links: [
-      { id: "link-a", from: "core", to: "a", kind: "wired" },
-      { id: "link-b", from: "core", to: "b", kind: "wired" },
-      { id: "link-c", from: "core", to: "c", kind: "wired" },
-    ],
-    groups: [],
-  };
-
-  const endpointOffsets = project.links.map((link) =>
-    linkEndpointOffset(project, "core", link.id, 112),
-  );
-  const channelOffsets = project.links.map((link) =>
-    linkChannelOffset(project, link.id),
-  );
-
-  assert.equal(new Set(endpointOffsets).size, 3);
-  assert.ok(endpointOffsets[0] < endpointOffsets[1]);
-  assert.ok(endpointOffsets[1] < endpointOffsets[2]);
-  assert.equal(new Set(channelOffsets).size, 3);
-  assert.ok(channelOffsets.every((offset) => Math.abs(offset) <= 42));
 });

@@ -1,17 +1,50 @@
-import { linkEndpointOffset } from "./topology-layout.ts";
 import type { Device, Link, Project } from "./topology-types";
 
 export const TOPOLOGY_NODE_WIDTH = 178;
 export const TOPOLOGY_NODE_HEIGHT = 112;
 
 const OBSTACLE_MARGIN = 14;
-const GRID_CLEARANCE = 6;
+const GRID_CLEARANCE = 8;
+const CORNER_PADDING = 12;
+const LANE_SPACING = 12;
+const MAX_ANCHOR_OFFSET = 42;
+const ANCHOR_COLLISION_TOLERANCE = 2;
+const SHARED_CORRIDOR_OVERLAP = 24;
 const BEND_PENALTY = 34;
-const MAX_GRID_OBSTACLES = 60;
+const MAX_GRID_OBSTACLES = 24;
 
+export type RouteSide = "left" | "right" | "top" | "bottom";
 export type Point = { x: number; y: number };
 export type Rect = { left: number; right: number; top: number; bottom: number };
-export type TopologyRoute = { points: Point[]; labelPoint: Point; kind: "direct" | "orthogonal" };
+export type RouteAnchor = {
+  deviceId: string;
+  side: RouteSide;
+  point: Point;
+  exitPoint: Point;
+  normal: { x: -1 | 0 | 1; y: -1 | 0 | 1 };
+  baseAxisCoord: number;
+};
+export type TopologyRouteStatus = "resolved" | "unresolved-no-path" | "invalid-missing-endpoint";
+export type TopologyRoute = {
+  linkId: string;
+  kind: "orthogonal" | "wireless";
+  status: TopologyRouteStatus;
+  source?: RouteAnchor;
+  target?: RouteAnchor;
+  points: Point[];
+  labelPoint: Point;
+  lane?: {
+    anchorLaneIndex: number;
+    corridorLaneIndex: number;
+    spacing: number;
+    reason?: "anchor-overlap" | "shared-corridor";
+  };
+  diagnostics?: {
+    blockedByDeviceIds?: string[];
+    reason?: string;
+  };
+};
+export type RouteValidationResult = { valid: boolean; blockedByDeviceIds: string[]; reason?: string };
 export type LinkVisualClass =
   | "speed-unknown"
   | "speed-copper-100"
@@ -37,6 +70,10 @@ function pointKey(point: Point) {
   return `${roundCoordinate(point.x)}:${roundCoordinate(point.y)}`;
 }
 
+function samePoint(left: Point, right: Point, tolerance = 0.001) {
+  return Math.abs(left.x - right.x) <= tolerance && Math.abs(left.y - right.y) <= tolerance;
+}
+
 function deviceCenter(device: Device): Point {
   return { x: device.x + TOPOLOGY_NODE_WIDTH / 2, y: device.y + TOPOLOGY_NODE_HEIGHT / 2 };
 }
@@ -50,8 +87,16 @@ export function deviceRoutingRect(device: Device, margin = OBSTACLE_MARGIN): Rec
   };
 }
 
+function deviceBoundaryRect(device: Device): Rect {
+  return { left: device.x, right: device.x + TOPOLOGY_NODE_WIDTH, top: device.y, bottom: device.y + TOPOLOGY_NODE_HEIGHT };
+}
+
+function rectsOverlap(left: Rect, right: Rect) {
+  return left.left <= right.right && left.right >= right.left && left.top <= right.bottom && left.bottom >= right.top;
+}
+
 function pointInsideRect(point: Point, rect: Rect) {
-  return point.x >= rect.left && point.x <= rect.right && point.y >= rect.top && point.y <= rect.bottom;
+  return point.x > rect.left && point.x < rect.right && point.y > rect.top && point.y < rect.bottom;
 }
 
 export function segmentIntersectsRect(a: Point, b: Point, rect: Rect) {
@@ -83,57 +128,51 @@ function segmentIsClear(a: Point, b: Point, obstacles: Rect[]) {
   return obstacles.every((rect) => !segmentIntersectsRect(a, b, rect));
 }
 
-function routeIntersectionCount(points: Point[], obstacles: Rect[]) {
-  let count = 0;
-  for (let index = 0; index < points.length - 1; index += 1) {
-    for (const obstacle of obstacles) {
-      if (segmentIntersectsRect(points[index], points[index + 1], obstacle)) count += 1;
+function segmentIsOrthogonal(a: Point, b: Point) {
+  return roundCoordinate(a.x) === roundCoordinate(b.x) || roundCoordinate(a.y) === roundCoordinate(b.y);
+}
+
+export function selectNearestSide(device: Device, toward: Point): RouteSide {
+  const center = deviceCenter(device);
+  const dx = toward.x - center.x;
+  const dy = toward.y - center.y;
+  if (Math.abs(dx) > Math.abs(dy)) return dx >= 0 ? "right" : "left";
+  if (Math.abs(dy) > Math.abs(dx)) return dy >= 0 ? "bottom" : "top";
+  if (toward.x >= center.x) return "right";
+  if (toward.y >= center.y) return "bottom";
+  return "left";
+}
+
+function normalForSide(side: RouteSide): RouteAnchor["normal"] {
+  if (side === "left") return { x: -1, y: 0 };
+  if (side === "right") return { x: 1, y: 0 };
+  if (side === "top") return { x: 0, y: -1 };
+  return { x: 0, y: 1 };
+}
+
+export function computeRouteAnchor(device: Device, toward: Point, side = selectNearestSide(device, toward)): RouteAnchor {
+  const center = deviceCenter(device);
+  const normal = normalForSide(side);
+  const point = side === "left" || side === "right"
+    ? {
+      x: side === "right" ? device.x + TOPOLOGY_NODE_WIDTH : device.x,
+      y: clamp(toward.y, device.y + CORNER_PADDING, device.y + TOPOLOGY_NODE_HEIGHT - CORNER_PADDING),
     }
-  }
-  return count;
-}
-
-function boundaryAnchor(device: Device, toward: Point, offset: number): Point {
-  const center = deviceCenter(device);
-  const dx = toward.x - center.x;
-  const dy = toward.y - center.y;
-  const halfWidth = TOPOLOGY_NODE_WIDTH / 2;
-  const halfHeight = TOPOLOGY_NODE_HEIGHT / 2;
-  const xScale = Math.abs(dx) < 0.0001 ? Number.POSITIVE_INFINITY : halfWidth / Math.abs(dx);
-  const yScale = Math.abs(dy) < 0.0001 ? Number.POSITIVE_INFINITY : halfHeight / Math.abs(dy);
-  const scale = Math.min(xScale, yScale);
-
-  if (xScale <= yScale) {
-    return {
-      x: center.x + dx * scale,
-      y: clamp(center.y + dy * scale + offset, device.y + 10, device.y + TOPOLOGY_NODE_HEIGHT - 10),
+    : {
+      x: clamp(toward.x, device.x + CORNER_PADDING, device.x + TOPOLOGY_NODE_WIDTH - CORNER_PADDING),
+      y: side === "bottom" ? device.y + TOPOLOGY_NODE_HEIGHT : device.y,
     };
-  }
   return {
-    x: clamp(center.x + dx * scale + offset, device.x + 10, device.x + TOPOLOGY_NODE_WIDTH - 10),
-    y: center.y + dy * scale,
+    deviceId: device.id,
+    side,
+    point,
+    exitPoint: {
+      x: point.x + normal.x * (OBSTACLE_MARGIN + GRID_CLEARANCE),
+      y: point.y + normal.y * (OBSTACLE_MARGIN + GRID_CLEARANCE),
+    },
+    normal,
+    baseAxisCoord: side === "left" || side === "right" ? point.y - center.y : point.x - center.x,
   };
-}
-
-function orthogonalPort(device: Device, toward: Point, offset: number) {
-  const center = deviceCenter(device);
-  const dx = toward.x - center.x;
-  const dy = toward.y - center.y;
-  const horizontal = Math.abs(dx) >= Math.abs(dy);
-  if (horizontal) {
-    const direction = dx >= 0 ? 1 : -1;
-    const anchor = {
-      x: direction > 0 ? device.x + TOPOLOGY_NODE_WIDTH : device.x,
-      y: clamp(center.y + offset, device.y + 10, device.y + TOPOLOGY_NODE_HEIGHT - 10),
-    };
-    return { anchor, exit: { x: anchor.x + direction * (OBSTACLE_MARGIN + GRID_CLEARANCE), y: anchor.y } };
-  }
-  const direction = dy >= 0 ? 1 : -1;
-  const anchor = {
-    x: clamp(center.x + offset, device.x + 10, device.x + TOPOLOGY_NODE_WIDTH - 10),
-    y: direction > 0 ? device.y + TOPOLOGY_NODE_HEIGHT : device.y,
-  };
-  return { anchor, exit: { x: anchor.x, y: anchor.y + direction * (OBSTACLE_MARGIN + GRID_CLEARANCE) } };
 }
 
 function compactRoute(points: Point[]) {
@@ -141,10 +180,11 @@ function compactRoute(points: Point[]) {
     const previous = points[index - 1];
     const next = points[index + 1];
     if (!previous) return true;
-    if (previous.x === point.x && previous.y === point.y) return false;
     if (!next) return true;
-    const sameVertical = previous.x === point.x && point.x === next.x;
-    const sameHorizontal = previous.y === point.y && point.y === next.y;
+    if (index === 1 || index === points.length - 2) return true;
+    if (samePoint(previous, point)) return false;
+    const sameVertical = roundCoordinate(previous.x) === roundCoordinate(point.x) && roundCoordinate(point.x) === roundCoordinate(next.x);
+    const sameHorizontal = roundCoordinate(previous.y) === roundCoordinate(point.y) && roundCoordinate(point.y) === roundCoordinate(next.y);
     return !sameVertical && !sameHorizontal;
   });
 }
@@ -236,7 +276,7 @@ function gridRoute(start: Point, end: Point, obstacles: Rect[]) {
   const startIndex = indexByKey.get(pointKey(start));
   const endIndex = indexByKey.get(pointKey(end));
   if (startIndex === undefined || endIndex === undefined) return undefined;
-  const adjacency = new Map(points.map((_, index) => [index, [] as Array<{ to: number; distance: number; direction: 0 | 1 }> ]));
+  const adjacency = new Map(points.map((_, index) => [index, [] as Array<{ to: number; distance: number; direction: 0 | 1 }>]));
 
   for (const y of ys) {
     const row = points.map((point, index) => ({ point, index })).filter(({ point }) => point.y === y).sort((a, b) => a.point.x - b.point.x);
@@ -287,7 +327,13 @@ function gridRoute(start: Point, end: Point, obstacles: Rect[]) {
   return compactRoute(route.reverse());
 }
 
-function fallbackRoute(start: Point, end: Point, obstacles: Rect[]) {
+function safeOuterRoute(start: Point, end: Point, obstacles: Rect[]) {
+  if (obstacles.length === 0) {
+    const middle = start.x === end.x || start.y === end.y
+      ? [start, end]
+      : [start, { x: end.x, y: start.y }, end];
+    return compactRoute(middle);
+  }
   const minX = Math.min(...obstacles.map((rect) => rect.left), start.x, end.x) - 48;
   const maxX = Math.max(...obstacles.map((rect) => rect.right), start.x, end.x) + 48;
   const minY = Math.min(...obstacles.map((rect) => rect.top), start.y, end.y) - 48;
@@ -297,44 +343,233 @@ function fallbackRoute(start: Point, end: Point, obstacles: Rect[]) {
     [start, { x: start.x, y: maxY }, { x: end.x, y: maxY }, end],
     [start, { x: minX, y: start.y }, { x: minX, y: end.y }, end],
     [start, { x: maxX, y: start.y }, { x: maxX, y: end.y }, end],
-  ];
-  return candidates.sort((left, right) =>
-    routeIntersectionCount(left, obstacles) - routeIntersectionCount(right, obstacles),
-  )[0];
+  ].map(compactRoute);
+  return candidates.find((points) => validateSegmentsOnly(points, obstacles).valid);
+}
+
+function validateSegmentsOnly(points: Point[], obstacles: Rect[]): RouteValidationResult {
+  const blocked = new Set<string>();
+  for (let index = 0; index < points.length - 1; index += 1) {
+    const from = points[index];
+    const to = points[index + 1];
+    if (!segmentIsOrthogonal(from, to)) return { valid: false, blockedByDeviceIds: [], reason: "diagonal-segment" };
+    obstacles.forEach((rect, rectIndex) => {
+      if (segmentIntersectsRect(from, to, rect)) blocked.add(String(rectIndex));
+    });
+  }
+  return { valid: blocked.size === 0, blockedByDeviceIds: [...blocked], reason: blocked.size ? "blocked-by-obstacle" : undefined };
+}
+
+function buildUnresolved(linkId: string, source: RouteAnchor, target: RouteAnchor, reason: string, blockedByDeviceIds?: string[]): TopologyRoute {
+  const points = compactRoute([source.point, source.exitPoint, target.exitPoint, target.point]);
+  return {
+    linkId,
+    kind: "orthogonal",
+    status: "unresolved-no-path",
+    source,
+    target,
+    points,
+    labelPoint: labelPointForRoute(points),
+    diagnostics: { reason, blockedByDeviceIds },
+  };
+}
+
+export function buildBaseOrthogonalRoute(source: RouteAnchor, target: RouteAnchor, obstacles: Rect[], linkId = ""): TopologyRoute {
+  const middle = gridRoute(source.exitPoint, target.exitPoint, obstacles)
+    ?? safeOuterRoute(source.exitPoint, target.exitPoint, obstacles);
+  if (!middle) return buildUnresolved(linkId, source, target, "no zero-collision orthogonal path");
+  const points = compactRoute([source.point, source.exitPoint, ...middle, target.exitPoint, target.point]);
+  const route: TopologyRoute = {
+    linkId,
+    kind: "orthogonal",
+    status: "resolved",
+    source,
+    target,
+    points,
+    labelPoint: labelPointForRoute(points),
+  };
+  const validation = validateSegmentsOnly(points.slice(1, -1), obstacles);
+  if (!validation.valid) {
+    return { ...route, status: "unresolved-no-path", diagnostics: validation };
+  }
+  return route;
+}
+
+function routeWirelessLink(link: Link, from: Device, to: Device): TopologyRoute {
+  const source = computeRouteAnchor(from, deviceCenter(to));
+  const target = computeRouteAnchor(to, deviceCenter(from));
+  const points = [source.point, target.point];
+  return { linkId: link.id, kind: "wireless", status: "resolved", source, target, points, labelPoint: labelPointForRoute(points) };
 }
 
 export function routeTopologyLink(link: Link, project: Project): TopologyRoute | null {
   const from = project.devices.find((device) => device.id === link.from);
   const to = project.devices.find((device) => device.id === link.to);
-  if (!from || !to) return null;
+  if (!from || !to) {
+    return { linkId: link.id, kind: link.kind === "wireless" ? "wireless" : "orthogonal", status: "invalid-missing-endpoint", points: [], labelPoint: { x: 0, y: 0 } };
+  }
+  if (link.kind === "wireless") return routeWirelessLink(link, from, to);
+
   const fromCenter = deviceCenter(from);
   const toCenter = deviceCenter(to);
-  const fromHorizontal = Math.abs(toCenter.x - fromCenter.x) >= Math.abs(toCenter.y - fromCenter.y);
-  const toHorizontal = Math.abs(fromCenter.x - toCenter.x) >= Math.abs(fromCenter.y - toCenter.y);
-  const fromOffset = linkEndpointOffset(project, from.id, link.id, fromHorizontal ? TOPOLOGY_NODE_HEIGHT : TOPOLOGY_NODE_WIDTH);
-  const toOffset = linkEndpointOffset(project, to.id, link.id, toHorizontal ? TOPOLOGY_NODE_HEIGHT : TOPOLOGY_NODE_WIDTH);
-  const directStart = boundaryAnchor(from, toCenter, fromOffset);
-  const directEnd = boundaryAnchor(to, fromCenter, toOffset);
-  const otherObstacles = project.devices
+  const source = computeRouteAnchor(from, toCenter);
+  const target = computeRouteAnchor(to, fromCenter);
+  if (rectsOverlap(deviceRoutingRect(from), deviceRoutingRect(to))) {
+    return buildUnresolved(link.id, source, target, "endpoint routing rectangles overlap", [from.id, to.id]);
+  }
+  const obstacles = project.devices
     .filter((device) => device.id !== from.id && device.id !== to.id)
     .map((device) => deviceRoutingRect(device));
+  const route = buildBaseOrthogonalRoute(source, target, obstacles, link.id);
+  const validation = validateOrthogonalRoute(route, project);
+  return validation.valid ? route : { ...route, status: "unresolved-no-path", diagnostics: validation };
+}
 
-  if (segmentIsClear(directStart, directEnd, otherObstacles)) {
-    const points = [directStart, directEnd];
-    return { points, labelPoint: labelPointForRoute(points), kind: "direct" };
+function laneOrder(index: number) {
+  if (index === 0) return 0;
+  const magnitude = Math.ceil(index / 2);
+  return index % 2 === 1 ? magnitude : -magnitude;
+}
+
+function anchorGroupKey(anchor: RouteAnchor) {
+  const bucket = Math.round(anchor.baseAxisCoord / ANCHOR_COLLISION_TOLERANCE);
+  return `${anchor.deviceId}:${anchor.side}:${bucket}`;
+}
+
+type Segment = { linkId: string; index: number; a: Point; b: Point };
+
+function routeSegments(route: TopologyRoute): Segment[] {
+  const segments: Segment[] = [];
+  for (let index = 0; index < route.points.length - 1; index += 1) {
+    segments.push({ linkId: route.linkId, index, a: route.points[index], b: route.points[index + 1] });
+  }
+  return segments;
+}
+
+function corridorOverlap(left: Segment, right: Segment) {
+  const leftHorizontal = roundCoordinate(left.a.y) === roundCoordinate(left.b.y);
+  const rightHorizontal = roundCoordinate(right.a.y) === roundCoordinate(right.b.y);
+  if (leftHorizontal !== rightHorizontal) return false;
+  if (leftHorizontal) {
+    if (roundCoordinate(left.a.y) !== roundCoordinate(right.a.y)) return false;
+    const overlap = Math.min(Math.max(left.a.x, left.b.x), Math.max(right.a.x, right.b.x)) -
+      Math.max(Math.min(left.a.x, left.b.x), Math.min(right.a.x, right.b.x));
+    return overlap >= SHARED_CORRIDOR_OVERLAP;
+  }
+  if (roundCoordinate(left.a.x) !== roundCoordinate(right.a.x)) return false;
+  const overlap = Math.min(Math.max(left.a.y, left.b.y), Math.max(right.a.y, right.b.y)) -
+    Math.max(Math.min(left.a.y, left.b.y), Math.min(right.a.y, right.b.y));
+  return overlap >= SHARED_CORRIDOR_OVERLAP;
+}
+
+function offsetRoute(route: TopologyRoute, laneIndex: number, reason: "anchor-overlap" | "shared-corridor") {
+  if (!route.source || !route.target || laneIndex === 0) {
+    return {
+      ...route,
+      lane: { anchorLaneIndex: laneIndex, corridorLaneIndex: laneIndex, spacing: LANE_SPACING, reason },
+    };
+  }
+  const offset = clamp(laneIndex * LANE_SPACING, -MAX_ANCHOR_OFFSET, MAX_ANCHOR_OFFSET);
+  const axis = Math.abs(route.points[0].x - route.points.at(-1)!.x) >= Math.abs(route.points[0].y - route.points.at(-1)!.y) ? "y" : "x";
+  const shiftPoint = (point: Point) => axis === "y" ? { x: point.x, y: point.y + offset } : { x: point.x + offset, y: point.y };
+  const points = route.points.map(shiftPoint);
+  const shiftAnchor = (anchor: RouteAnchor): RouteAnchor => ({
+    ...anchor,
+    point: shiftPoint(anchor.point),
+    exitPoint: shiftPoint(anchor.exitPoint),
+    baseAxisCoord: anchor.baseAxisCoord + offset,
+  });
+  return {
+    ...route,
+    source: shiftAnchor(route.source),
+    target: shiftAnchor(route.target),
+    points: compactRoute(points),
+    labelPoint: labelPointForRoute(points),
+    lane: { anchorLaneIndex: laneIndex, corridorLaneIndex: laneIndex, spacing: LANE_SPACING, reason },
+  };
+}
+
+export function assignRouteLanes(routes: Iterable<TopologyRoute>, project: Project): Map<string, TopologyRoute> {
+  const byId = new Map([...routes].map((route) => [route.linkId, route]));
+  const laneCandidates = new Map<string, { reason: "anchor-overlap" | "shared-corridor"; ids: Set<string> }>();
+  const resolvedWired = [...byId.values()].filter((route) => route.kind === "orthogonal" && route.status === "resolved");
+
+  const anchorGroups = new Map<string, string[]>();
+  for (const route of resolvedWired) {
+    for (const anchor of [route.source, route.target]) {
+      if (!anchor) continue;
+      const key = anchorGroupKey(anchor);
+      anchorGroups.set(key, [...(anchorGroups.get(key) ?? []), route.linkId]);
+    }
+  }
+  for (const ids of anchorGroups.values()) {
+    const uniqueIds = [...new Set(ids)].sort();
+    if (uniqueIds.length > 1) {
+      laneCandidates.set(`anchor:${uniqueIds.join(":")}`, { reason: "anchor-overlap", ids: new Set(uniqueIds) });
+    }
   }
 
-  const fromPort = orthogonalPort(from, toCenter, fromOffset);
-  const toPort = orthogonalPort(to, fromCenter, toOffset);
-  const allObstacles = project.devices.map((device) => deviceRoutingRect(device));
-  const middle = gridRoute(fromPort.exit, toPort.exit, allObstacles)
-    ?? fallbackRoute(fromPort.exit, toPort.exit, allObstacles);
-  const points = compactRoute([fromPort.anchor, ...middle, toPort.anchor]);
-  return { points, labelPoint: labelPointForRoute(points), kind: "orthogonal" };
+  for (let leftIndex = 0; leftIndex < resolvedWired.length; leftIndex += 1) {
+    for (let rightIndex = leftIndex + 1; rightIndex < resolvedWired.length; rightIndex += 1) {
+      const shared = routeSegments(resolvedWired[leftIndex]).some((left) =>
+        routeSegments(resolvedWired[rightIndex]).some((right) => corridorOverlap(left, right)),
+      );
+      if (shared) {
+        const ids = [resolvedWired[leftIndex].linkId, resolvedWired[rightIndex].linkId].sort();
+        laneCandidates.set(`corridor:${ids.join(":")}`, { reason: "shared-corridor", ids: new Set(ids) });
+      }
+    }
+  }
+
+  const laneById = new Map<string, { index: number; reason: "anchor-overlap" | "shared-corridor" }>();
+  for (const candidate of laneCandidates.values()) {
+    const ids = [...candidate.ids].sort();
+    ids.forEach((id, index) => {
+      const laneIndex = laneOrder(index);
+      if (laneIndex === 0) return;
+      const current = laneById.get(id);
+      if (!current || Math.abs(laneIndex) > Math.abs(current.index)) {
+        laneById.set(id, { index: laneIndex, reason: candidate.reason });
+      }
+    });
+  }
+
+  for (const [id, lane] of laneById) {
+    const route = byId.get(id);
+    if (!route) continue;
+    const next = offsetRoute(route, lane.index, lane.reason);
+    const validation = validateOrthogonalRoute(next, project);
+    byId.set(id, validation.valid ? next : { ...route, status: "unresolved-no-path", diagnostics: validation });
+  }
+  return byId;
+}
+
+export function routeTopologyLinks(project: Project, links: Link[] = project.links): Map<string, TopologyRoute> {
+  const routes = links
+    .map((link) => routeTopologyLink(link, project))
+    .filter((route): route is TopologyRoute => Boolean(route));
+  return assignRouteLanes(routes, project);
+}
+
+export function validateOrthogonalRoute(route: TopologyRoute, project: Project): RouteValidationResult {
+  if (route.kind === "wireless" || route.status === "invalid-missing-endpoint") return { valid: true, blockedByDeviceIds: [] };
+  const blocked = new Set<string>();
+  for (let index = 0; index < route.points.length - 1; index += 1) {
+    const from = route.points[index];
+    const to = route.points[index + 1];
+    if (!segmentIsOrthogonal(from, to)) return { valid: false, blockedByDeviceIds: [], reason: "diagonal-segment" };
+    for (const device of project.devices) {
+      const endpoint = device.id === route.source?.deviceId || device.id === route.target?.deviceId;
+      const rect = endpoint ? deviceBoundaryRect(device) : deviceRoutingRect(device);
+      if (endpoint && (index === 0 || index === route.points.length - 2)) continue;
+      if (segmentIntersectsRect(from, to, rect)) blocked.add(device.id);
+    }
+  }
+  return { valid: blocked.size === 0, blockedByDeviceIds: [...blocked], reason: blocked.size ? "blocked-by-device" : undefined };
 }
 
 export function routePath(points: Point[]) {
-  return points.map((point, index) => `${index === 0 ? "M" : "L"} ${point.x} ${point.y}`).join(" ");
+  return points.map((point, index) => `${index === 0 ? "M" : "L"} ${roundCoordinate(point.x)} ${roundCoordinate(point.y)}`).join(" ");
 }
 
 export function parseSpeedMbps(speed?: string) {

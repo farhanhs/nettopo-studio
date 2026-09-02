@@ -112,37 +112,6 @@ export function orderLayersByConnectivity(layers: Device[][], project: Project) 
   return ordered;
 }
 
-function alternatingOffset(index: number, step: number, limit: number) {
-  if (index === 0) return 0;
-  const magnitude = Math.ceil(index / 2) * step;
-  return Math.max(-limit, Math.min(limit, index % 2 === 1 ? magnitude : -magnitude));
-}
-
-/**
- * Spreads several links connected to the same device across its node edge.
- * The result is visual-only and never mutates port names or link endpoints.
- */
-export function linkEndpointOffset(project: Project, deviceId: string, linkId: string, span: number) {
-  const incident = project.links
-    .filter((link) => link.from === deviceId || link.to === deviceId)
-    .map((link) => link.id)
-    .sort();
-  if (incident.length <= 1) return 0;
-  const index = incident.indexOf(linkId);
-  if (index < 0) return 0;
-  const usable = span * 0.62;
-  return -usable / 2 + usable * (index / (incident.length - 1));
-}
-
-/**
- * Gives parallel routes distinct channels so their middle and outer segments
- * do not sit exactly on top of one another.
- */
-export function linkChannelOffset(project: Project, linkId: string) {
-  const index = [...project.links].map((link) => link.id).sort().indexOf(linkId);
-  return index < 0 ? 0 : alternatingOffset(index, 12, 42);
-}
-
 export const LAYOUT_DESCRIPTIONS: Record<ResolvedLayoutMode, string> = {
   "three-tier": "依 WAN／邊界／核心／匯聚／存取／端點分欄，適合企業園區與辦公室網路。",
   "spine-leaf": "依邊界／Spine／Leaf／端點分列，強調 Spine 與 Leaf 的東西向互連。",
