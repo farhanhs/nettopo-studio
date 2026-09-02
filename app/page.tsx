@@ -11,6 +11,7 @@ import {
   type Node,
   type NodeChange,
   type EdgeChange,
+  type OnNodeDrag,
   applyNodeChanges,
   applyEdgeChanges,
   Position,
@@ -19,7 +20,8 @@ import {
 import "@xyflow/react/dist/style.css";
 import { Group as PanelGroup, Panel, Separator as PanelResizeHandle } from "react-resizable-panels";
 import { type FormEvent, type ReactNode, useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { LOGIN_PROFILE, validateLogin } from "./lib/login-auth";
+import { FileDropZone } from "./components/import/FileDropZone";
+import { ImportPreviewModal } from "./components/import/ImportPreviewModal";
 import {
   LAYOUT_DESCRIPTIONS,
   orderLayersByConnectivity,
@@ -28,18 +30,21 @@ import {
 import {
   linkVisualClass,
   routePath,
-  routeTopologyLink,
+  routeTopologyLinks,
   TOPOLOGY_NODE_HEIGHT as NODE_HEIGHT,
   TOPOLOGY_NODE_WIDTH as NODE_WIDTH,
 } from "./lib/topology-routing";
 import { useTopologyStore } from "./lib/topology-store";
 import {
   buildImportPlan,
+  buildImportPlanFromFileDescriptors,
+  applyImportPlanExclusions,
   materializeImport,
   projectExportToJson,
-  projectToCsvFiles,
+  projectToCsvBundleZip,
   type ImportPlan,
   type ImportStrategy,
+  type MaskedCredentialRow,
 } from "./lib/topology-transfer";
 import {
   buildCanvasProject,
@@ -47,7 +52,7 @@ import {
   type CanvasDevice,
   type CanvasLink,
 } from "./lib/topology-visibility";
-import type { Device, DeviceType, Group, Link, Project, SiteRecord, TopologyRecord, UserRecord } from "./lib/topology-types";
+import type { Device, DeviceCredentialRecord, DeviceType, Group, Link, Project, SiteRecord, TopologyRecord, UserRecord } from "./lib/topology-types";
 type Selection = { kind: "device"; id: string } | { kind: "link"; id: string };
 type LayoutMode = "auto-detect" | "three-tier" | "spine-leaf" | "layered";
 type DeviceGraph = {
@@ -88,14 +93,6 @@ const ROLE_LABELS: Record<UserRecord["role"], string> = {
   engineer: "工程師",
   sales_procurement: "採購與業務",
 };
-const DEV_IDENTITIES = [
-  { email: "sean.sie@dus.local", label: "sean.sie / 謝慶宣" },
-  { email: "manner@company.local", label: "manner / 老闆" },
-  { email: "north1.manager@company.local", label: "北一站站長" },
-  { email: "north2.manager@company.local", label: "北二站站長" },
-  { email: "engineer@company.local", label: "工程師" },
-  { email: "sales@company.local", label: "採購與業務" },
-];
 const PANEL_LAYOUT_KEY = "nettopo-panel-layout-v1";
 const MAX_DEVICE_QUANTITY = 10_000;
 
@@ -108,6 +105,21 @@ const PANEL_LIMITS = {
 
 const elk = new ELK();
 const LOGIN_SESSION_KEY = "nettopo-login-session";
+const USE_SERVER_STORAGE = process.env.NEXT_PUBLIC_TOPOLOGY_STORAGE === "server";
+
+type RuntimeCapabilities = {
+  profile: "development" | "test" | "production" | "pilot";
+  authMode: "demo" | "oidc" | "disabled" | "pilot";
+  capabilities: {
+    demoAuth: boolean;
+    devIdentityOverride: boolean;
+    demoSeed: boolean;
+    pilotAuth: boolean;
+    pilotFullExport: boolean;
+  };
+};
+
+type DevIdentity = { email: string; label: string };
 
 function uid(prefix: string) {
   return `${prefix}-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 7)}`;
@@ -119,6 +131,16 @@ function clean(value: FormDataEntryValue | null) {
 
 function downloadText(filename: string, content: string, type: string) {
   const url = URL.createObjectURL(new Blob([content], { type }));
+  const anchor = document.createElement("a");
+  anchor.href = url;
+  anchor.download = filename;
+  anchor.click();
+  URL.revokeObjectURL(url);
+}
+
+function downloadBinary(filename: string, content: Uint8Array, type: string) {
+  const bytes = content.buffer.slice(content.byteOffset, content.byteOffset + content.byteLength) as ArrayBuffer;
+  const url = URL.createObjectURL(new Blob([bytes], { type }));
   const anchor = document.createElement("a");
   anchor.href = url;
   anchor.download = filename;
@@ -465,43 +487,98 @@ async function layoutWithElk(project: Project) {
   };
 }
 
+async function restoreSession() {
+  const sessionResponse = await fetch("/api/session", { cache: "no-store" }).catch(() => undefined);
+  if (sessionResponse?.ok) return true;
+  const devResponse = await fetch("/api/dev/session", { cache: "no-store" }).catch(() => undefined);
+  return Boolean(devResponse?.ok);
+}
+
 function LoginGate({ children }: { children: ReactNode }) {
   const [authenticated, setAuthenticated] = useState(false);
-  const [account, setAccount] = useState("");
-  const [password, setPassword] = useState("");
+  const [authChecked, setAuthChecked] = useState(false);
+  const [capabilities, setCapabilities] = useState<RuntimeCapabilities>();
   const [error, setError] = useState("");
+  const [pilotEmail, setPilotEmail] = useState("");
 
   useEffect(() => {
-    queueMicrotask(() => {
-      setAuthenticated(sessionStorage.getItem(LOGIN_SESSION_KEY) === "authenticated");
-    });
-  }, []);
+    void fetch("/api/runtime-capabilities", { cache: "no-store" })
+      .then((response) => response.json())
+      .then((payload: RuntimeCapabilities) => setCapabilities(payload))
+      .catch(() => setCapabilities({
+        profile: "production",
+        authMode: "disabled",
+        capabilities: { demoAuth: false, devIdentityOverride: false, demoSeed: false, pilotAuth: false, pilotFullExport: false },
+      }));
 
-  function submitLogin(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    const form = new FormData(event.currentTarget);
-    const submittedAccount = String(form.get("account") ?? "");
-    const submittedPassword = String(form.get("password") ?? "");
-    if (!validateLogin(submittedAccount, submittedPassword)) {
-      setError("帳號或密碼錯誤，請重新輸入。");
-      setPassword("");
+    if (sessionStorage.getItem(LOGIN_SESSION_KEY) !== "authenticated") {
+      queueMicrotask(() => setAuthChecked(true));
       return;
     }
 
+    void restoreSession()
+      .then((valid) => {
+        if (valid) setAuthenticated(true);
+        else {
+          sessionStorage.removeItem(LOGIN_SESSION_KEY);
+          setAuthenticated(false);
+        }
+      })
+      .catch(() => {
+        sessionStorage.removeItem(LOGIN_SESSION_KEY);
+        setAuthenticated(false);
+      })
+      .finally(() => setAuthChecked(true));
+  }, []);
+
+  async function enterDemo() {
+    setError("");
+    const response = await fetch("/api/dev/session", { method: "POST" });
+    if (!response.ok) {
+      setError("本機 Demo 尚未啟用。請確認 RuntimePolicy development/test gate。");
+      return;
+    }
     sessionStorage.setItem(LOGIN_SESSION_KEY, "authenticated");
     setAuthenticated(true);
-    setPassword("");
-    setError("");
+    setAuthChecked(true);
   }
 
-  function logout() {
-    sessionStorage.removeItem(LOGIN_SESSION_KEY);
-    setAuthenticated(false);
-    setAccount("");
-    setPassword("");
+  async function enterPilot(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setError("");
+    const response = await fetch("/api/pilot/session", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email: pilotEmail }),
+    });
+    if (!response.ok) {
+      setError("Internal Pilot 登入失敗，請確認 email 已在 Pilot allowlist 且未被撤銷。");
+      return;
+    }
+    sessionStorage.setItem(LOGIN_SESSION_KEY, "authenticated");
+    setAuthenticated(true);
+    setAuthChecked(true);
+  }
+
+  if (!authChecked) {
+    return (
+      <main className="login-shell">
+        <section className="login-panel">
+          <div className="login-card">
+            <header>
+              <p>歡迎使用</p>
+              <h2>檢查登入狀態</h2>
+              <span>正在確認本機 Demo session...</span>
+            </header>
+          </div>
+        </section>
+      </main>
+    );
   }
 
   if (!authenticated) {
+    const demoEnabled = Boolean(capabilities?.capabilities.demoAuth);
+    const pilotEnabled = Boolean(capabilities?.capabilities.pilotAuth);
     return (
       <main className="login-shell">
         <section className="login-intro" aria-label="系統介紹">
@@ -525,67 +602,37 @@ function LoginGate({ children }: { children: ReactNode }) {
         </section>
 
         <section className="login-panel">
-          <form
+          <div
             className="login-card"
             aria-label="登入工作平台"
-            onSubmit={submitLogin}
           >
             <header>
               <p>歡迎使用</p>
               <h2>登入工作平台</h2>
-              <span>請輸入您的員工帳號與密碼</span>
+              <span>{pilotEnabled ? "Internal Pilot 僅允許 allowlist 工程師登入" : demoEnabled ? "本機開發模式可使用 Demo 工作階段" : "正式登入尚未接上，請由管理員設定 OIDC"}</span>
             </header>
 
-            <label>
-              帳號
-              <input
-                autoComplete="username"
-                autoFocus
-                name="account"
-                onChange={(event) => setAccount(event.target.value)}
-                placeholder="請輸入帳號"
-                required
-                value={account}
-              />
-            </label>
-
-            <label>
-              密碼
-              <input
-                autoComplete="current-password"
-                name="password"
-                onChange={(event) => setPassword(event.target.value)}
-                placeholder="請輸入密碼"
-                required
-                type="password"
-                value={password}
-              />
-            </label>
+            {demoEnabled && <button className="login-submit" type="button" onClick={() => void enterDemo()}>進入本機 Demo</button>}
+            {pilotEnabled && <form className="pilot-login-form" onSubmit={(event) => void enterPilot(event)}>
+              <label>
+                <span>Pilot Email</span>
+                <input value={pilotEmail} onChange={(event) => setPilotEmail(event.target.value)} placeholder="pilot.engineer@company.local" type="email" required />
+              </label>
+              <button className="login-submit" type="submit">進入 Internal Pilot</button>
+              <p className="login-security-note">INTERNAL PILOT：僅限假資料與測試客戶，不得輸入正式設備帳密。</p>
+            </form>}
+            {!demoEnabled && !pilotEnabled && <p className="login-security-note">Demo 登入預設關閉；production 不會顯示測試登入或測試身分切換。</p>}
 
             {error && <p className="login-error" role="alert">{error}</p>}
 
-            <button className="login-submit" type="submit">登入系統</button>
-            <small className="login-security-note">帳密僅用於本次系統登入，不會出現在網址列。</small>
-          </form>
+            {capabilities && capabilities.profile !== "production" && capabilities.profile !== "pilot" && <small className="login-security-note">DEVELOPMENT MODE：Demo session 使用 HttpOnly cookie，不含密碼。</small>}
+          </div>
         </section>
       </main>
     );
   }
 
-  return (
-    <>
-      {children}
-      <aside className="session-profile" aria-label="登入者資料">
-        <span className="session-avatar" aria-hidden="true">{LOGIN_PROFILE.name.slice(0, 1)}</span>
-        <span>
-          <small>登入者</small>
-          <strong>{LOGIN_PROFILE.name}</strong>
-          <em>員工編號 {LOGIN_PROFILE.employeeId}</em>
-        </span>
-        <button onClick={logout} type="button">登出</button>
-      </aside>
-    </>
-  );
+  return <>{children}</>;
 }
 
 export default function Home() {
@@ -639,8 +686,12 @@ function TopologyApp() {
   const [importStrategy, setImportStrategy] = useState<ImportStrategy>("new");
   const [importName, setImportName] = useState("匯入拓樸");
   const [importBusy, setImportBusy] = useState(false);
+  const [warningAcknowledged, setWarningAcknowledged] = useState(false);
+  const [credentialExportNotice, setCredentialExportNotice] = useState("");
   const [customerAction, setCustomerAction] = useState<"rename" | "duplicate" | "delete">();
   const [topologyAction, setTopologyAction] = useState<"rename" | "duplicate" | "delete">();
+  const [runtimeCapabilities, setRuntimeCapabilities] = useState<RuntimeCapabilities>();
+  const [devIdentities, setDevIdentities] = useState<DevIdentity[]>([]);
   const [layoutMode, setLayoutMode] = useState<LayoutMode>("auto-detect");
   const [groupCollapseOverrides, setGroupCollapseOverrides] = useState<Record<string, Record<string, boolean>>>({});
   const [notice, setNotice] = useState("資料儲存在這台裝置的 IndexedDB");
@@ -662,6 +713,22 @@ function TopologyApp() {
   }, [initialize]);
 
   useEffect(() => {
+    void fetch("/api/runtime-capabilities", { cache: "no-store" })
+      .then((response) => response.json())
+      .then((payload: RuntimeCapabilities) => {
+        setRuntimeCapabilities(payload);
+        if (!payload.capabilities.devIdentityOverride) {
+          setDevIdentities([]);
+          return undefined;
+        }
+        return fetch("/api/dev/identities", { cache: "no-store" })
+          .then((response) => response.ok ? response.json() : { identities: [] })
+          .then((data: { identities?: DevIdentity[] }) => setDevIdentities(data.identities ?? []));
+      })
+      .catch(() => setDevIdentities([]));
+  }, []);
+
+  useEffect(() => {
     if (!loadedRef.current || !panelLayoutReady) return;
     if (isSafePanelLayout(panelLayout)) localStorage.setItem(PANEL_LAYOUT_KEY, JSON.stringify(panelLayout));
     else localStorage.removeItem(PANEL_LAYOUT_KEY);
@@ -676,6 +743,8 @@ function TopologyApp() {
   const canWriteActiveTopology = canWriteTopology(currentUser, activeTopology);
   const canManageActiveCustomer = currentUser?.role === "boss" || canWriteActiveTopology;
   const canDeleteActiveCustomer = currentUser?.role === "boss";
+  const isPilotProfile = runtimeCapabilities?.profile === "pilot";
+  const canUseFullExport = !isPilotProfile || (Boolean(runtimeCapabilities?.capabilities.pilotFullExport) && currentUser?.role === "boss");
 
   const selectedDevice = selection?.kind === "device" ? project.devices.find((device) => device.id === selection.id) : undefined;
   const selectedLink = selection?.kind === "link" ? project.links.find((link) => link.id === selection.id) : undefined;
@@ -695,10 +764,18 @@ function TopologyApp() {
     [project.devices],
   );
 
-  const nodes = useMemo(
+  const derivedNodes = useMemo(
     () => canvasProject.devices.map((device) => deviceToNode(device, selection?.kind === "device" && selection.id === device.id)),
     [canvasProject.devices, selection],
   );
+  const [flowNodes, setFlowNodes] = useState<Node[]>(derivedNodes);
+  const draggingNodeRef = useRef(false);
+  const latestNodePositionsRef = useRef(new Map<string, { x: number; y: number }>());
+
+  useEffect(() => {
+    latestNodePositionsRef.current = new Map(derivedNodes.map((node) => [node.id, node.position]));
+    if (!draggingNodeRef.current) setFlowNodes(derivedNodes);
+  }, [derivedNodes]);
 
   const edges = useMemo(
     () => canvasProject.links.map((link) => linkToEdge(link, selection?.kind === "link" && selection.id === link.id, canvasProject)),
@@ -710,19 +787,48 @@ function TopologyApp() {
       - Number(selection?.kind === "link" && selection.id === right.id)),
     [canvasProject.links, selection],
   );
+  const routeMap = useMemo(
+    () => routeTopologyLinks(canvasProject, renderedCanvasLinks),
+    [canvasProject, renderedCanvasLinks],
+  );
 
   const onNodesChange = useCallback((changes: NodeChange[]) => {
     if (!canWriteActiveTopology) return;
-    const updated = applyNodeChanges(changes, nodes);
-    const positionById = new Map(updated.map((node) => [node.id, node.position]));
+    setFlowNodes((currentNodes) => {
+      const updatedNodes = applyNodeChanges(changes, currentNodes);
+      latestNodePositionsRef.current = new Map(updatedNodes.map((node) => [node.id, node.position]));
+      return updatedNodes;
+    });
+  }, [canWriteActiveTopology]);
+
+  const onNodeDrag: OnNodeDrag = useCallback((_, node) => {
+    if (!canWriteActiveTopology) return;
+    latestNodePositionsRef.current.set(node.id, node.position);
+    setFlowNodes((currentNodes) =>
+      currentNodes.map((currentNode) =>
+        currentNode.id === node.id ? { ...currentNode, position: node.position } : currentNode,
+      ),
+    );
+  }, [canWriteActiveTopology]);
+
+  const onNodeDragStop: OnNodeDrag = useCallback((_, node) => {
+    draggingNodeRef.current = false;
+    if (!canWriteActiveTopology) return;
+    const nextPosition = latestNodePositionsRef.current.get(node.id) ?? node.position;
+    setFlowNodes((currentNodes) =>
+      currentNodes.map((currentNode) =>
+        currentNode.id === node.id ? { ...currentNode, position: nextPosition } : currentNode,
+      ),
+    );
     setProject((current) => ({
       ...current,
       devices: current.devices.map((device) => {
-        const position = positionById.get(device.id);
-        return position ? { ...device, x: position.x, y: position.y } : device;
+        if (device.id !== node.id) return device;
+        if (device.x === nextPosition.x && device.y === nextPosition.y) return device;
+        return { ...device, x: nextPosition.x, y: nextPosition.y };
       }),
     }));
-  }, [canWriteActiveTopology, nodes, setProject]);
+  }, [canWriteActiveTopology, setProject]);
 
   const onEdgesChange = useCallback((changes: EdgeChange[]) => {
     applyEdgeChanges(changes, edges);
@@ -736,8 +842,8 @@ function TopologyApp() {
     const quantity = Math.max(1, Math.min(MAX_DEVICE_QUANTITY, Math.trunc(Number(data.get("quantity")) || 1)));
     const name = clean(data.get("name")) || "新設備";
     const type = (clean(data.get("type")) || "client") as DeviceType;
-    const username = clean(data.get("username"));
-    const password = clean(data.get("password"));
+    const username = USE_SERVER_STORAGE ? clean(data.get("username")) : "";
+    const password = USE_SERVER_STORAGE ? clean(data.get("password")) : "";
     const addition: Device = {
       id: uid("dev"),
       name,
@@ -747,8 +853,6 @@ function TopologyApp() {
       model: clean(data.get("model")),
       location: clean(data.get("location")),
       url: clean(data.get("url")),
-      username,
-      password,
       quantity,
       groupId: clean(data.get("groupId")) || undefined,
       x: 80 + (project.devices.length % 4) * 240,
@@ -758,9 +862,9 @@ function TopologyApp() {
     setSelection({ kind: "device", id: addition.id });
     setShowDeviceForm(false);
     try {
-      await saveDeviceCredential(addition.id, username, password);
+      if (username || password) await saveDeviceCredential(addition.id, username, password);
     } catch (error) {
-      setNotice(error instanceof Error ? error.message : "Credential save failed.");
+      setNotice(error instanceof Error ? error.message : "帳密儲存失敗。");
       return;
     }
     setNotice(`已新增數量型節點：${name} x${quantity}`);
@@ -842,24 +946,50 @@ function TopologyApp() {
     setNotice(`已建立拓樸：${name}`);
   }
 
-  async function prepareImport(files: FileList | null) {
+  async function prepareImport(files: FileList | File[] | null) {
     if (!files?.length) return;
     setImportBusy(true);
+    setWarningAcknowledged(false);
     try {
-      const sources = await Promise.all([...files].map(async (file) => ({
+      const fileList = [...files];
+      const metadataPlan = buildImportPlanFromFileDescriptors(fileList.map((file) => ({
         name: file.name,
+        size: file.size,
+        type: file.type,
+        lastModified: file.lastModified,
+      })));
+      if (metadataPlan) {
+        setImportPlan(metadataPlan);
+        setImportName(metadataPlan.suggestedName);
+        setNotice("Import preview is blocked before file contents are read. Fix the selected files and try again.");
+        return;
+      }
+      const sources = await Promise.all(fileList.map(async (file) => ({
+        name: file.name,
+        size: file.size,
+        type: file.type,
+        lastModified: file.lastModified,
         text: await file.text(),
       })));
       const plan = buildImportPlan(sources);
       setImportPlan(plan);
       setImportName(plan.suggestedName);
+      setNotice(plan.canApply ? "Import preview is ready. Nothing is written until confirmation." : "Import preview is blocked. Fix or exclude blocking items before writing.");
     } finally {
       setImportBusy(false);
     }
   }
 
   async function confirmImport() {
-    if (!importPlan?.canApply) return;
+    const blockingIssues = importPlan?.issues.some((issue) => issue.blocking === true || issue.severity === "error") ?? false;
+    if (!importPlan || !importPlan.canApply || blockingIssues || importPlan.summary.missingBlocking > 0) {
+      setNotice("Import plan is blocked. Re-open preview and resolve blocking items before writing.");
+      return;
+    }
+    if (importPlan.summary.missingWarnings > 0 && !warningAcknowledged) {
+      setNotice("Warning items require acknowledgement before import.");
+      return;
+    }
     if (importStrategy === "new" && !canCreateRecords) {
       setNotice("目前角色沒有建立新拓樸的權限。");
       return;
@@ -877,6 +1007,7 @@ function TopologyApp() {
       setShowTransfer(undefined);
       setImportPlan(undefined);
       setImportStrategy("new");
+      setWarningAcknowledged(false);
       setNotice(`匯入完成：${importPlan.summary.devices} 個設備、${importPlan.summary.links} 條連線、${importPlan.summary.groups} 個群組。`);
     } catch (error) {
       setNotice(error instanceof Error ? error.message : "匯入失敗。");
@@ -885,7 +1016,35 @@ function TopologyApp() {
     }
   }
 
+  function excludeImportDevice(deviceId: string) {
+    if (!importPlan) return;
+    const affectedLinks = importPlan.project.links.filter((link) => link.from === deviceId || link.to === deviceId).length;
+    const affectedCredentials = importPlan.maskedCredentials.filter((credential) => credential.projectDeviceId === deviceId).length;
+    const device = importPlan.project.devices.find((item) => item.id === deviceId);
+    const ok = window.confirm(`Exclude ${device?.name ?? deviceId}? This also excludes ${affectedLinks} links and ${affectedCredentials} masked credential rows.`);
+    if (!ok) return;
+    const nextPlan = applyImportPlanExclusions(importPlan, { deviceIds: [deviceId] });
+    setImportPlan(nextPlan);
+    setWarningAcknowledged(false);
+    setNotice(nextPlan.canApply ? "Incomplete device excluded and import plan revalidated." : "Plan revalidated; blocking items remain.");
+  }
+
+  function excludeMissingInfo(id: string) {
+    if (!importPlan) return;
+    const ok = window.confirm("Exclude this blocking item and re-run validation?");
+    if (!ok) return;
+    const nextPlan = applyImportPlanExclusions(importPlan, { missingInfoIds: [id] });
+    setImportPlan(nextPlan);
+    setWarningAcknowledged(false);
+    setNotice(nextPlan.canApply ? "Incomplete item excluded and import plan revalidated." : "Plan revalidated; blocking items remain.");
+  }
+
   function exportJson(safe: boolean) {
+    if (!safe && !canUseFullExport) {
+      setNotice("Internal Pilot 預設禁用完整匯出，請使用安全分享版。");
+      return;
+    }
+    if (!safe && !window.confirm("Full JSON keeps network and management location data, but never exports plaintext credentials. Continue?")) return;
     const name = (activeTopology?.name || "topology").replace(/[\\/:*?"<>|]+/g, "-");
     downloadText(
       `${name}${safe ? "-safe" : ""}.json`,
@@ -894,10 +1053,58 @@ function TopologyApp() {
     );
   }
 
-  function exportCsv(safe: boolean) {
-    const files = projectToCsvFiles(project, { safe });
-    for (const [filename, content] of Object.entries(files)) {
-      downloadText(filename, content, "text/csv;charset=utf-8");
+  async function readMaskedCredentialsForExport(): Promise<{ credentials: MaskedCredentialRow[]; denied: boolean }> {
+    if (!activeTopologyId) return { credentials: [], denied: false };
+    try {
+      const response = await fetch(`/api/credentials?topologyId=${encodeURIComponent(activeTopologyId)}`, {
+        cache: "no-store",
+        headers: devUserEmail ? { "x-nettopo-dev-user-email": devUserEmail } : undefined,
+      });
+      if (response.status === 403) return { credentials: [], denied: true };
+      if (!response.ok) return { credentials: [], denied: false };
+      const payload = await response.json() as { credentials?: DeviceCredentialRecord[] };
+      return {
+        denied: false,
+        credentials: (payload.credentials ?? []).map((credential) => ({
+          projectDeviceId: credential.projectDeviceId,
+          deviceName: project.devices.find((device) => device.id === credential.projectDeviceId)?.name,
+          kind: credential.kind,
+          usernameMasked: credential.usernameMasked,
+          secretMasked: "********" as const,
+          keyVersion: credential.keyVersion,
+          lastRotatedAt: credential.lastRotatedAt,
+        })),
+      };
+    } catch {
+      return { credentials: [], denied: false };
+    }
+  }
+
+  async function exportCsvBundle(safe: boolean) {
+    if (!safe && !canUseFullExport) {
+      setNotice("Internal Pilot 預設禁用完整 CSV，請使用安全 CSV。");
+      return;
+    }
+    if (!safe && !window.confirm("Full CSV bundle keeps IP, MAC, location and URL, but never exports plaintext credentials. Continue?")) return;
+    setImportBusy(true);
+    try {
+      const credentialResult = await readMaskedCredentialsForExport();
+      setCredentialExportNotice(credentialResult.denied
+      ? "目前身分沒有讀取遮蔽帳密的權限，ZIP 不會包含 credentials.masked.csv 資料列。"
+        : credentialResult.credentials.length === 0
+          ? "沒有可匯出的遮蔽帳密資料列。"
+          : `已加入 ${credentialResult.credentials.length} 筆遮蔽帳密資料列。`);
+      const name = (activeTopology?.name || "topology").replace(/[\/:*?"<>|]+/g, "-");
+      const zip = await projectToCsvBundleZip(project, {
+        safe,
+        maskedCredentials: credentialResult.denied ? [] : credentialResult.credentials,
+      });
+      downloadBinary(`${name}-topology-csv-bundle.zip`, zip, "application/zip");
+      setNotice("CSV bundle ZIP exported.");
+    } catch (error) {
+      setNotice(error instanceof Error ? error.message : "CSV bundle export failed.");
+    } finally {
+      setImportBusy(false);
     }
   }
 
@@ -965,8 +1172,8 @@ function TopologyApp() {
       return;
     }
     const nextType = (clean(data.get("type")) || "client") as DeviceType;
-    const username = clean(data.get("username"));
-    const password = clean(data.get("password"));
+    const username = USE_SERVER_STORAGE ? clean(data.get("username")) : "";
+    const password = USE_SERVER_STORAGE ? clean(data.get("password")) : "";
     setProject((current) => ({
       ...current,
       devices: current.devices.map((device) => device.id === id ? {
@@ -979,15 +1186,13 @@ function TopologyApp() {
         location: clean(data.get("location")),
         url: clean(data.get("url")),
         quantity: Math.max(1, Math.min(MAX_DEVICE_QUANTITY, Math.trunc(Number(data.get("quantity")) || 1))),
-        username,
-        password,
         groupId: clean(data.get("groupId")) || undefined,
       } : device),
     }));
     try {
-      await saveDeviceCredential(id, username, password);
+      if (username || password) await saveDeviceCredential(id, username, password);
     } catch (error) {
-      setNotice(error instanceof Error ? error.message : "Credential save failed.");
+      setNotice(error instanceof Error ? error.message : "帳密儲存失敗。");
       return;
     }
     setNotice("設備資料已更新");
@@ -1059,9 +1264,30 @@ function TopologyApp() {
     setSelection(undefined);
   }
 
+  async function logoutFromWorkspace() {
+    const isPilotRuntime = runtimeCapabilities?.profile === "pilot";
+    const logoutEndpoint = isPilotRuntime ? "/api/pilot/session" : "/api/dev/session";
+    await fetch(logoutEndpoint, {
+      method: "DELETE",
+      headers: isPilotRuntime ? { "Content-Type": "application/json" } : undefined,
+    }).catch(() => undefined);
+    sessionStorage.removeItem(LOGIN_SESSION_KEY);
+    window.location.reload();
+  }
+
   return (
     <main className="app-shell">
       <header className="topbar">
+        {runtimeCapabilities && runtimeCapabilities.profile === "pilot" && (
+          <div className="development-banner pilot-banner">
+            INTERNAL PILOT · synthetic test data only · do not enter production credentials
+          </div>
+        )}
+        {runtimeCapabilities && runtimeCapabilities.profile !== "production" && runtimeCapabilities.profile !== "pilot" && (
+          <div className="development-banner">
+            DEVELOPMENT MODE · demoAuth={String(runtimeCapabilities.capabilities.demoAuth)} · devIdentityOverride={String(runtimeCapabilities.capabilities.devIdentityOverride)} · demoSeed={String(runtimeCapabilities.capabilities.demoSeed)}
+          </div>
+        )}
         <div className="brand">
           <span className="brand-mark">N</span>
           <div><strong>NetTopo Studio</strong><small>網路架構拓樸編輯器</small></div>
@@ -1114,13 +1340,25 @@ function TopologyApp() {
             </div>
           </div>
           <div className="save-state">
-            <span className={`saved-dot ${saving ? "saving" : ""}`} />
-            <small>{saving ? "儲存中" : "已自動儲存"}</small>
-            {currentUser && <span className="role-badge">{ROLE_LABELS[currentUser.role]} · {currentUser.name}</span>}
+            <div className="save-indicator" aria-label="儲存狀態">
+              <span className={`saved-dot ${saving ? "saving" : ""}`} />
+              <small>{saving ? "儲存中" : "已自動儲存"}</small>
+            </div>
+            {ready && currentUser && (
+              <aside className="session-profile" aria-label="登入者資料">
+                <span className="session-avatar" aria-hidden="true">{currentUser.name.slice(0, 1)}</span>
+                <span>
+                  <small>登入者</small>
+                  <strong>{currentUser.name}</strong>
+                  <em>{ROLE_LABELS[currentUser.role]} · {currentUser.email}</em>
+                </span>
+                <button onClick={() => void logoutFromWorkspace()} type="button" aria-label={`登出 ${currentUser.name}`}>登出</button>
+              </aside>
+            )}
           </div>
         </div>
         <div className="top-actions">
-          <label className="identity-picker">
+          {devIdentities.length > 0 && <label className="identity-picker">
             <span>測試身分</span>
             <select
               value={devUserEmail}
@@ -1130,9 +1368,10 @@ function TopologyApp() {
                 setNotice("正在切換測試身分...");
               }}
             >
-              {DEV_IDENTITIES.map((identity) => <option key={identity.email} value={identity.email}>{identity.label}</option>)}
+              <option value="">使用 Demo session 身分</option>
+              {devIdentities.map((identity) => <option key={identity.email} value={identity.email}>{identity.label}</option>)}
             </select>
-          </label>
+          </label>}
           <label className="layout-picker">
             <span>排版模式</span>
             <select value={layoutMode} onChange={(event) => setLayoutMode(event.target.value as LayoutMode)}>
@@ -1251,16 +1490,22 @@ function TopologyApp() {
             </div>
             <div className="flow-shell">
               <ReactFlow
-                nodes={nodes}
+                nodes={flowNodes}
                 edges={[]}
                 onNodesChange={onNodesChange}
                 onEdgesChange={onEdgesChange}
+                onNodeDragStart={() => {
+                  draggingNodeRef.current = true;
+                }}
+                onNodeDrag={onNodeDrag}
+                onNodeDragStop={onNodeDragStop}
                 onNodeClick={(_, node) => {
                   const collapsedGroup = canvasProject.devices.find((device) => device.id === node.id)?.collapsedGroup;
                   if (collapsedGroup) toggleGroupCollapsed(collapsedGroup.id);
                   else setSelection({ kind: "device", id: node.id });
                 }}
                 onEdgeClick={(_, edge) => setSelection({ kind: "link", id: edge.id })}
+                nodesDraggable={canWriteActiveTopology}
                 fitView
                 minZoom={0.25}
                 maxZoom={2}
@@ -1268,14 +1513,15 @@ function TopologyApp() {
                 <ViewportPortal>
                   <svg className="flow-link-overlay" width="4000" height="2400">
                     {renderedCanvasLinks.map((link) => {
-                      const route = routeTopologyLink(link, canvasProject);
+                      const route = routeMap.get(link.id);
                       if (!route) return null;
-                      const label = [link.aggregateCount && link.aggregateCount > 1 ? `${link.aggregateCount} 條連線` : undefined, link.speed, link.vlan && `VLAN ${link.vlan}`].filter(Boolean).join(" · ");
+                      const routeWarning = route.status === "unresolved-no-path" ? "路徑受阻，請調整設備位置" : undefined;
+                      const label = [routeWarning, link.aggregateCount && link.aggregateCount > 1 ? `${link.aggregateCount} 條連線` : undefined, link.speed, link.vlan && `VLAN ${link.vlan}`].filter(Boolean).join(" · ");
                       const selected = selection?.kind === "link" && selection.id === link.id;
                       const labelWidth = Math.max(42, label.length * 6.5 + 16);
                       const path = routePath(route.points);
                       return (
-                        <g key={link.id} data-link-id={link.id} data-route-kind={route.kind} className={`flow-link ${linkVisualClass(link)} ${route.kind} ${selected ? "selected" : ""}`}>
+                        <g key={link.id} data-link-id={link.id} data-route-kind={route.kind} data-route-status={route.status} className={`flow-link ${linkVisualClass(link)} ${route.kind} ${route.status} ${selected ? "selected" : ""}`}>
                           <path className="hit-line" d={path} onClick={() => setSelection({ kind: "link", id: link.id })} />
                           {selected && <path className="selection-line" d={path} />}
                           <path className="visible-line" d={path} onClick={() => setSelection({ kind: "link", id: link.id })} />
@@ -1312,7 +1558,7 @@ function TopologyApp() {
 
       {showDeviceForm && <Modal title="新增設備" onClose={() => setShowDeviceForm(false)}>
         <form action={addDevice} className="form-grid">
-          <DeviceFields groups={project.groups} />
+          <DeviceFields groups={project.groups} canStoreCredentials={USE_SERVER_STORAGE} />
           <FormActions onCancel={() => setShowDeviceForm(false)} />
         </form>
       </Modal>}
@@ -1357,65 +1603,29 @@ function TopologyApp() {
         setImportStrategy("new");
       }}>
         <div className="transfer-panel">
-          <div className="transfer-drop">
-            <strong>選擇 JSON 或 CSV 檔案</strong>
-            <p>JSON 一次一個；CSV 請使用 devices.csv、links.csv、groups.csv，可同時選取。</p>
-            <input
-              type="file"
-              accept=".json,.csv,application/json,text/csv"
-              multiple
-              onChange={(event) => void prepareImport(event.target.files)}
-            />
+          <FileDropZone busy={importBusy} onFiles={(files) => void prepareImport(files)} />
+          <div className="new-import-preview">
+            {importPlan && <ImportPreviewModal
+              plan={importPlan}
+              strategy={importStrategy}
+              importName={importName}
+              busy={importBusy}
+              warningAcknowledged={warningAcknowledged}
+              onStrategyChange={setImportStrategy}
+              onNameChange={setImportName}
+              onWarningAcknowledgedChange={setWarningAcknowledged}
+              onExcludeDevice={excludeImportDevice}
+              onExcludeMissing={excludeMissingInfo}
+              onCancel={() => {
+                setShowTransfer(undefined);
+                setImportPlan(undefined);
+                setImportStrategy("new");
+                setWarningAcknowledged(false);
+              }}
+              onConfirm={() => void confirmImport()}
+            />}
           </div>
-
           {importBusy && <p className="transfer-loading">正在解析與驗證檔案…</p>}
-
-          {importPlan && <>
-            <div className="import-summary">
-              <span><strong>{importPlan.summary.devices}</strong>設備</span>
-              <span><strong>{importPlan.summary.links}</strong>連線</span>
-              <span><strong>{importPlan.summary.groups}</strong>群組</span>
-              <span className={importPlan.canApply ? "summary-ok" : "summary-error"}>
-                {importPlan.canApply ? "可匯入" : "需修正"}
-              </span>
-            </div>
-
-            <div className="import-issues" aria-live="polite">
-              {importPlan.issues.length === 0
-                ? <p className="issue-ok">資料與跨表關聯驗證通過。</p>
-                : importPlan.issues.map((issue, index) => (
-                  <p className={`issue-${issue.severity}`} key={`${issue.code}-${index}`}>
-                    <strong>{issue.severity === "error" ? "錯誤" : "警告"}</strong>
-                    {issue.message}
-                    {issue.path && <small>{issue.path}</small>}
-                  </p>
-                ))}
-            </div>
-
-            <div className="import-options">
-              <label>
-                套用策略
-                <select value={importStrategy} onChange={(event) => setImportStrategy(event.target.value as ImportStrategy)}>
-                  <option value="new">建立新拓樸（預設）</option>
-                  <option value="merge">合併到目前拓樸</option>
-                  <option value="replace">取代目前拓樸</option>
-                </select>
-              </label>
-              {importStrategy === "new" && <label>
-                新拓樸名稱
-                <input value={importName} onChange={(event) => setImportName(event.target.value)} />
-              </label>}
-            </div>
-
-            {importStrategy === "replace" && <p className="replace-warning">取代會完整覆蓋目前拓樸的設備、連線與群組。</p>}
-
-            <div className="form-actions">
-              <button type="button" className="secondary" onClick={() => setShowTransfer(undefined)}>取消</button>
-              <button type="button" className="primary" disabled={!importPlan.canApply || importBusy} onClick={() => void confirmImport()}>
-                {importBusy ? "匯入中…" : "確認匯入"}
-              </button>
-            </div>
-          </>}
         </div>
       </Modal>}
 
@@ -1424,7 +1634,8 @@ function TopologyApp() {
           <div>
             <h3>JSON 完整備份</h3>
             <p>包含 schemaVersion 與所有設備欄位，適合備份及還原。</p>
-            <button className="primary" type="button" onClick={() => exportJson(false)}>下載完整 JSON</button>
+            <button className="primary" type="button" onClick={() => exportJson(false)} disabled={!canUseFullExport}>下載完整 JSON</button>
+            {!canUseFullExport && <p className="credential-export-notice">Internal Pilot 預設禁用完整匯出。</p>}
           </div>
           <div>
             <h3>JSON 安全分享版</h3>
@@ -1432,12 +1643,13 @@ function TopologyApp() {
             <button className="secondary" type="button" onClick={() => exportJson(true)}>下載安全 JSON</button>
           </div>
           <div>
-            <h3>CSV 三檔</h3>
-            <p>輸出 devices.csv、links.csv、groups.csv，適合試算表編輯。</p>
+            <h3>CSV Bundle v2 五檔</h3>
+            <p>輸出 devices.csv、links.csv、groups.csv、credentials.masked.csv、missing-info.csv，適合試算表檢查與安全交接。</p>
             <div className="export-buttons">
-              <button className="secondary" type="button" onClick={() => exportCsv(false)}>完整 CSV</button>
-              <button className="secondary" type="button" onClick={() => exportCsv(true)}>安全 CSV</button>
+              <button className="secondary" type="button" onClick={() => void exportCsvBundle(false)} disabled={!canUseFullExport}>完整 CSV</button>
+              <button className="secondary" type="button" onClick={() => void exportCsvBundle(true)}>安全 CSV</button>
             </div>
+            {credentialExportNotice && <p className="credential-export-notice">{credentialExportNotice}</p>}
           </div>
         </div>
       </Modal>}
@@ -1499,7 +1711,7 @@ function TopologyApp() {
   );
 }
 
-function DeviceFields({ device, groups }: { device?: Device; groups: Group[] }) {
+function DeviceFields({ device, groups, canStoreCredentials }: { device?: Device; groups: Group[]; canStoreCredentials: boolean }) {
   return (
     <>
       <label>設備名稱<input name="name" required defaultValue={device?.name} placeholder="例如：核心交換器" /></label>
@@ -1511,9 +1723,13 @@ function DeviceFields({ device, groups }: { device?: Device; groups: Group[] }) 
       <label>品牌／型號<input name="model" defaultValue={device?.model} placeholder="FortiGate 90G" /></label>
       <label>實體位置<input name="location" defaultValue={device?.location} placeholder="機房 A 櫃" /></label>
       <label className="full">管理網址<input name="url" defaultValue={device?.url} placeholder="https://192.168.1.1" /></label>
-      <div className="secret-warning full">帳密只儲存在此瀏覽器，未經密碼庫等級加密。請勿在共用電腦輸入正式密碼。</div>
-      <label>管理帳號<input name="username" defaultValue={device?.username} autoComplete="off" /></label>
-      <label>管理密碼<input name="password" type="password" defaultValue={device?.password} autoComplete="new-password" /></label>
+      <div className="secret-warning full">
+        {canStoreCredentials
+          ? "帳密會送到 PostgreSQL credentials API，以遮蔽值回讀；Project、IndexedDB 與匯出檔不保存明文。"
+          : "本機模式尚未提供安全帳密保存。帳密欄位已停用，避免寫入 Project、IndexedDB 或匯出檔。"}
+      </div>
+      <label>管理帳號<input name="username" autoComplete="off" disabled={!canStoreCredentials} /></label>
+      <label>管理密碼<input name="password" type="password" autoComplete="new-password" disabled={!canStoreCredentials} /></label>
     </>
   );
 }
@@ -1547,7 +1763,7 @@ function DeviceInspector({ device, groups, canEdit, onSave, onDelete }: { device
   return (
     <form action={onSave} className="inspector-form">
       <div className={`inspect-icon type-${device.type}`}>{TYPE_MAP[device.type].glyph}</div>
-      <DeviceFields device={device} groups={groups} />
+      <DeviceFields device={device} groups={groups} canStoreCredentials={USE_SERVER_STORAGE} />
       {canEdit ? (
         <div className="inspector-actions">
           <button type="button" className="danger" onClick={onDelete}>刪除設備</button>
