@@ -42,8 +42,8 @@
 | 049 | `DEV_SEC_002` | DEV | P0 | `READY_FOR_QA` | Transfer Security Correction | DEV_IMP_002/DEV_EXP_002 READY_FOR_QA | Import／Export persistence、DOM、network、JSON／CSV／ZIP secret hardening | [active/DEV_SEC_002.md](active/DEV_SEC_002.md) |
 | 049 | `DSG_REL_001` | DSG | P0 | `READY` | Release Design | DEV_REL_001 recovery artifact stop evidence, R1 APPROVED | R1 修訂 recovery artifact secret boundary：canonical format 改為 sanitized overlay bundle，已核准作為 DEV_REL_001 執行基線 | [active/DSG_REL_001.md](active/DSG_REL_001.md) |
 | 050 | `PM_REL_001` | PM | P0 | `READY` | Release | D24 APPROVED, Release QA passed, DSG_REL_001-R1 APPROVED | Pilot scope freeze 與 R1 recovery artifact secret boundary 已核准；deploy 仍未授權 | [active/PM_REL_001.md](active/PM_REL_001.md) |
-| 051 | `DEV_REL_001` | DEV | P0 | `IN_PROGRESS` | Release | QA_PIL_003 QA_PASSED, DSG_REL_001-R1 APPROVED, D24/D26 | 依 sanitized overlay recovery 契約重建可辨識 checkpoint chain；QA_REL_001 通過後由 DEV push checkpoint branch，不 merge/deploy | [active/DEV_REL_001.md](active/DEV_REL_001.md) |
-| 052 | `QA_REL_001` | QA | P0 | `BLOCKED` | Release | DEV_REL_001 READY_FOR_QA | 逐 checkpoint build/test、recovery restore 與最終 frozen-tree equivalence | [active/QA_REL_001.md](active/QA_REL_001.md) |
+| 051 | `DEV_REL_001` | DEV | P0 | `READY_FOR_QA` | Release | QA_PIL_003 QA_PASSED, DSG_REL_001-R1 APPROVED, D24/D26/D27/D28 | Recovery、checkpoint chain、DB/Browser/security gates 與 DEV final equivalence 已完成；等待 QA_REL_001 獨立驗收 | [active/DEV_REL_001.md](active/DEV_REL_001.md) |
+| 052 | `QA_REL_001` | QA | P0 | `READY_FOR_QA` | Release | DEV_REL_001 READY_FOR_QA | 逐 checkpoint build/test、recovery restore 與最終 frozen-tree equivalence | [active/QA_REL_001.md](active/QA_REL_001.md) |
 | 060 | `OPS_PIL_001` | OPS | P1 | `BLOCKED` | Pilot deploy | QA_REL_001 | 部署 Internal Pilot、HTTPS、backup、health gate | 待建立詳細票 |
 | 061 | `PM_PIL_001` | PM | P1 | `BLOCKED` | Pilot feedback | OPS_PIL_001 | 工程師試用、問題分級與下一階段決策 | 待建立詳細票 |
 
@@ -94,8 +94,8 @@
 
 ## 當前放行判斷
 
-- Current checkpoint：`QA_PIL_003` 2026-09-01 同票完整 UAT 已 `QA_PASSED`；D25 暫緩已解除，`DEV_REL_001` 依 R1 sanitized overlay contract 重啟。先完成 recovery/checkpoint 與 `QA_REL_001`，再依 D26 由 DEV push checkpoint branch；不 merge/deploy。
+- Current checkpoint：`DEV_REL_001` 已 `READY_FOR_QA`；R1 recovery、checkpoint chain、真實 DB、Browser UAT、security 與 DEV final equivalence 已完成。現在交 `QA_REL_001` 獨立驗收；只有 QA 通過後才依 D26 push checkpoint branch，不 merge/deploy。
 - 自動化測試快照：QA_IMP_001 2026-08-29 Re-test：Preview ownership 30/30 pass；targeted transfer/security 41/41 pass；Browser re-test pass；serial full Node tests 192/192 pass；tsc pass；build:local pass；scoped ESLint pass；full lint 仍因 Windows 缺少 bash blocked。
 - P0 fail：目前無 QA_DBM_001／QA_PIL_001／QA_PIL_002／QA_IMP_001 blocker。
-- Functional UAT：`QA_PIL_003` 已通過，覆蓋 `session-profile`、Canvas drag persistence 與 Pilot logout endpoint。功能大區塊已完成；目前轉入 `DEV_REL_001` checkpoint，`QA_REL_001` 仍等待 DEV READY_FOR_QA。
+- Functional UAT：`QA_PIL_003` 已通過，覆蓋 `session-profile`、Canvas drag persistence 與 Pilot logout endpoint。`DEV_REL_001` 已完成並交 `QA_REL_001`；尚未授權 push、merge 或 deploy。
 - Pilot deploy 仍未授權；`OPS_PIL_001` 維持 blocked。

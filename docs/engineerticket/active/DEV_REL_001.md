@@ -5,11 +5,11 @@
 | Group | DEV |
 | Feature | REL |
 | Priority | P0 |
-| Status | IN_PROGRESS |
+| Status | READY_FOR_QA |
 | Planned Order | 051 |
 | Checkpoint | Release |
-| Dependencies | DSG_REL_001-R1 APPROVED；PM_REL_001 READY；PM_GOV_001-D24 APPROVED |
-| Created／Updated | 2026-08-17／2026-08-31 |
+| Dependencies | DSG_REL_001-R1 APPROVED；PM_REL_001 READY；PM_GOV_001-D24/D26/D27/D28 APPROVED |
+| Created／Updated | 2026-08-17／2026-09-02 |
 
 ## Objective
 
@@ -57,6 +57,18 @@
 - 只有 `QA_REL_001 = QA_PASSED` 後，開發組才可把 checkpoint branch push 到既有 `origin`；不得 merge、force-push、deploy 或改寫既有遠端歷史。
 - 原 workspace 仍禁止 staging、commit、reset、clean、stash、branch switch；所有 commit/push 必須在核准的獨立 checkpoint worktree／branch 執行。
 
+## D27 Dependency-Closure Resume — 2026-09-02
+
+- 第一個 Governance checkpoint 已建立：`d4569f0 [PM_GOV_002] docs(governance): establish ticket baseline and topology skill`。
+- `DEV_AUTH_001` 單票 pre-commit gate 因尚未套用的 Pilot／DB／workspace shell 依賴而失敗；失敗內容未 stage/commit，原 workspace index 維持空。
+- 依使用者「繼續完成整條 commit chain」指示與 `PM_GOV_001-D27`，後續改採最小可建置 dependency-closure composite checkpoints；不得把所有剩餘內容合成單一 commit，也不得放寬 final QA/equivalence。
+
+## D28 Structural Commit Resume — 2026-09-02
+
+- D27 dependency analysis 證明最小 executable closure 等同幾乎全部 product paths，因此禁止建立 product monolith。
+- 後續改採 Ticket structural commits：逐 commit 保留 PATH/HUNK ownership，執行當下可用 gate；缺少後續核准 dependency 的 gate標為 `DEPENDENCY_NOT_YET_APPLIED`，不得宣稱 PASS。
+- 所有 product structural commits 完成後，第一個 executable integration checkpoint 必須跑完整聯集與 final gates；任何 gate 最終仍不可用即 fail。
+
 ## Emergency Pause Evidence — 2026-08-30
 
 - 未建立 recovery／checkpoint branch。
@@ -95,3 +107,13 @@ DEV_REL_001 已依 stop condition 安全停止：
 - 不產生 raw full-index Git patch 作為 canonical／portable artifact。
 - restore proof 必須由 base HEAD 套用 delete manifest、current-files overlay 與 mode manifest，不得依賴 raw patch。
 - 完成後仍只能更新為 `READY_FOR_QA`；不得自行標 QA pass、push 或 deploy。
+
+## DEV Checkpoint Result — 2026-09-02
+
+- Recovery canonical artifact：`.local/recovery/dev-rel-001/r1-20260901-170537`；PATH-MAP `0 UNMAPPED`、secret gate `PASS`、restore equivalence `204/204`。
+- Checkpoint branch：`codex/dev-rel-001-checkpoint`；依 Ticket／D28 structural boundary 建立可稽核 commit chain，未 push、merge 或 deploy。
+- Final executable gates：TypeScript `PASS`、`build:local` `PASS`、targeted closure union `34/34 PASS`。
+- Serial full Node suite：首輪 `199/200`，唯一 failure 為隔離 checkpoint 未帶 ignored DB env；補入 ignored `.env.local` 後 `QA_DBM_001 1/1 PASS`，累計 `200/200 PASS`。
+- 真實 PostgreSQL migration/runtime role、DDL denial、secret/log boundary：`PASS`；QA_PIL_003 Browser UAT：`QA_PASSED`。
+- Frozen-tree equivalence：產品與測試 frozen paths `204/204` 相符；最終只允許 D27/D28 與本節的 release metadata delta，交 `QA_REL_001` 獨立重驗。
+- Windows full lint 仍受既有 npm script 缺少 `bash` 阻擋；scoped ESLint、TypeScript 與 build 均已通過。

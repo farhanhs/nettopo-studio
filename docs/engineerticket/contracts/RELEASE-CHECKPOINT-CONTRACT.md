@@ -713,3 +713,35 @@ R1 approved on 2026-08-31:
 2. Do not generate raw patch in the normal flow; any future forensic raw patch requires separate PM/security approval and remains local-only, ignored, non-portable and non-evidence.
 
 `DEV_REL_001` may restart from this R1 contract. `QA_REL_001` remains `BLOCKED` until DEV produces READY_FOR_QA evidence.
+
+## 18. D27 Buildable Dependency-Closure Addendum — 2026-09-02
+
+The original one-primary-ticket-per-commit recommendation is superseded only where executable evidence proves that it cannot create an independently buildable/testable intermediate tree. Recovery format, secret boundary, frozen content and final equivalence remain unchanged.
+
+Rules:
+
+1. Prefer a single-ticket commit when its required gate can run from the preceding checkpoint.
+2. When a ticket's files/tests immediately import or inspect not-yet-applied files owned by another approved ticket, compute the smallest dependency closure that makes the checkpoint executable.
+3. A composite commit message and release map must list every included Ticket ID; PATH-MAP/HUNK-MAP ownership remains per path/hunk and is not replaced by a broad composite owner.
+4. Before committing, stage only the declared closure and prove no unrelated frozen paths are included.
+5. After committing, run the union of all closure targeted gates plus TypeScript/build where the closure introduces an executable application boundary.
+6. No product edit may be made in the checkpoint worktree to manufacture a passing intermediate state; only approved frozen content may be applied.
+7. Final serial full tests, DB/Browser/security gates and frozen-tree equivalence remain mandatory and may not be deferred to post-push.
+8. `QA_REL_001` must verify that each composite is the minimal practical dependency closure and that Ticket traceability remains auditable.
+
+Initial evidence requiring this addendum:
+
+- `DEV_AUTH_001` targeted gate failed in the isolated checkpoint tree because request identity imports Pilot session code, DB seed tests import the later PostgreSQL repository, and source/rendered guards inspect the later workspace shell.
+- The failed pre-commit tree was not committed; checkpoint index returned to empty, original workspace index remained empty, and recovery/restore evidence stayed PASS.
+
+## 19. D28 Structural Commit／Executable Integration Addendum — 2026-09-02
+
+Dependency analysis after D27 proved that the smallest executable closure spans AUTH, DBM, PIL, API, SEC, UIX, IMP, EXP and the workspace shell. A single product commit would defeat the approved goal of recognizable Ticket history. Therefore:
+
+1. Product paths continue as Ticket-scoped structural commits following PATH-MAP/HUNK-MAP ownership.
+2. Each structural commit must have a clean index after commit, contain only declared Ticket paths/hunks and pass manifest/hash/source-syntax checks plus every targeted test that is executable at that point.
+3. A targeted gate unavailable solely because a later approved dependency is absent must be recorded as `DEPENDENCY_NOT_YET_APPLIED`, with the exact dependency edge and future integration gate; it is not recorded as PASS or product failure.
+4. No structural commit may edit frozen product content to create a temporary compatibility shim.
+5. The first tree containing all approved product structural commits is the executable integration checkpoint. Before any QA handoff it must pass the complete targeted union, serial full tests, TypeScript, build, real DB, Browser UAT, artifact/secret scans and frozen-tree equivalence.
+6. QA_REL_001 must inspect structural ownership and independently rerun the executable integration/final gates. Any unavailable gate remaining at final integration is a hard failure.
+7. Push remains forbidden until QA_REL_001 is `QA_PASSED`.
