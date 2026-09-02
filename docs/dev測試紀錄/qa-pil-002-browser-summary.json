@@ -1,0 +1,157 @@
+{
+  "iabFallback": "in-app Browser setup attempted with 26.814.41407 browser-client; runtime service requested unavailable 26.814.41957 browser-service, so Playwright Chromium fallback was used.",
+  "baseUrl": "http://127.0.0.1:4392",
+  "browser": "Playwright Chromium",
+  "statuses": [
+    {
+      "step": "unauth topology",
+      "status": 401
+    },
+    {
+      "step": "engineer credential masked read",
+      "status": 200
+    },
+    {
+      "step": "engineer credential write",
+      "status": 403
+    },
+    {
+      "step": "engineer audit read",
+      "status": 403
+    },
+    {
+      "step": "after logout topology",
+      "status": 401
+    },
+    {
+      "step": "tampered cookie topology",
+      "status": 401
+    },
+    {
+      "step": "allowlist version revoked topology",
+      "status": 401
+    }
+  ],
+  "headers": {
+    "pilot-login": {
+      "status": 200,
+      "cacheControl": "no-store",
+      "csp": "default-src 'self'; object-src 'none'; base-uri 'self'; frame-ancestors 'none'",
+      "xContentTypeOptions": "nosniff",
+      "referrerPolicy": "strict-origin-when-cross-origin",
+      "permissionsPolicy": "camera=(), microphone=(), geolocation=()"
+    },
+    "engineer-create-customer": {
+      "status": 200,
+      "cacheControl": "no-store",
+      "csp": "default-src 'self'; object-src 'none'; base-uri 'self'; frame-ancestors 'none'",
+      "xContentTypeOptions": "nosniff",
+      "referrerPolicy": "strict-origin-when-cross-origin",
+      "permissionsPolicy": "camera=(), microphone=(), geolocation=()"
+    },
+    "engineer-create-topology": {
+      "status": 200,
+      "cacheControl": "no-store",
+      "csp": "default-src 'self'; object-src 'none'; base-uri 'self'; frame-ancestors 'none'",
+      "xContentTypeOptions": "nosniff",
+      "referrerPolicy": "strict-origin-when-cross-origin",
+      "permissionsPolicy": "camera=(), microphone=(), geolocation=()"
+    },
+    "csv-import-apply": {
+      "status": 200,
+      "cacheControl": "no-store",
+      "csp": "default-src 'self'; object-src 'none'; base-uri 'self'; frame-ancestors 'none'",
+      "xContentTypeOptions": "nosniff",
+      "referrerPolicy": "strict-origin-when-cross-origin",
+      "permissionsPolicy": "camera=(), microphone=(), geolocation=()"
+    },
+    "logout": {
+      "status": 200,
+      "cacheControl": "no-store",
+      "csp": "default-src 'self'; object-src 'none'; base-uri 'self'; frame-ancestors 'none'",
+      "xContentTypeOptions": "nosniff",
+      "referrerPolicy": "strict-origin-when-cross-origin",
+      "permissionsPolicy": "camera=(), microphone=(), geolocation=()"
+    }
+  },
+  "cookie": {
+    "name": "__Host-nettopo-pilot-session",
+    "path": "Path=/",
+    "maxAge": "Max-Age=21600",
+    "httpOnly": true,
+    "secure": true,
+    "sameSite": "SameSite=Strict"
+  },
+  "screenshots": [
+    "C:\\Users\\DUS\\Desktop\\project\\nettopo-studio\\docs\\dev測試紀錄\\screenshots\\qa-pil-002-engineer-login.png",
+    "C:\\Users\\DUS\\Desktop\\project\\nettopo-studio\\docs\\dev測試紀錄\\screenshots\\qa-pil-002-engineer-created-customer.png",
+    "C:\\Users\\DUS\\Desktop\\project\\nettopo-studio\\docs\\dev測試紀錄\\screenshots\\qa-pil-002-txt-preview.png",
+    "C:\\Users\\DUS\\Desktop\\project\\nettopo-studio\\docs\\dev測試紀錄\\screenshots\\qa-pil-002-csv-applied.png"
+  ],
+  "dbCounts": {
+    "afterSeed": {
+      "sites": 2,
+      "users": 3,
+      "customers": 1,
+      "topologies": 1,
+      "credentials": 0,
+      "audit_logs": 0
+    },
+    "afterEngineerCreate": {
+      "sites": 2,
+      "users": 3,
+      "customers": 2,
+      "topologies": 3,
+      "credentials": 0,
+      "audit_logs": 3
+    },
+    "beforeCleanup": {
+      "sites": 2,
+      "users": 3,
+      "customers": 2,
+      "topologies": 4,
+      "credentials": 0,
+      "audit_logs": 17
+    }
+  },
+  "dexie": {
+    "databasePresent": false,
+    "counts": {},
+    "plaintextFound": false
+  },
+  "import": {
+    "txtPreviewCancelNoWrite": true,
+    "mdPreviewShown": true,
+    "csvApply": {
+      "devices": 3,
+      "links": 2,
+      "groups": 1,
+      "maskedCredentialRows": 1
+    }
+  },
+  "export": {
+    "zipPath": "C:\\Users\\DUS\\Desktop\\project\\nettopo-studio\\docs\\dev測試紀錄\\screenshots\\qa-pil-002-safe-csv-bundle.zip",
+    "members": [
+      "credentials.masked.csv",
+      "devices.csv",
+      "groups.csv",
+      "links.csv",
+      "missing-info.csv"
+    ],
+    "secretScan": "PASS",
+    "formulaNeutralized": true,
+    "safeIpRedaction": true,
+    "engineerFullExportDisabled": true
+  },
+  "security": {
+    "fullExportFlag": "PASS"
+  },
+  "cleanup": {
+    "sites": 0,
+    "users": 0,
+    "customers": 0,
+    "topologies": 0,
+    "credentials": 0,
+    "audit_logs": 0
+  }
+}

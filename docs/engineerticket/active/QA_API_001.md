@@ -22,7 +22,7 @@
 |---|---|
 | User Intent | 確認 Audit protected API 不會在未驗證身分前解析不可信 query 或碰 repository／DB，並讓 limit 行為可測可預期 |
 | Historical Sources | `REQUIREMENT-BASELINE.md`、`RULES.md`、`DECISION-LOG.md`、`DSG_API_002.md`、`DEV_API_001.md` |
-| Approved Decisions | `PM_GOV_001-D03`、`D06`、`D11`、`D12`、`D13`；2026-08-20 strict `limit` contract approved |
+| Approved Decisions | `PM_GOV_001-D03`、`D06`、`D11`、`D12`、`D13`、`D14` |
 | Change Type | `CORRECT` + `EXTEND` |
 | Affected Layers | Audit API route、Request identity、Audit repository boundary、Security headers、Node handler test |
 | Preserved Invariants | Audit boss-only／`audit.read` 不變；不改 Pilot／OIDC／Customer RBAC／DB schema／migration／package/env；response/log 不洩漏 stack、SQL、DB URL、secret、token、cookie、checksum |

@@ -22,7 +22,7 @@
 |---|---|
 | User Intent | 修正 Audit API 在 protected endpoint 上的 auth-first 行為，並將 `limit` 查詢參數收斂為可測、可預期的嚴格契約 |
 | Historical Sources | `REQUIREMENT-BASELINE.md`、`RULES.md`、`DECISION-LOG.md`、`ARCHITECTURE-MAP.md`、`DESIGN-DEVELOPMENT-MAP.md`、`TICKET-REGISTER.md`、`DSG_API_002.md` |
-| Approved Decisions | `PM_GOV_001-D03`、`D06`、`D11`、`D12`、`D13`；2026-08-20 使用者核准 strict `limit` contract |
+| Approved Decisions | `PM_GOV_001-D03`、`D06`、`D11`、`D12`、`D13`、`D14` |
 | Change Type | `CORRECT` + `EXTEND`：修正 auth-first 測試缺口，擴充 strict limit 與 typed safe error |
 | Affected Layers | API route、Identity boundary、Audit repository call boundary、Security headers、Node handler tests |
 | Preserved Invariants | Audit read 維持 repository Boss／`audit.read` 授權；不改 Pilot Session／OIDC／Customer RBAC／DB schema／migration／package/env；所有回應 no-store 且不洩漏 secret／stack／SQL／DB URL |

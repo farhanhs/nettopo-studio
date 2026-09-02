@@ -1,0 +1,100 @@
+{
+  "ticket": "QA_IMP_001",
+  "phase": "2026-08-29 re-test browser",
+  "baseUrl": "http://127.0.0.1:4395",
+  "browser": "Playwright Chromium against loopback Pilot preview",
+  "statuses": [
+    {
+      "step": "pilot login",
+      "status": 200
+    },
+    {
+      "step": "post-login topology probe",
+      "status": 200
+    },
+    {
+      "step": "session profile visible",
+      "status": 200
+    }
+  ],
+  "fileGate": {
+    "oversizedBeforeTextRead": true,
+    "dbZeroWrite": true,
+    "duplicateIssueMessageCount": 1
+  },
+  "previewControls": {
+    "strategySelectCount": 1,
+    "confirmButtonCount": 1,
+    "expectedStrategySelectCount": 1,
+    "expectedConfirmButtonCount": 1
+  },
+  "warningAck": {
+    "confirmDisabledBeforeAck": true,
+    "confirmEnabledAfterAck": true,
+    "cancelZeroWrite": true
+  },
+  "blockingFailClosed": {
+    "confirmDisabled": true,
+    "domHackZeroWrite": true
+  },
+  "applyScenarios": {
+    "cancelZeroWrite": true,
+    "new": {
+      "topologyName": "QA IMP 001 Imported New",
+      "devices": 2,
+      "links": 1,
+      "groups": 1
+    },
+    "merge": {
+      "devices": 4,
+      "links": 2,
+      "groups": 2,
+      "remappedIds": true
+    },
+    "replace": {
+      "devices": 1,
+      "links": 0,
+      "groups": 1,
+      "siblingUnaffected": true
+    },
+    "maskedCredentialsWritten": 0
+  },
+  "exportChecks": {
+    "pilotEngineerFullCsvDisabled": true,
+    "safeCsvZipMembers": [
+      "credentials.masked.csv",
+      "devices.csv",
+      "groups.csv",
+      "links.csv",
+      "missing-info.csv"
+    ],
+    "safeCsvBrowserRoundTrip": {
+      "devices": 1,
+      "links": 0,
+      "groups": 1
+    },
+    "secretScan": "PASS"
+  },
+  "screenshots": [
+    "C:\\Users\\DUS\\Desktop\\project\\nettopo-studio\\docs\\dev測試紀錄\\screenshots\\qa-imp-001-retest-oversized-file-gate.png",
+    "C:\\Users\\DUS\\Desktop\\project\\nettopo-studio\\docs\\dev測試紀錄\\screenshots\\qa-imp-001-retest-preview-controls.png"
+  ],
+  "dbCounts": {
+    "afterSeed": {
+      "sites": 1,
+      "users": 1,
+      "customers": 1,
+      "topologies": 1,
+      "credentials": 0,
+      "audit_logs": 0
+    }
+  },
+  "cleanup": {
+    "sites": 0,
+    "users": 0,
+    "customers": 0,
+    "topologies": 0,
+    "credentials": 0,
+    "audit_logs": 0
+  }
+}
