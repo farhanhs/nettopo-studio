@@ -88,7 +88,8 @@ test("quantity nodes and collapsible groups use a separate migration", async () 
 test("runtime repository uses migrations instead of embedded create-table DDL", async () => {
   const source = await readFile(new URL("../db/topology-postgres.ts", import.meta.url), "utf8");
   assert.doesNotMatch(source, /create\s+table/i);
-  assert.match(source, /runPostgresMigrations/);
+  assert.doesNotMatch(source, /runPostgresMigrations|postgresMigrations|seedDictionaries/);
+  assert.match(source, /assertPostgresSchemaReady/);
 });
 
 test("migration runner applies a new migration and records it", async () => {
