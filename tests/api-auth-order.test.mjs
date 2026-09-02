@@ -14,17 +14,17 @@ function body(source, signature) {
 
 test("topology POST authenticates before parsing an untrusted request body", () => {
   const post = body(topology, "export async function POST");
-  assert.ok(post.indexOf("requireRequestIdentity(request)") < post.indexOf("request.json()"));
+  assert.ok(post.indexOf("requirePilotBoundRequestIdentity(request)") < post.indexOf("request.json()"));
 });
 
 test("credentials POST authenticates before parsing an untrusted request body", () => {
   const post = body(credentials, "export async function POST");
-  assert.ok(post.indexOf("requireRequestIdentity(request)") < post.indexOf("request.json()"));
+  assert.ok(post.indexOf("requirePilotBoundRequestIdentity(request)") < post.indexOf("request.json()"));
 });
 
 test("credentials GET authenticates before query/resource validation", () => {
   const get = body(credentials, "export async function GET");
-  assert.ok(get.indexOf("requireRequestIdentity(request)") < get.indexOf('searchParams.get("topologyId")'));
+  assert.ok(get.indexOf("requirePilotBoundRequestIdentity(request)") < get.indexOf('searchParams.get("topologyId")'));
 });
 
 test("audit logs GET authenticates before query parsing", () => {

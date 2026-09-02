@@ -1,5 +1,6 @@
 import { noStoreHeaders } from "../../lib/server/http-security.ts";
-import { RequestIdentityError, requireRequestIdentity, type RequestIdentity } from "../../lib/server/request-identity.ts";
+import { requirePilotBoundRequestIdentity } from "../../lib/server/pilot-request.ts";
+import { RequestIdentityError, type RequestIdentity } from "../../lib/server/request-identity.ts";
 import type { AuditLogRecord } from "../../lib/topology-types.ts";
 import { PostgresSchemaNotReadyError, safePostgresSchemaError } from "../../../db/postgres-schema-check.ts";
 import { readAuditLogs } from "../../../db/topology-postgres.ts";
@@ -16,9 +17,13 @@ export type AuditApiErrorCode =
   | "AUDIT_API_ERROR";
 
 type AuditLogsHandlerDeps = {
-  authenticate: (request: Request) => RequestIdentity;
+  authenticate: (request: Request) => RequestIdentity | Promise<RequestIdentity>;
   parseLimit?: (url: string) => number;
-  readAuditLogs: (email: string, limit: number) => Promise<AuditLogRecord[]>;
+  readAuditLogs: (
+    email: string,
+    limit: number,
+    context?: { identitySource?: RequestIdentity["source"]; pilotPrincipal?: RequestIdentity["pilot"] },
+  ) => Promise<AuditLogRecord[]>;
 };
 
 export class AuditApiError extends Error {
@@ -78,10 +83,10 @@ export function mapAuditApiError(error: unknown): { status: number; body: Record
 export function createAuditLogsGetHandler(deps: AuditLogsHandlerDeps) {
   return async function auditLogsGetHandler(request: Request) {
     try {
-      const identity = deps.authenticate(request);
+      const identity = await deps.authenticate(request);
       const limit = (deps.parseLimit ?? parseAuditLimit)(request.url);
       return Response.json(
-        { auditLogs: await deps.readAuditLogs(identity.email, limit) },
+        { auditLogs: await deps.readAuditLogs(identity.email, limit, { identitySource: identity.source, pilotPrincipal: identity.pilot }) },
         { headers: noStoreHeaders() },
       );
     } catch (error) {
@@ -92,6 +97,6 @@ export function createAuditLogsGetHandler(deps: AuditLogsHandlerDeps) {
 }
 
 export const GET = createAuditLogsGetHandler({
-  authenticate: requireRequestIdentity,
+  authenticate: requirePilotBoundRequestIdentity,
   readAuditLogs,
 });
