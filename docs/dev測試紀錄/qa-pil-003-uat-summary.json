@@ -1,0 +1,199 @@
+{
+  "ticket": "QA_PIL_003",
+  "result": "QA_PASSED",
+  "browser": "Playwright Chromium against loopback Pilot preview; in-app Browser runtime setup succeeded before fallback for reproducible UAT script",
+  "baseUrl": "http://127.0.0.1:4396",
+  "startedAt": "2026-09-01T08:41:10.375Z",
+  "durationMs": 27311,
+  "statuses": [
+    {
+      "step": "unauth protected topology",
+      "status": 401
+    },
+    {
+      "step": "engineer login",
+      "status": 200
+    },
+    {
+      "step": "after logout topology",
+      "status": 401
+    },
+    {
+      "step": "tampered cookie topology",
+      "status": 401
+    }
+  ],
+  "cookieAttributes": {
+    "name": "__Host-nettopo-pilot-session",
+    "path": "Path=/",
+    "maxAge": "Max-Age=21600",
+    "httpOnly": true,
+    "secure": true,
+    "sameSite": "SameSite=Strict"
+  },
+  "screenshots": [
+    "C:\\Users\\DUS\\Desktop\\project\\nettopo-studio\\docs\\dev測試紀錄\\screenshots\\qa-pil-003-01-engineer-login.png",
+    "C:\\Users\\DUS\\Desktop\\project\\nettopo-studio\\docs\\dev測試紀錄\\screenshots\\qa-pil-003-02-synthetic-customer-topology.png",
+    "C:\\Users\\DUS\\Desktop\\project\\nettopo-studio\\docs\\dev測試紀錄\\screenshots\\qa-pil-003-03-txt-preview.png",
+    "C:\\Users\\DUS\\Desktop\\project\\nettopo-studio\\docs\\dev測試紀錄\\screenshots\\qa-pil-003-04-blocking-exclusion.png",
+    "C:\\Users\\DUS\\Desktop\\project\\nettopo-studio\\docs\\dev測試紀錄\\screenshots\\qa-pil-003-05-md-preview.png",
+    "C:\\Users\\DUS\\Desktop\\project\\nettopo-studio\\docs\\dev測試紀錄\\screenshots\\qa-pil-003-06-csv-applied.png",
+    "C:\\Users\\DUS\\Desktop\\project\\nettopo-studio\\docs\\dev測試紀錄\\screenshots\\qa-pil-003-07-canvas-routes.png"
+  ],
+  "dbCounts": {
+    "afterSeed": {
+      "sites": 2,
+      "users": 3,
+      "customers": 1,
+      "topologies": 1,
+      "credentials": 0,
+      "audit_logs": 0
+    },
+    "afterSyntheticCreate": {
+      "sites": 2,
+      "users": 3,
+      "customers": 2,
+      "topologies": 3,
+      "credentials": 0,
+      "audit_logs": 3
+    },
+    "beforeCleanup": {
+      "sites": 2,
+      "users": 3,
+      "customers": 2,
+      "topologies": 5,
+      "credentials": 0,
+      "audit_logs": 9
+    }
+  },
+  "importPreview": {
+    "txtMaskedPreview": true,
+    "txtCancelZeroWrite": true,
+    "mdPreview": true,
+    "csvCounts": {
+      "devices": 3,
+      "links": 3,
+      "groups": 1,
+      "maskedCredentials": 1
+    },
+    "warningAcknowledgement": true,
+    "appliedProject": {
+      "devices": 3,
+      "links": 3,
+      "groups": 1
+    }
+  },
+  "missingInfo": {
+    "blockingExclusion": {
+      "confirmDisabledBeforeExclude": true,
+      "exclusionButtonUsed": true,
+      "zeroWrite": true
+    }
+  },
+  "canvas": {
+    "routeElements": [
+      {
+        "linkId": "uat-link-primary",
+        "kind": "orthogonal",
+        "status": "resolved",
+        "className": "flow-link speed-fiber-1g orthogonal resolved ",
+        "path": "M 258 276.3 L 280 276.3 L 280 272 L 308 272 L 330 272",
+        "label": "1 Gbps"
+      },
+      {
+        "linkId": "uat-link-backup",
+        "kind": "orthogonal",
+        "status": "resolved",
+        "className": "flow-link speed-fiber-1g orthogonal resolved ",
+        "path": "M 258 264.3 L 280 264.3 L 280 260 L 308 260 L 330 260",
+        "label": "1 Gbps · VLAN 20"
+      },
+      {
+        "linkId": "uat-link-server",
+        "kind": "orthogonal",
+        "status": "resolved",
+        "className": "flow-link speed-fiber-10g orthogonal resolved ",
+        "path": "M 508 216 L 530 216 L 558 216 L 580 216",
+        "label": "10 Gbps · VLAN 30"
+      },
+      {
+        "linkId": "link-mtif4gjt-ozxmj",
+        "kind": "wireless",
+        "status": "resolved",
+        "className": "flow-link speed-wireless wireless resolved ",
+        "path": "M 258 264.3 L 580 260",
+        "label": "1 Gbps"
+      }
+    ],
+    "wiredCount": 3,
+    "resolvedWiredCount": 3,
+    "unresolvedWiredCount": 0,
+    "wirelessCount": 1,
+    "orthogonalPaths": 3,
+    "sharedCorridorOffsetObserved": true
+  },
+  "persistence": {
+    "reloadProject": {
+      "devices": 3,
+      "links": 4,
+      "groups": 1
+    },
+    "movedRouterPersisted": true
+  },
+  "export": {
+    "safeZipMembers": [
+      "credentials.masked.csv",
+      "devices.csv",
+      "groups.csv",
+      "links.csv",
+      "missing-info.csv"
+    ],
+    "safeSecretScan": "PASS",
+    "formulaNeutralized": true,
+    "safeCanonicalEquality": true,
+    "engineerFullCsvDisabled": true,
+    "zipPath": "C:\\Users\\DUS\\Desktop\\project\\nettopo-studio\\docs\\dev測試紀錄\\screenshots\\qa-pil-003-safe-csv-bundle.zip"
+  },
+  "rbac": {
+    "engineer": {
+      "credentialWrite": 403,
+      "auditRead": 403
+    },
+    "admin": {
+      "pilotSiteOnly": true,
+      "fullExportDefaultDisabled": true
+    }
+  },
+  "usability": {
+    "retries": 0,
+    "frictions": [
+      {
+        "severity": "MINOR",
+        "area": "Import strategy",
+        "note": "CSV warning import requires explicit acknowledgement; behavior is safe and understandable but adds one extra click."
+      },
+      {
+        "severity": "OBSERVATION",
+        "area": "Safe export",
+        "note": "Engineer can discover Safe CSV; Full CSV is visibly disabled in Pilot as expected."
+      }
+    ]
+  },
+  "cleanup": {
+    "sites": 0,
+    "users": 0,
+    "customers": 0,
+    "topologies": 0,
+    "credentials": 0,
+    "audit_logs": 0
+  },
+  "canvasProject": {
+    "afterWirelessCreate": {
+      "devices": 3,
+      "links": 4,
+      "wiredLinks": 3,
+      "wirelessLinks": 1
+    }
+  },
+  "finishedAt": "2026-09-01T08:41:37.701Z"
+}

@@ -12,6 +12,8 @@
 - `rbac-p0-closeout-2026-08-13.md`：P0 Customer / Topology RBAC 收尾驗證，2026-08-14 更新。
 - `qa-uix-001-routing-visual-2026-08-18.md`：DEV_UIX_002 直角避障路由與無線例外驗收。
 - `qa-api-001-audit-api-2026-08-20.md`：QA_API_001 Audit API auth-first、strict limit、安全錯誤與 headers 驗收。
+- `qa-dbm-001-2026-08-20.md`：QA_DBM_001 真實 PostgreSQL Migration／Runtime role boundary 驗收。
+- `qa-pil-002-browser-2026-08-20.md`：QA_PIL_002 Internal Pilot Browser critical flow；首輪 Demo identity blocker 修復後重驗 QA_PASSED。
 
 ## 紀錄原則
 
