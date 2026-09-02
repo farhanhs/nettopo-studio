@@ -6,7 +6,7 @@ services:
     environment:
       POSTGRES_DB: nettopo_studio
       POSTGRES_USER: nettopo
-      POSTGRES_PASSWORD: nettopo_dev_password
+      POSTGRES_PASSWORD: ${NETTOPO_POSTGRES_PASSWORD:?Set NETTOPO_POSTGRES_PASSWORD outside source control}
     ports:
       - "5432:5432"
     volumes:
