@@ -1,3 +1,5 @@
+import { MASKED_SECRET, maskCredentialUsername } from "../app/lib/credential-masking.ts";
+
 const textEncoder = new TextEncoder();
 
 type EncryptCredentialInput = {
@@ -27,17 +29,7 @@ function encodeBase64(value: ArrayBuffer | Uint8Array) {
   return btoa(binary);
 }
 
-export function maskCredentialUsername(value?: string) {
-  const username = value?.trim();
-  if (!username) return undefined;
-  const at = username.indexOf("@");
-  if (at > 0) {
-    const local = username.slice(0, at);
-    return `${local.slice(0, 1)}***@${username.slice(at + 1)}`;
-  }
-  if (username.length === 1) return "*";
-  return `${username.slice(0, 1)}***${username.slice(-1)}`;
-}
+export { maskCredentialUsername };
 
 export async function encryptCredentialEnvelope(input: EncryptCredentialInput, options: EncryptionOptions = {}) {
   const encodedKey = options.encodedKey ?? process.env.NETTOPO_CREDENTIAL_ENCRYPTION_KEY;
@@ -60,7 +52,7 @@ export async function encryptCredentialEnvelope(input: EncryptCredentialInput, o
 
   return {
     usernameMasked: maskCredentialUsername(input.username),
-    secretMasked: "********",
+    secretMasked: MASKED_SECRET,
     secretCiphertext: encodeBase64(ciphertext),
     secretNonce: encodeBase64(nonce),
     keyVersion,

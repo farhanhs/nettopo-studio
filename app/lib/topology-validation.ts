@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import type { Project } from "./topology-types";
+import type { Device, Project } from "./topology-types";
 
 const MAX_ID_LENGTH = 128;
 const MAX_TEXT_LENGTH = 2_000;
@@ -67,14 +67,14 @@ function formatZodError(error: z.ZodError) {
   }).join("; ");
 }
 
-function containsProjectCredentials(value: unknown) {
+export function containsProjectCredentials(value: unknown) {
   if (!value || typeof value !== "object") return false;
   const devices = (value as { devices?: unknown }).devices;
   if (!Array.isArray(devices)) return false;
   return devices.some((device) =>
     Boolean(device) &&
     typeof device === "object" &&
-    (Object.hasOwn(device, "username") || Object.hasOwn(device, "password")),
+    (Object.hasOwn(device, "username") || Object.hasOwn(device, "password") || Object.hasOwn(device, "secret")),
   );
 }
 
@@ -121,12 +121,21 @@ export function validateProject(value: unknown): Project {
 export function stripProjectCredentials(project: Project): Project {
   return {
     devices: project.devices.map((device) => {
-      const safeDevice = { ...device };
+      const safeDevice = { ...(device as Device & {
+        username?: unknown;
+        password?: unknown;
+        secret?: unknown;
+      }) };
       delete safeDevice.username;
       delete safeDevice.password;
-      return safeDevice;
+      delete safeDevice.secret;
+      return { ...safeDevice };
     }),
     links: project.links.map((link) => ({ ...link })),
     groups: project.groups.map((group) => ({ ...group })),
   };
+}
+
+export function sanitizeProject(project: Project): Project {
+  return validateProject(stripProjectCredentials(project));
 }

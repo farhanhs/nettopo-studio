@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import { validateProject } from "../app/lib/topology-validation.ts";
+import { containsProjectCredentials, sanitizeProject, validateProject } from "../app/lib/topology-validation.ts";
 
 const validProject = {
   groups: [{ id: "site-1", name: " Main site ", kind: "site", color: "#AABBCC", collapsed: true }],
@@ -55,4 +55,19 @@ test("validateProject rejects self-links, invalid coordinates, and plaintext cre
     () => validateProject({ ...validProject, devices: [{ ...validProject.devices[0], password: "secret" }] }),
     /credentials API/,
   );
+});
+
+test("sanitizeProject strips legacy device credentials before state or storage", () => {
+  const unsafe = {
+    ...validProject,
+    devices: [{ ...validProject.devices[0], username: "admin", password: "cleartext", secret: "raw" }, validProject.devices[1]],
+  };
+  const sanitized = sanitizeProject(unsafe);
+
+  assert.equal(containsProjectCredentials(unsafe), true);
+  assert.equal(containsProjectCredentials(sanitized), false);
+  assert.equal(sanitized.devices[0].username, undefined);
+  assert.equal(sanitized.devices[0].password, undefined);
+  assert.equal(sanitized.devices[0].secret, undefined);
+  assert.deepEqual(sanitized, validateProject(sanitized));
 });
