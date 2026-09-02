@@ -20,15 +20,19 @@ test("persistent sean.sie demo has the requested spine-leaf inventory", () => {
   assert.equal(resolveLayoutMode(SEAN_SPINE_LEAF_PROJECT, "auto-detect"), "spine-leaf");
 });
 
-test("local and PostgreSQL repositories seed the demo idempotently for sean.sie", async () => {
+test("local and PostgreSQL repositories keep demo seed behind explicit gates", async () => {
   const [localSource, postgresSource] = await Promise.all([
     readFile(new URL("../app/lib/topology-store.ts", import.meta.url), "utf8"),
     readFile(new URL("../db/topology-postgres.ts", import.meta.url), "utf8"),
   ]);
 
+  assert.doesNotMatch(localSource, /^import .*demo-topologies/m);
+  assert.match(localSource, /readRuntimeCapabilities/);
   assert.match(localSource, /ensureSeanSpineLeafDemo/);
+  assert.match(localSource, /runtime\.demoSeed/);
   assert.match(localSource, /ownerUserId: LOCAL_ADMIN_USER\.id/);
   assert.match(postgresSource, /seedSeanSpineLeafDemo/);
+  assert.match(postgresSource, /seedDemoDatabase/);
   assert.match(postgresSource, /user-sean-sie/);
   assert.match(postgresSource, /on conflict \(id\) do nothing/i);
 });
