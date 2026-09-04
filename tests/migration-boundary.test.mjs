@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { readdir, readFile } from "node:fs/promises";
 import test from "node:test";
 
-import { definePostgresMigrations } from "../db/postgres-migrations.js";
+import { canonicalizePostgresMigrationSource, definePostgresMigrations } from "../db/postgres-migrations.js";
 import { expectedPostgresMigrations } from "../db/postgres-schema-version.ts";
 import { loadPostgresMigrationSources } from "../scripts/lib/load-postgres-migrations.mjs";
 
@@ -51,11 +51,37 @@ test("runtime schema checker is read-only and does not write migration records",
 test("generated schema version metadata is synchronized with SQL migrations and contains no SQL body", async () => {
   const generated = expectedPostgresMigrations;
   const loaded = definePostgresMigrations(await loadPostgresMigrationSources())
-    .map(({ version, name, filename, checksum }) => ({ version, name, filename, checksum }));
+    .map(({ version, name, filename, checksum, compatibleChecksums }) => ({
+      version,
+      name,
+      filename,
+      checksum,
+      ...(compatibleChecksums?.length ? { compatibleChecksums } : {}),
+    }));
   const source = await readFile(new URL("../db/postgres-schema-version.ts", import.meta.url), "utf8");
 
   assert.deepEqual(generated, loaded);
   assert.doesNotMatch(source, /create table|alter table|insert into|\.sql\?raw|source/i);
+});
+
+test("generated schema metadata matches CRLF migration checkout text", async () => {
+  const lfSources = await loadPostgresMigrationSources();
+  const crlfSources = Object.fromEntries(
+    Object.entries(lfSources).map(([filename, source]) => [
+      filename,
+      canonicalizePostgresMigrationSource(filename, source).canonicalSource.replaceAll("\n", "\r\n"),
+    ]),
+  );
+  const loaded = definePostgresMigrations(crlfSources)
+    .map(({ version, name, filename, checksum, compatibleChecksums }) => ({
+      version,
+      name,
+      filename,
+      checksum,
+      ...(compatibleChecksums?.length ? { compatibleChecksums } : {}),
+    }));
+
+  assert.deepEqual(expectedPostgresMigrations, loaded);
 });
 
 test("no empty forward migration was created for the boundary refactor", async () => {

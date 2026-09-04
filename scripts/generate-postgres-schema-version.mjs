@@ -7,17 +7,27 @@ async function main() {
   const requiredVersion = migrations.at(-1)?.version;
   if (!requiredVersion) throw new Error("No PostgreSQL migrations found.");
 
-  const body = `export type PostgresMigrationExpectation = {
+const body = `export type PostgresMigrationExpectation = {
   version: string;
   name: string;
   filename: string;
   checksum: string;
+  compatibleChecksums?: Array<{
+    checksum: string;
+    reason: "legacy_raw_crlf";
+  }>;
 };
 
 export const requiredPostgresSchemaVersion = ${JSON.stringify(requiredVersion)};
 
 export const expectedPostgresMigrations: PostgresMigrationExpectation[] = ${JSON.stringify(
-    migrations.map(({ version, name, filename, checksum }) => ({ version, name, filename, checksum })),
+    migrations.map(({ version, name, filename, checksum, compatibleChecksums }) => ({
+      version,
+      name,
+      filename,
+      checksum,
+      ...(compatibleChecksums?.length ? { compatibleChecksums } : {}),
+    })),
     null,
     2,
   )};

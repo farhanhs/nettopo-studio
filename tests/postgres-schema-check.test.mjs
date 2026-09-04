@@ -22,6 +22,18 @@ test("schema status reports ready when every expected migration is applied", () 
   assert.deepEqual(status.checksumMismatches, []);
 });
 
+test("schema status accepts deterministic legacy raw CRLF migration checksums", () => {
+  const legacyApplied = expectedPostgresMigrations.map((migration) => ({
+    version: migration.version,
+    checksum: migration.compatibleChecksums?.[0]?.checksum ?? migration.checksum,
+  }));
+  const status = evaluatePostgresSchemaStatus(legacyApplied);
+
+  assert.equal(status.ready, true);
+  assert.equal(status.state, "ready");
+  assert.deepEqual(status.checksumMismatches, []);
+});
+
 test("schema status reports uninitialized and outdated states", () => {
   assert.equal(evaluatePostgresSchemaStatus([]).state, "uninitialized");
 

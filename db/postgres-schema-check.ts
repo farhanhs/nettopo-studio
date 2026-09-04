@@ -93,6 +93,11 @@ function compareVersion(left: string | undefined, right: string | undefined) {
   return (left ?? "").localeCompare(right ?? "", "en", { numeric: true });
 }
 
+function isCompatibleMigrationChecksum(row: SchemaMigrationRow, expected: PostgresMigrationExpectation) {
+  if (row.checksum === expected.checksum) return true;
+  return Boolean(expected.compatibleChecksums?.some(({ checksum }) => checksum === row.checksum));
+}
+
 export function evaluatePostgresSchemaStatus(
   appliedRows: SchemaMigrationRow[],
   expectations: PostgresMigrationExpectation[] = expectedPostgresMigrations,
@@ -107,7 +112,7 @@ export function evaluatePostgresSchemaStatus(
   const checksumMismatches = appliedRows
     .map((row) => {
       const expected = expectedByVersion.get(row.version);
-      if (!expected || expected.checksum === row.checksum) return undefined;
+      if (!expected || isCompatibleMigrationChecksum(row, expected)) return undefined;
       return {
         version: row.version,
         expectedChecksum: expected.checksum,
