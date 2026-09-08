@@ -1,0 +1,103 @@
+{
+  "ticket": "QA_PIL_004",
+  "result": "PASS",
+  "mode": "browser-local / Playwright Chromium / loopback preview",
+  "baseUrl": "http://127.0.0.1:4404",
+  "startedAt": "2026-09-04T13:45:56.904Z",
+  "durationMs": 33573,
+  "screenshots": [
+    "C:\\Users\\DUS\\Desktop\\project\\nettopo-studio\\docs\\dev測試紀錄\\screenshots\\qa-pil-004-local-empty-initial.png",
+    "C:\\Users\\DUS\\Desktop\\project\\nettopo-studio\\docs\\dev測試紀錄\\screenshots\\qa-pil-004-responsive-unspecified-modal.png",
+    "C:\\Users\\DUS\\Desktop\\project\\nettopo-studio\\docs\\dev測試紀錄\\screenshots\\qa-pil-004-created-unspecified-topology.png",
+    "C:\\Users\\DUS\\Desktop\\project\\nettopo-studio\\docs\\dev測試紀錄\\screenshots\\qa-pil-004-device-persist-before-reload.png",
+    "C:\\Users\\DUS\\Desktop\\project\\nettopo-studio\\docs\\dev測試紀錄\\screenshots\\qa-pil-004-reload-persisted-unspecified.png"
+  ],
+  "network": [
+    {
+      "path": "/api/runtime-capabilities",
+      "status": 200,
+      "cacheControl": "no-store",
+      "xContentTypeOptions": "nosniff"
+    },
+    {
+      "path": "/api/dev/session",
+      "status": 200,
+      "cacheControl": "",
+      "xContentTypeOptions": ""
+    },
+    {
+      "path": "/api/runtime-capabilities",
+      "status": 200,
+      "cacheControl": "no-store",
+      "xContentTypeOptions": "nosniff"
+    },
+    {
+      "path": "/api/runtime-capabilities",
+      "status": 200,
+      "cacheControl": "no-store",
+      "xContentTypeOptions": "nosniff"
+    },
+    {
+      "path": "/api/runtime-capabilities",
+      "status": 200,
+      "cacheControl": "no-store",
+      "xContentTypeOptions": "nosniff"
+    },
+    {
+      "path": "/api/session",
+      "status": 503,
+      "cacheControl": "no-store",
+      "xContentTypeOptions": "nosniff"
+    },
+    {
+      "path": "/api/dev/session",
+      "status": 200,
+      "cacheControl": "",
+      "xContentTypeOptions": ""
+    },
+    {
+      "path": "/api/runtime-capabilities",
+      "status": 200,
+      "cacheControl": "no-store",
+      "xContentTypeOptions": "nosniff"
+    },
+    {
+      "path": "/api/runtime-capabilities",
+      "status": 200,
+      "cacheControl": "no-store",
+      "xContentTypeOptions": "nosniff"
+    }
+  ],
+  "localEmptySites": {
+    "optionText": "未指定",
+    "selectDisabled": false,
+    "selectRequired": false,
+    "createdTopologyName": "QA PIL 004 未指定拓樸 1788529556904",
+    "renderedSiteText": "未指定站點"
+  },
+  "persistence": {
+    "customerCount": 1,
+    "topologyCount": 2,
+    "createdSiteId": null,
+    "fakeSiteIdDetected": false,
+    "devicePersistedAfterReload": true
+  },
+  "responsive": {
+    "innerWidth": 360,
+    "scrollWidth": 360,
+    "modalWidth": 344,
+    "gridColumns": "312px",
+    "actionsBottom": 381.5,
+    "actionsTop": 312.5,
+    "innerHeight": 520
+  },
+  "guardCoverage": {
+    "serverPilotEmptySites": "covered by tests/dev-pil-002-topology-site.test.mjs and tests/pilot-checkpoint.test.mjs; not asserted as browser evidence in this script",
+    "browserLocalWithSites": "not representable in current Dexie schema because local durable DB has customers/topologies/meta only and app returns sites=[] in local mode",
+    "activeTopologySiteInheritance": "covered by tests/dev-pil-002-topology-site.test.mjs source guard and this browser-local persisted undefined siteId check"
+  },
+  "cleanup": {
+    "storage": "ephemeral Playwright browser context closed; no persistent QA DB fixture created by this local-mode UAT",
+    "postgresFixtureCounts": "not applicable"
+  }
+}

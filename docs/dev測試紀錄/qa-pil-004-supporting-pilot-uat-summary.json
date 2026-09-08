@@ -1,0 +1,166 @@
+{
+  "ticket": "QA_PIL_003",
+  "result": "QA_FAILED",
+  "browser": "Playwright Chromium against loopback Pilot preview; in-app Browser runtime setup succeeded before fallback for reproducible UAT script",
+  "baseUrl": "http://127.0.0.1:4396",
+  "startedAt": "2026-09-04T13:48:34.599Z",
+  "durationMs": 75345,
+  "statuses": [
+    {
+      "step": "unauth protected topology",
+      "status": 401
+    },
+    {
+      "step": "engineer login",
+      "status": 200
+    }
+  ],
+  "cookieAttributes": {
+    "name": "__Host-nettopo-pilot-session",
+    "path": "Path=/",
+    "maxAge": "Max-Age=21600",
+    "httpOnly": true,
+    "secure": true,
+    "sameSite": "SameSite=Strict"
+  },
+  "screenshots": [
+    "C:\\Users\\DUS\\Desktop\\project\\nettopo-studio\\docs\\dev測試紀錄\\screenshots\\qa-pil-003-01-engineer-login.png",
+    "C:\\Users\\DUS\\Desktop\\project\\nettopo-studio\\docs\\dev測試紀錄\\screenshots\\qa-pil-003-02-synthetic-customer-topology.png",
+    "C:\\Users\\DUS\\Desktop\\project\\nettopo-studio\\docs\\dev測試紀錄\\screenshots\\qa-pil-003-03-txt-preview.png",
+    "C:\\Users\\DUS\\Desktop\\project\\nettopo-studio\\docs\\dev測試紀錄\\screenshots\\qa-pil-003-04-blocking-exclusion.png",
+    "C:\\Users\\DUS\\Desktop\\project\\nettopo-studio\\docs\\dev測試紀錄\\screenshots\\qa-pil-003-05-md-preview.png",
+    "C:\\Users\\DUS\\Desktop\\project\\nettopo-studio\\docs\\dev測試紀錄\\screenshots\\qa-pil-003-06-csv-applied.png",
+    "C:\\Users\\DUS\\Desktop\\project\\nettopo-studio\\docs\\dev測試紀錄\\screenshots\\qa-pil-003-07-canvas-routes.png",
+    "C:\\Users\\DUS\\Desktop\\project\\nettopo-studio\\docs\\dev測試紀錄\\screenshots\\qa-pil-003-failure-session-profile-overlap.png"
+  ],
+  "dbCounts": {
+    "afterSeed": {
+      "sites": 2,
+      "users": 3,
+      "customers": 1,
+      "topologies": 1,
+      "credentials": 0,
+      "audit_logs": 0
+    },
+    "afterSyntheticCreate": {
+      "sites": 2,
+      "users": 3,
+      "customers": 2,
+      "topologies": 3,
+      "credentials": 0,
+      "audit_logs": 3
+    }
+  },
+  "importPreview": {
+    "txtMaskedPreview": true,
+    "txtCancelZeroWrite": true,
+    "mdPreview": true,
+    "csvCounts": {
+      "devices": 3,
+      "links": 3,
+      "groups": 1,
+      "maskedCredentials": 1
+    },
+    "warningAcknowledgement": true,
+    "appliedProject": {
+      "devices": 3,
+      "links": 3,
+      "groups": 1
+    }
+  },
+  "missingInfo": {
+    "blockingExclusion": {
+      "confirmDisabledBeforeExclude": true,
+      "exclusionButtonUsed": true,
+      "zeroWrite": true
+    }
+  },
+  "canvas": {
+    "routeElements": [
+      {
+        "linkId": "uat-link-primary",
+        "kind": "orthogonal",
+        "status": "resolved",
+        "className": "flow-link speed-fiber-1g orthogonal resolved ",
+        "path": "M 258 276.3 L 280 276.3 L 280 272 L 308 272 L 330 272",
+        "label": "1 Gbps"
+      },
+      {
+        "linkId": "uat-link-backup",
+        "kind": "orthogonal",
+        "status": "resolved",
+        "className": "flow-link speed-fiber-1g orthogonal resolved ",
+        "path": "M 258 264.3 L 280 264.3 L 280 260 L 308 260 L 330 260",
+        "label": "1 Gbps · VLAN 20"
+      },
+      {
+        "linkId": "uat-link-server",
+        "kind": "orthogonal",
+        "status": "resolved",
+        "className": "flow-link speed-fiber-10g orthogonal resolved ",
+        "path": "M 508 216 L 530 216 L 558 216 L 580 216",
+        "label": "10 Gbps · VLAN 30"
+      },
+      {
+        "linkId": "link-mtn0fqxk-b6ezz",
+        "kind": "wireless",
+        "status": "resolved",
+        "className": "flow-link speed-wireless wireless resolved ",
+        "path": "M 258 264.3 L 580 260",
+        "label": "1 Gbps"
+      }
+    ],
+    "wiredCount": 3,
+    "resolvedWiredCount": 3,
+    "unresolvedWiredCount": 0,
+    "wirelessCount": 1,
+    "orthogonalPaths": 3,
+    "sharedCorridorOffsetObserved": true
+  },
+  "persistence": {
+    "reloadProject": {
+      "devices": 3,
+      "links": 4,
+      "groups": 1
+    },
+    "movedRouterPersisted": true
+  },
+  "export": {},
+  "rbac": {
+    "engineer": {
+      "credentialWrite": 403,
+      "auditRead": 403
+    }
+  },
+  "usability": {
+    "retries": 0,
+    "frictions": [
+      {
+        "severity": "BLOCKING",
+        "area": "QA_PIL_003 UAT",
+        "note": "UAT stopped before completion: locator.click: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('.modal').last().getByRole('button', { name: '×' })\u001b[22m\n"
+      }
+    ]
+  },
+  "cleanup": {
+    "sites": 0,
+    "users": 0,
+    "customers": 0,
+    "topologies": 0,
+    "credentials": 0,
+    "audit_logs": 0
+  },
+  "failure": {
+    "name": "TimeoutError",
+    "message": "locator.click: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('.modal').last().getByRole('button', { name: '×' })\u001b[22m\n"
+  },
+  "canvasProject": {
+    "afterWirelessCreate": {
+      "devices": 3,
+      "links": 4,
+      "wiredLinks": 3,
+      "wirelessLinks": 1
+    }
+  },
+  "finishedAt": "2026-09-04T13:49:49.966Z"
+}
