@@ -19,7 +19,7 @@ import {
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
 import { Group as PanelGroup, Panel, Separator as PanelResizeHandle } from "react-resizable-panels";
-import { type FormEvent, type ReactNode, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { type FormEvent, type ReactNode, useCallback, useEffect, useId, useMemo, useRef, useState } from "react";
 import { FileDropZone } from "./components/import/FileDropZone";
 import { ImportPreviewModal } from "./components/import/ImportPreviewModal";
 import {
@@ -739,6 +739,9 @@ function TopologyApp() {
   const currentTopologies = topologies.filter((topology) => topology.customerId === activeCustomerId);
   const activeSite = sites.find((site) => site.id === activeTopology?.siteId);
   const availableSites = editableSites(currentUser, sites);
+  const canUseUnspecifiedSite = !USE_SERVER_STORAGE && ready && availableSites.length === 0;
+  const canCreateWithSelectedSite = availableSites.length > 0;
+  const canSubmitSiteScopedCreate = canCreateWithSelectedSite || canUseUnspecifiedSite;
   const canCreateRecords = permissions.canCreate;
   const canWriteActiveTopology = canWriteTopology(currentUser, activeTopology);
   const canManageActiveCustomer = currentUser?.role === "boss" || canWriteActiveTopology;
@@ -940,7 +943,12 @@ function TopologyApp() {
   async function addTopology(data: FormData) {
     const name = clean(data.get("name")) || "新拓樸";
     const copyCurrent = clean(data.get("copyCurrent")) === "on";
-    await createTopology(name, copyCurrent, clean(data.get("siteId")) || activeTopology?.siteId);
+    const selectedSiteId = clean(data.get("siteId")) || undefined;
+    if (!selectedSiteId && !canUseUnspecifiedSite) {
+      setNotice(USE_SERVER_STORAGE ? "目前帳號沒有可建立拓樸的站點。" : "站點資料尚未載入完成，請稍後再試。");
+      return;
+    }
+    await createTopology(name, copyCurrent, selectedSiteId);
     setSelection(undefined);
     setShowTopologyForm(false);
     setNotice(`已建立拓樸：${name}`);
@@ -1582,18 +1590,30 @@ function TopologyApp() {
       {showCustomerForm && <Modal title="新增客戶" onClose={() => setShowCustomerForm(false)}>
         <form action={addCustomer} className="form-grid">
           <label className="full">客戶名稱<input name="name" required placeholder="例如：興恆毅、A 客戶總公司" /></label>
-          <SiteField sites={availableSites} defaultSiteId={activeTopology?.siteId} />
+          <SiteField
+            sites={availableSites}
+            defaultSiteId={activeTopology?.siteId}
+            allowUnspecified={canUseUnspecifiedSite}
+            disabled={!canSubmitSiteScopedCreate}
+            emptyMessage={canUseUnspecifiedSite ? "本機資料尚未設定站點，將以未指定站點建立。" : "目前帳號沒有可建立客戶的站點。"}
+          />
           <div className="secret-warning full">新增客戶會建立一張空白的「現況拓樸」，方便與其他客戶資料分開保存。</div>
-          <FormActions onCancel={() => setShowCustomerForm(false)} submitLabel="建立客戶" />
+          <FormActions onCancel={() => setShowCustomerForm(false)} submitLabel="建立客戶" submitDisabled={!canSubmitSiteScopedCreate} />
         </form>
       </Modal>}
 
       {showTopologyForm && <Modal title="新增拓樸" onClose={() => setShowTopologyForm(false)}>
         <form action={addTopology} className="form-grid">
           <label className="full">拓樸名稱<input name="name" required placeholder="例如：更新後拓樸、B 分店現況" /></label>
-          <SiteField sites={availableSites} defaultSiteId={activeTopology?.siteId} />
+          <SiteField
+            sites={availableSites}
+            defaultSiteId={activeTopology?.siteId}
+            allowUnspecified={canUseUnspecifiedSite}
+            disabled={!canSubmitSiteScopedCreate}
+            emptyMessage={canUseUnspecifiedSite ? "本機資料尚未設定站點，將以未指定站點建立。" : "目前帳號沒有可建立拓樸的站點。"}
+          />
           <label className="check-row full"><input name="copyCurrent" type="checkbox" defaultChecked /> 複製目前拓樸作為新版草稿</label>
-          <FormActions onCancel={() => setShowTopologyForm(false)} submitLabel="建立拓樸" />
+          <FormActions onCancel={() => setShowTopologyForm(false)} submitLabel="建立拓樸" submitDisabled={!canSubmitSiteScopedCreate} />
         </form>
       </Modal>}
 
@@ -1748,13 +1768,31 @@ function LinkFields({ link, devices }: { link?: Link; devices: Device[] }) {
   );
 }
 
-function SiteField({ sites, defaultSiteId }: { sites: SiteRecord[]; defaultSiteId?: string }) {
+function SiteField({
+  sites,
+  defaultSiteId,
+  allowUnspecified = false,
+  disabled = false,
+  emptyMessage,
+}: {
+  sites: SiteRecord[];
+  defaultSiteId?: string;
+  allowUnspecified?: boolean;
+  disabled?: boolean;
+  emptyMessage?: string;
+}) {
+  const hasSites = sites.length > 0;
+  const selectedSiteId = sites.some((site) => site.id === defaultSiteId) ? defaultSiteId : sites[0]?.id ?? "";
+  const showUnspecified = !hasSites && allowUnspecified;
   return (
-    <label className="full">
+    <label className="site-field full">
       所屬站點
-      <select name="siteId" defaultValue={defaultSiteId ?? sites[0]?.id ?? ""} required>
-        {sites.map((site) => <option key={site.id} value={site.id}>{site.name}</option>)}
+      <select name="siteId" defaultValue={hasSites ? selectedSiteId : ""} required={hasSites && !allowUnspecified} disabled={disabled || (!hasSites && !allowUnspecified)}>
+        {hasSites
+          ? sites.map((site) => <option key={site.id} value={site.id}>{site.name}</option>)
+          : <option value="">{showUnspecified ? "未指定" : "無可用站點"}</option>}
       </select>
+      {!hasSites && emptyMessage && <span className="field-note">{emptyMessage}</span>}
     </label>
   );
 }
@@ -1790,11 +1828,14 @@ function LinkInspector({ link, devices, canEdit, onSave, onDelete }: { link: Lin
 }
 
 function Modal({ title, onClose, children }: { title: string; onClose: () => void; children: React.ReactNode }) {
+  const titleId = useId();
   return <div className="modal-backdrop" onMouseDown={(event) => { if (event.target === event.currentTarget) onClose(); }}>
-    <section className="modal"><header><h2>{title}</h2><button onClick={onClose}>×</button></header>{children}</section>
+    <section className="modal" role="dialog" aria-modal="true" aria-labelledby={titleId}>
+      <header><h2 id={titleId}>{title}</h2><button type="button" aria-label="關閉" onClick={onClose}>×</button></header>{children}
+    </section>
   </div>;
 }
 
-function FormActions({ onCancel, submitLabel = "確認新增" }: { onCancel: () => void; submitLabel?: string }) {
-  return <div className="form-actions full"><button type="button" className="secondary" onClick={onCancel}>取消</button><button type="submit" className="primary">{submitLabel}</button></div>;
+function FormActions({ onCancel, submitLabel = "確認新增", submitDisabled = false }: { onCancel: () => void; submitLabel?: string; submitDisabled?: boolean }) {
+  return <div className="form-actions full"><button type="button" className="secondary" onClick={onCancel}>取消</button><button type="submit" className="primary" disabled={submitDisabled}>{submitLabel}</button></div>;
 }

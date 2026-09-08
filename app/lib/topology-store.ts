@@ -503,6 +503,7 @@ export const useTopologyStore = create<TopologyStore>((set, get) => ({
     const topology: TopologyRecord = {
       id: uid("topology"),
       customerId: customer.id,
+      siteId: siteId || undefined,
       name: "現況拓樸",
       versionLabel: "v1",
       project: cloneProject(EMPTY_PROJECT),
@@ -548,6 +549,7 @@ export const useTopologyStore = create<TopologyStore>((set, get) => ({
     const topology: TopologyRecord = {
       id: uid("topology"),
       customerId: current.activeCustomerId,
+      siteId: siteId || undefined,
       ownerUserId: current.currentUser?.id,
       createdByUserId: current.currentUser?.id,
       updatedByUserId: current.currentUser?.id,

@@ -5,12 +5,12 @@
 | Group | DEV |
 | Feature | PIL |
 | Priority | P1 |
-| Status | PROPOSED |
+| Status | QA_PASSED |
 | Planned Order | 034 |
 | Checkpoint | Functional UAT |
 | Owner | 開發組 |
 | Created | 2026-08-31 |
-| Updated | 2026-08-31 |
+| Updated | 2026-09-08 |
 
 ## Objective
 
@@ -71,11 +71,11 @@
 
 ## Acceptance Criteria
 
-- [ ] 空站點清單時，「新增拓樸」modal 顯示可理解的「未指定」選項。
-- [ ] 空站點清單時，使用者可建立拓樸，且拓樸顯示為「未指定站點」。
-- [ ] 有站點資料時，既有站點選擇行為不退步。
-- [ ] Pilot profile 仍需明確 Pilot site scope，不得靠空白站點繞過。
-- [ ] QA fixture 可建立 synthetic site/customer/topology，並能覆蓋空站點與有站點兩種情境。
+- [x] 空站點清單時，「新增拓樸」modal 顯示可理解的「未指定」選項。
+- [x] 空站點清單時，使用者可建立拓樸，且拓樸顯示為「未指定站點」。
+- [x] 有站點資料時，既有站點選擇行為不退步。
+- [x] Pilot profile 仍需明確 Pilot site scope，不得靠空白站點繞過。
+- [x] QA fixture 可建立 synthetic site/customer/topology，並能覆蓋空站點與有站點兩種情境。
 - [ ] Browser UAT 可從建立拓樸繼續到匯入、畫布與儲存流程。
 
 ## Stop Conditions
@@ -87,3 +87,29 @@
 ## Handoff
 
 待 PM 核准後交開發組實作；完成後交 `QA_PIL_004` 重驗。
+
+## 本輪設計先行
+
+使用者已核准先由 `DSG_PIL_002` 補齊功能欄位及響應式容器規格。本輪 DEV 不開工，等待設計回 PM 後交付；依 `TOPOLOGY-CREATE-SITE-RESPONSIVE` contract 明確區分載入中、錯誤、真空清單及授權限制。後續仍在 commit 前等待使用者核准。
+
+## DEV Implementation 2026-09-04
+
+- `app/page.tsx`：新增 `canUseUnspecifiedSite` / `canSubmitSiteScopedCreate` gate；`addTopology()` 改為只送出明確選取的 `siteId` 或 browser-local loaded-empty 的 `undefined`，移除 `activeTopology?.siteId` fallback。
+- `SiteField`：空清單時顯示「未指定」或「無可用站點」，未使用 fake site id；server/Pilot 無站點時 submit disabled。
+- `Modal` / `app/globals.css`：補 dialog aria、關閉按鈕標籤、viewport 內 flex 容器、小螢幕單欄與 footer 可捲動/可達。
+- `app/lib/topology-store.ts`：local `createCustomer` / `createTopology` 保存選定 `siteId`，未指定保留 `undefined`。
+- `tests/dev-pil-002-topology-site.test.mjs`：新增 DEV regression，覆蓋 hidden fallback、browser-local only gate、SiteField fake id 禁止、local persistence、modal responsive/accessibility guard。
+
+驗證：
+
+- `node --test tests/dev-pil-002-topology-site.test.mjs`：PASS，5/5。
+- `node --test tests/dev-pil-002-topology-site.test.mjs tests/pilot-checkpoint.test.mjs`：PASS，14/14。
+- `node node_modules\typescript\bin\tsc --noEmit --pretty false`：PASS。
+- `node_modules\.bin\eslint.cmd app\page.tsx app\globals.css app\lib\topology-store.ts tests\dev-pil-002-topology-site.test.mjs`：PASS，0 errors；CSS 依現有 config 顯示 ignored warning。
+- `npm.cmd run build:local`：PASS，僅既有 chunk size / route classification warning。
+
+交付狀態：READY_FOR_QA；Browser UAT 交 `QA_PIL_004` 獨立重驗。
+
+## QA Final 2026-09-08
+
+`QA_PIL_004` 已補強 accessible close selector 與 responsive Browser matrix，最終結果 `QA_PASSED`。本票狀態同步為 `QA_PASSED`，checkpoint commit/push 授權依 `PM_GOV_001-D30` 執行；不包含 merge、deploy、tag 或 force-push。
