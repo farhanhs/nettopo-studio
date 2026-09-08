@@ -844,7 +844,7 @@ async function runUat(sql) {
     const decoder = new TextDecoder();
     const zipTexts = Object.fromEntries(Object.entries(unzipped).map(([name, bytes]) => [name, decoder.decode(bytes)]));
     assertSafeText("safe CSV ZIP", Object.values(zipTexts).join("\n"));
-    await exportModal.getByRole("button", { name: "×" }).click();
+    await exportModal.getByRole("button", { name: "關閉" }).click();
 
     await applyCsv(page, formulaProbeCsvFixtures(), { strategy: "new", name: "QA PIL 003 Formula Probe", expectedDevices: "1設備", expectedLinks: "0連線" });
     await selectActiveTopology(page, (await waitForTopology(sql, "QA PIL 003 Formula Probe", (row) => row.project.devices.length === 1, "formula probe")).id, "QA PIL 003 Formula Probe");
@@ -856,7 +856,7 @@ async function runUat(sql) {
     await formulaDownload.saveAs(formulaZipPath);
     const formulaTexts = Object.fromEntries(Object.entries(unzipSync(new Uint8Array(await readFile(formulaZipPath)))).map(([name, bytes]) => [name, decoder.decode(bytes)]));
     assert.match(formulaTexts["groups.csv"], /'=QA Formula Group/);
-    await currentModal(page).getByRole("button", { name: "×" }).click();
+    await currentModal(page).getByRole("button", { name: "關閉" }).click();
 
     await selectActiveTopology(page, reloadedTopology.id, topologyName);
     const exportedCsvFiles = zipMembers.map((name) => ({ name, text: zipTexts[name] }));

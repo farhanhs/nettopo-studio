@@ -33,6 +33,14 @@
 | `PM_GOV_001-D27` | `APPROVED` | Checkpoint commit 以「最小可建置／可測的 dependency closure」為拆分單位；單票 commit 因 runtime、DB、Pilot、workspace shell 的跨票依賴無法獨立通過時，可建立明列多 Ticket 的 composite checkpoint。每個 composite 仍須保留 PATH/HUNK ownership、Ticket IDs、closure targeted gates，且 final frozen-tree equivalence／full QA 不得放寬 | DEV_REL_001, QA_REL_001 | 2026-09-02 使用者明確要求從已 staged Governance checkpoint 繼續並完成整條 commit chain；DEV_AUTH 單票 gate 證明原 DAG 無法產生可測中間狀態。此決策只校正 Git checkpoint granularity，不改產品語意或 frozen content |
 | `PM_GOV_001-D28` | `APPROVED` | 當最小 executable closure 等同幾乎全部產品路徑時，禁止 product monolith；改採可辨識的 Ticket structural commits。Structural commit 須驗 PATH/HUNK/hash 與當下可執行子測試，並明列因後續 dependency 尚未到位的 unavailable gates；所有產品 structural commits 完成後，第一個 executable integration checkpoint 必須跑完整 targeted 聯集、TypeScript、build、DB、Browser、安全與 final equivalence | DEV_REL_001, QA_REL_001 | D27 實測 closure 涵蓋 AUTH/DBM/PIL/API/SEC/UIX/IMP/EXP/workspace shell；2026-09-02 使用者要求繼續完成整條 chain。D28 保留可辨識歷史且不虛構中間 commit 可執行性，不改 frozen product content |
 
+## D30 — DEV_PIL_002 PM 審查後 Commit／Push 授權（2026-09-08）
+
+- ID：`PM_GOV_001-D30`；Status：`APPROVED`；來源：使用者要求 PM 範圍審查與狀態校正，若無問題即執行 commit／push。
+- 授權僅涵蓋 `DSG_PIL_002 → DEV_PIL_002 → QA_PIL_004` 的具名設計、產品修正、DEV 測試及 QA 證據；不得提交原工作區其他歷史變更。
+- PM 審查發現 accessible close selector 與 responsive Browser matrix 證據缺口，須由 QA 同票補強並通過後，才可建立具 Ticket ID 的 checkpoint commits。
+- 通過後可 push `codex/dev-rel-001-checkpoint` 至既有 `origin`；不包含 merge、deploy、tag、force-push 或遠端歷史改寫。
+- commit 後須重驗實際 committed tree，push 前確認 checkpoint 工作樹乾淨、HEAD 與預期 commit chain 相符。
+
 ## 更新規則
 
 - Decision ID 不重用。

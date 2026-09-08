@@ -1,0 +1,425 @@
+{
+  "ticket": "QA_PIL_004",
+  "result": "PASS",
+  "mode": "browser-local / Playwright Chromium / loopback preview",
+  "baseUrl": "http://127.0.0.1:4404",
+  "startedAt": "2026-09-08T02:59:59.393Z",
+  "candidateHashes": {
+    "app/page.tsx": "1E8B2F74F094EF969B46D77399A82905D56CD460B90B280DA7EE25B97DAEDF3D",
+    "app/globals.css": "1D874F787CEA7BF22C8E70DB876D3AC0D9D2863B1E4506DB473BDD00AF4A0BBF",
+    "app/lib/topology-store.ts": "8A5D2B7BCA304683AE484E7F5D05165AFD2ACF64541C4C477A8B133F755A0003",
+    "docs/engineerticket/active/DEV_PIL_002.md": "6968520D36AED6A8DDC36628AD5FEA96AABE265261FBF34C8F91E190EBC9AFDA"
+  },
+  "durationMs": 47486,
+  "screenshots": [
+    "C:\\Users\\DUS\\Desktop\\project\\nettopo-studio\\docs\\dev測試紀錄\\screenshots\\qa-pil-004-local-empty-initial.png",
+    "C:\\Users\\DUS\\Desktop\\project\\nettopo-studio\\docs\\dev測試紀錄\\screenshots\\qa-pil-004-responsive-360x520.png",
+    "C:\\Users\\DUS\\Desktop\\project\\nettopo-studio\\docs\\dev測試紀錄\\screenshots\\qa-pil-004-responsive-768x720.png",
+    "C:\\Users\\DUS\\Desktop\\project\\nettopo-studio\\docs\\dev測試紀錄\\screenshots\\qa-pil-004-responsive-1280x850.png",
+    "C:\\Users\\DUS\\Desktop\\project\\nettopo-studio\\docs\\dev測試紀錄\\screenshots\\qa-pil-004-responsive-short-height-720x420.png",
+    "C:\\Users\\DUS\\Desktop\\project\\nettopo-studio\\docs\\dev測試紀錄\\screenshots\\qa-pil-004-responsive-long-text-360x520.png",
+    "C:\\Users\\DUS\\Desktop\\project\\nettopo-studio\\docs\\dev測試紀錄\\screenshots\\qa-pil-004-responsive-device-scale-2-360x520.png",
+    "C:\\Users\\DUS\\Desktop\\project\\nettopo-studio\\docs\\dev測試紀錄\\screenshots\\qa-pil-004-created-unspecified-topology.png",
+    "C:\\Users\\DUS\\Desktop\\project\\nettopo-studio\\docs\\dev測試紀錄\\screenshots\\qa-pil-004-device-persist-before-reload.png",
+    "C:\\Users\\DUS\\Desktop\\project\\nettopo-studio\\docs\\dev測試紀錄\\screenshots\\qa-pil-004-reload-persisted-unspecified.png"
+  ],
+  "network": [
+    {
+      "path": "/api/runtime-capabilities",
+      "status": 200,
+      "cacheControl": "no-store",
+      "xContentTypeOptions": "nosniff"
+    },
+    {
+      "path": "/api/dev/session",
+      "status": 200,
+      "cacheControl": "",
+      "xContentTypeOptions": ""
+    },
+    {
+      "path": "/api/runtime-capabilities",
+      "status": 200,
+      "cacheControl": "no-store",
+      "xContentTypeOptions": "nosniff"
+    },
+    {
+      "path": "/api/runtime-capabilities",
+      "status": 200,
+      "cacheControl": "no-store",
+      "xContentTypeOptions": "nosniff"
+    },
+    {
+      "path": "/api/runtime-capabilities",
+      "status": 200,
+      "cacheControl": "no-store",
+      "xContentTypeOptions": "nosniff"
+    },
+    {
+      "path": "/api/session",
+      "status": 200,
+      "cacheControl": "no-store",
+      "xContentTypeOptions": "nosniff"
+    },
+    {
+      "path": "/api/runtime-capabilities",
+      "status": 200,
+      "cacheControl": "no-store",
+      "xContentTypeOptions": "nosniff"
+    },
+    {
+      "path": "/api/runtime-capabilities",
+      "status": 200,
+      "cacheControl": "no-store",
+      "xContentTypeOptions": "nosniff"
+    }
+  ],
+  "localEmptySites": {
+    "optionText": "未指定",
+    "selectDisabled": false,
+    "selectRequired": false,
+    "createdTopologyName": "QA PIL 004 未指定拓樸 1788836399393",
+    "renderedSiteText": "未指定站點"
+  },
+  "persistence": {
+    "customerCount": 1,
+    "topologyCount": 2,
+    "createdSiteId": null,
+    "fakeSiteIdDetected": false,
+    "devicePersistedAfterReload": true
+  },
+  "responsive": {
+    "method": "viewport matrix with direct DOM measurements; 200% zoom is covered by a separate Playwright context using deviceScaleFactor=2",
+    "matrix": [
+      {
+        "scenario": "360x520",
+        "viewport": {
+          "width": 360,
+          "height": 520
+        },
+        "cssZoom": 1,
+        "stressLongText": false,
+        "focusAudit": [
+          {
+            "tag": "button",
+            "name": "關閉",
+            "type": "button"
+          },
+          {
+            "tag": "input",
+            "name": "name",
+            "type": ""
+          },
+          {
+            "tag": "select",
+            "name": "siteId",
+            "type": ""
+          },
+          {
+            "tag": "input",
+            "name": "copyCurrent",
+            "type": "checkbox"
+          },
+          {
+            "tag": "button",
+            "name": "取消",
+            "type": "button"
+          },
+          {
+            "tag": "button",
+            "name": "建立拓樸",
+            "type": "submit"
+          }
+        ],
+        "measurements": {
+          "innerWidth": 360,
+          "scrollWidth": 360,
+          "modalWidth": 344,
+          "gridColumns": "312px",
+          "actionsBottom": 381.5,
+          "actionsTop": 312.5,
+          "fieldNoteWidth": 312,
+          "siteSelectWidth": 312,
+          "fieldNoteOverflowWrap": "anywhere",
+          "innerHeight": 520
+        }
+      },
+      {
+        "scenario": "768x720",
+        "viewport": {
+          "width": 768,
+          "height": 720
+        },
+        "cssZoom": 1,
+        "stressLongText": false,
+        "focusAudit": [
+          {
+            "tag": "button",
+            "name": "關閉",
+            "type": "button"
+          },
+          {
+            "tag": "input",
+            "name": "name",
+            "type": ""
+          },
+          {
+            "tag": "select",
+            "name": "siteId",
+            "type": ""
+          },
+          {
+            "tag": "input",
+            "name": "copyCurrent",
+            "type": "checkbox"
+          },
+          {
+            "tag": "button",
+            "name": "取消",
+            "type": "button"
+          },
+          {
+            "tag": "button",
+            "name": "建立拓樸",
+            "type": "submit"
+          }
+        ],
+        "measurements": {
+          "innerWidth": 768,
+          "scrollWidth": 768,
+          "modalWidth": 744,
+          "gridColumns": "342px 342px",
+          "actionsBottom": 562.25,
+          "actionsTop": 485.25,
+          "fieldNoteWidth": 700,
+          "siteSelectWidth": 700,
+          "fieldNoteOverflowWrap": "anywhere",
+          "innerHeight": 720
+        }
+      },
+      {
+        "scenario": "1280x850",
+        "viewport": {
+          "width": 1280,
+          "height": 850
+        },
+        "cssZoom": 1,
+        "stressLongText": false,
+        "focusAudit": [
+          {
+            "tag": "button",
+            "name": "關閉",
+            "type": "button"
+          },
+          {
+            "tag": "input",
+            "name": "name",
+            "type": ""
+          },
+          {
+            "tag": "select",
+            "name": "siteId",
+            "type": ""
+          },
+          {
+            "tag": "input",
+            "name": "copyCurrent",
+            "type": "checkbox"
+          },
+          {
+            "tag": "button",
+            "name": "取消",
+            "type": "button"
+          },
+          {
+            "tag": "button",
+            "name": "建立拓樸",
+            "type": "submit"
+          }
+        ],
+        "measurements": {
+          "innerWidth": 1280,
+          "scrollWidth": 1280,
+          "modalWidth": 920,
+          "gridColumns": "430px 430px",
+          "actionsBottom": 627.25,
+          "actionsTop": 550.25,
+          "fieldNoteWidth": 876,
+          "siteSelectWidth": 876,
+          "fieldNoteOverflowWrap": "anywhere",
+          "innerHeight": 850
+        }
+      },
+      {
+        "scenario": "short-height-720x420",
+        "viewport": {
+          "width": 720,
+          "height": 420
+        },
+        "cssZoom": 1,
+        "stressLongText": false,
+        "focusAudit": [
+          {
+            "tag": "button",
+            "name": "關閉",
+            "type": "button"
+          },
+          {
+            "tag": "input",
+            "name": "name",
+            "type": ""
+          },
+          {
+            "tag": "select",
+            "name": "siteId",
+            "type": ""
+          },
+          {
+            "tag": "input",
+            "name": "copyCurrent",
+            "type": "checkbox"
+          },
+          {
+            "tag": "button",
+            "name": "取消",
+            "type": "button"
+          },
+          {
+            "tag": "button",
+            "name": "建立拓樸",
+            "type": "submit"
+          }
+        ],
+        "measurements": {
+          "innerWidth": 720,
+          "scrollWidth": 720,
+          "modalWidth": 704,
+          "gridColumns": "672px",
+          "actionsBottom": 381.5,
+          "actionsTop": 312.5,
+          "fieldNoteWidth": 672,
+          "siteSelectWidth": 672,
+          "fieldNoteOverflowWrap": "anywhere",
+          "innerHeight": 420
+        }
+      },
+      {
+        "scenario": "long-text-360x520",
+        "viewport": {
+          "width": 360,
+          "height": 520
+        },
+        "cssZoom": 1,
+        "stressLongText": true,
+        "focusAudit": [
+          {
+            "tag": "button",
+            "name": "關閉",
+            "type": "button"
+          },
+          {
+            "tag": "input",
+            "name": "name",
+            "type": ""
+          },
+          {
+            "tag": "select",
+            "name": "siteId",
+            "type": ""
+          },
+          {
+            "tag": "input",
+            "name": "copyCurrent",
+            "type": "checkbox"
+          },
+          {
+            "tag": "button",
+            "name": "取消",
+            "type": "button"
+          },
+          {
+            "tag": "button",
+            "name": "建立拓樸",
+            "type": "submit"
+          }
+        ],
+        "measurements": {
+          "innerWidth": 360,
+          "scrollWidth": 360,
+          "modalWidth": 344,
+          "gridColumns": "312px",
+          "actionsBottom": 447.5,
+          "actionsTop": 378.5,
+          "fieldNoteWidth": 312,
+          "siteSelectWidth": 312,
+          "fieldNoteOverflowWrap": "anywhere",
+          "innerHeight": 520
+        }
+      }
+    ],
+    "deviceScaleFactor2": {
+      "method": "Playwright browser context deviceScaleFactor=2, representing 200% display scaling without modifying product code",
+      "measurement": {
+        "scenario": "device-scale-2-360x520",
+        "viewport": {
+          "width": 360,
+          "height": 520
+        },
+        "cssZoom": 1,
+        "stressLongText": false,
+        "focusAudit": [
+          {
+            "tag": "button",
+            "name": "關閉",
+            "type": "button"
+          },
+          {
+            "tag": "input",
+            "name": "name",
+            "type": ""
+          },
+          {
+            "tag": "select",
+            "name": "siteId",
+            "type": ""
+          },
+          {
+            "tag": "input",
+            "name": "copyCurrent",
+            "type": "checkbox"
+          },
+          {
+            "tag": "button",
+            "name": "取消",
+            "type": "button"
+          },
+          {
+            "tag": "button",
+            "name": "建立拓樸",
+            "type": "submit"
+          }
+        ],
+        "measurements": {
+          "innerWidth": 360,
+          "scrollWidth": 360,
+          "modalWidth": 344,
+          "gridColumns": "312px",
+          "actionsBottom": 381.5,
+          "actionsTop": 312.5,
+          "fieldNoteWidth": 312,
+          "siteSelectWidth": 312,
+          "fieldNoteOverflowWrap": "anywhere",
+          "innerHeight": 520
+        }
+      }
+    }
+  },
+  "guardCoverage": {
+    "serverPilotEmptySites": "covered by tests/dev-pil-002-topology-site.test.mjs and tests/pilot-checkpoint.test.mjs; not asserted as browser evidence in this script",
+    "browserLocalWithSites": "not representable in current Dexie schema because local durable DB has customers/topologies/meta only and app returns sites=[] in local mode",
+    "activeTopologySiteInheritance": "covered by tests/dev-pil-002-topology-site.test.mjs source guard and this browser-local persisted undefined siteId check"
+  },
+  "cleanup": {
+    "storage": "ephemeral Playwright browser context closed; no persistent QA DB fixture created by this local-mode UAT",
+    "postgresFixtureCounts": "not applicable"
+  }
+}

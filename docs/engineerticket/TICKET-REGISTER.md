@@ -1,10 +1,14 @@
 # Engineer Ticket Register
 
-- 更新日期：2026-08-31
+- 更新日期：2026-09-08
 - 排序：Priority → Planned Order → Ticket ID
 - 狀態來源：目前工作樹、開發／測試紀錄與已確認產品方向
 
 ## P0／P1 執行佇列
+
+### 最新功能指示：DEV_PIL_002 QA completed
+
+`QA_PIL_004` 已於 2026-09-08 補強後完成 `DEV_PIL_002` 獨立 UAT；空站點「未指定」新增拓樸、IndexedDB 持久化、responsive Browser matrix 與 Pilot scope supporting evidence 均已記錄。D30 授權僅涵蓋 `DSG_PIL_002 → DEV_PIL_002 → QA_PIL_004` checkpoint commit 與 push，不包含 merge、deploy、tag 或 force-push。
 
 | Order | Ticket ID | Group | Priority | Status | Checkpoint | 依賴 | 工作摘要 | 詳細紀錄 |
 |---:|---|---|---|---|---|---|---|---|
@@ -24,8 +28,8 @@
 | 031 | `QA_PIL_001` | QA | P0 | `QA_PASSED` | Pilot | DEV_PIL_001 READY_FOR_QA, DEV_API_001 QA_PASSED, QA_DBM_001 QA_PASSED | 同票 Re-test 通過：RBAC precedence 修復、Pilot real DB scope、security/export matrix 與 full serial tests 已驗證 | [active/QA_PIL_001.md](active/QA_PIL_001.md) |
 | 032 | `QA_PIL_002` | QA | P0 | `QA_PASSED` | Pilot | QA_DBM_001 QA_PASSED, QA_PIL_001 QA_PASSED | 2026-08-24 quick re-test 通過：Pilot session identity display、reload、logout/tamper/revoke、cleanup；Browser critical flow 維持通過 | [active/QA_PIL_002.md](active/QA_PIL_002.md) |
 | 033 | `QA_PIL_003` | QA | P1 | `QA_PASSED` | Functional UAT | DEV_UIX_004/005 READY_FOR_QA, DEV_PIL_003 READY_FOR_QA, QA_PIL_002/QA_IMP_001/QA_UIX_001 QA_PASSED, D25 | 2026-09-01 同票完整 UAT 通過：topbar 不遮擋、drag/reload persistence、Pilot-only logout、TXT/MD/CSV import、routing、Safe ZIP、secret/formula scan、round-trip、Admin/Engineer spot check 與 cleanup=0 | [active/QA_PIL_003.md](active/QA_PIL_003.md) |
-| 034 | `DEV_PIL_002` | DEV | P1 | `PROPOSED` | Functional UAT | QA_PIL_003 evidence, D25 | 修正新增拓樸 modal 在站點清單為空時被 required select 阻擋；本機 demo／允許未指定情境預設為「未指定站點」，Pilot scope 不放寬 | [active/DEV_PIL_002.md](active/DEV_PIL_002.md) |
-| 035 | `QA_PIL_004` | QA | P1 | `PROPOSED` | Functional UAT | DEV_PIL_002 READY_FOR_QA, QA_PIL_003 evidence | QC／QA-only synthetic fixture 補齊站點資料，並重驗空站點「未指定」新增拓樸流程 | [active/QA_PIL_004.md](active/QA_PIL_004.md) |
+| 034 | `DEV_PIL_002` | DEV | P1 | `QA_PASSED` | Functional UAT | QA_PIL_003 evidence, D25/D30 | 修正新增拓樸 modal 在站點清單為空時被 required select 阻擋；本機 demo／允許未指定情境預設為「未指定站點」，Pilot scope 不放寬；QA_PIL_004 補強後通過 | [active/DEV_PIL_002.md](active/DEV_PIL_002.md) |
+| 035 | `QA_PIL_004` | QA | P1 | `QA_PASSED` | Functional UAT | DEV_PIL_002 READY_FOR_QA, QA_PIL_003 evidence | 2026-09-08 補強後獨立 UAT 通過；空站點「未指定」新增拓樸、IndexedDB 持久化、responsive Browser matrix、Pilot scope supporting evidence、cleanup=0 | [active/QA_PIL_004.md](active/QA_PIL_004.md) |
 | 036 | `DEV_UIX_003` | DEV | P1 | `PROPOSED` | Functional UAT | DEV_UIX_002/QA_UIX_001, QA_PIL_003 evidence, D25 | 改善連線無效告警，讓使用者知道缺 port、重複端點、port 被占用或 route no-path 的具體原因 | [active/DEV_UIX_003.md](active/DEV_UIX_003.md) |
 | 037 | `DEV_UIX_004` | DEV | P1 | `QA_PASSED` | Functional UAT Fix | QA_PIL_003 QA_PASSED, D25 | 登入者資料卡進入 responsive topbar flow；1280px 下正常 pointer 操作不再被遮擋 | [active/DEV_UIX_004.md](active/DEV_UIX_004.md) |
 | 038 | `DEV_UIX_005` | DEV | P1 | `QA_PASSED` | Functional UAT Fix | QA_PIL_003 QA_PASSED, DEV_UIX_004 QA_PASSED, D25 | Canvas transient drag + drag-stop durable write；真 Browser reload persistence 通過 | [active/DEV_UIX_005.md](active/DEV_UIX_005.md) |
