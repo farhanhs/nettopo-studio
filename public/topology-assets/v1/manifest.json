@@ -1,0 +1,654 @@
+{
+  "version": 1,
+  "generatedOn": "2026-09-09",
+  "generator": "built-in image_gen",
+  "coordinateSpace": "image-local pixels, top-left origin, 160x100",
+  "dockMeaning": "Logical topology attachment markers; not physical Ethernet/optical port specifications.",
+  "assets": [
+    {
+      "id": "router",
+      "label": "路由器",
+      "kind": "device",
+      "src": "/topology-assets/v1/devices/router.png",
+      "src2x": "/topology-assets/v1/devices/router@2x.png",
+      "width": 160,
+      "height": 100,
+      "docks": [
+        {
+          "id": "left",
+          "side": "left",
+          "x": 23.387,
+          "y": 65.927,
+          "u": 0.146,
+          "v": 0.659,
+          "radius": 3.931,
+          "hitRadius": 12,
+          "normal": {
+            "x": -1,
+            "y": 0
+          }
+        },
+        {
+          "id": "right",
+          "side": "right",
+          "x": 136.492,
+          "y": 65.927,
+          "u": 0.853,
+          "v": 0.659,
+          "radius": 3.931,
+          "hitRadius": 12,
+          "normal": {
+            "x": 1,
+            "y": 0
+          }
+        }
+      ]
+    },
+    {
+      "id": "modem",
+      "label": "電信商數據機",
+      "kind": "device",
+      "src": "/topology-assets/v1/devices/modem.png",
+      "src2x": "/topology-assets/v1/devices/modem@2x.png",
+      "width": 160,
+      "height": 100,
+      "docks": [
+        {
+          "id": "left",
+          "side": "left",
+          "x": 19.556,
+          "y": 59.879,
+          "u": 0.122,
+          "v": 0.599,
+          "radius": 3.327,
+          "hitRadius": 12,
+          "normal": {
+            "x": -1,
+            "y": 0
+          }
+        },
+        {
+          "id": "right",
+          "side": "right",
+          "x": 140.423,
+          "y": 59.879,
+          "u": 0.878,
+          "v": 0.599,
+          "radius": 3.327,
+          "hitRadius": 12,
+          "normal": {
+            "x": 1,
+            "y": 0
+          }
+        }
+      ]
+    },
+    {
+      "id": "firewall",
+      "label": "防火牆",
+      "kind": "device",
+      "src": "/topology-assets/v1/devices/firewall.png",
+      "src2x": "/topology-assets/v1/devices/firewall@2x.png",
+      "width": 160,
+      "height": 100,
+      "docks": [
+        {
+          "id": "left",
+          "side": "left",
+          "x": 15.121,
+          "y": 58.77,
+          "u": 0.095,
+          "v": 0.588,
+          "radius": 2.923,
+          "hitRadius": 12,
+          "normal": {
+            "x": -1,
+            "y": 0
+          }
+        },
+        {
+          "id": "right",
+          "side": "right",
+          "x": 144.859,
+          "y": 58.77,
+          "u": 0.905,
+          "v": 0.588,
+          "radius": 2.923,
+          "hitRadius": 12,
+          "normal": {
+            "x": 1,
+            "y": 0
+          }
+        }
+      ]
+    },
+    {
+      "id": "switch",
+      "label": "交換器",
+      "kind": "device",
+      "src": "/topology-assets/v1/devices/switch.png",
+      "src2x": "/topology-assets/v1/devices/switch@2x.png",
+      "width": 160,
+      "height": 100,
+      "docks": [
+        {
+          "id": "left",
+          "side": "left",
+          "x": 13.306,
+          "y": 56.754,
+          "u": 0.083,
+          "v": 0.568,
+          "radius": 3.327,
+          "hitRadius": 12,
+          "normal": {
+            "x": -1,
+            "y": 0
+          }
+        },
+        {
+          "id": "right",
+          "side": "right",
+          "x": 146.774,
+          "y": 56.754,
+          "u": 0.917,
+          "v": 0.568,
+          "radius": 3.327,
+          "hitRadius": 12,
+          "normal": {
+            "x": 1,
+            "y": 0
+          }
+        }
+      ]
+    },
+    {
+      "id": "server",
+      "label": "伺服器",
+      "kind": "device",
+      "src": "/topology-assets/v1/devices/server.png",
+      "src2x": "/topology-assets/v1/devices/server@2x.png",
+      "width": 160,
+      "height": 100,
+      "docks": [
+        {
+          "id": "left",
+          "side": "left",
+          "x": 49.294,
+          "y": 76.815,
+          "u": 0.308,
+          "v": 0.768,
+          "radius": 2.823,
+          "hitRadius": 12,
+          "normal": {
+            "x": -1,
+            "y": 0
+          }
+        },
+        {
+          "id": "right",
+          "side": "right",
+          "x": 110.282,
+          "y": 76.815,
+          "u": 0.689,
+          "v": 0.768,
+          "radius": 2.823,
+          "hitRadius": 12,
+          "normal": {
+            "x": 1,
+            "y": 0
+          }
+        }
+      ]
+    },
+    {
+      "id": "nas",
+      "label": "網路儲存裝置",
+      "kind": "device",
+      "src": "/topology-assets/v1/devices/nas.png",
+      "src2x": "/topology-assets/v1/devices/nas@2x.png",
+      "width": 160,
+      "height": 100,
+      "docks": [
+        {
+          "id": "left",
+          "side": "left",
+          "x": 41.633,
+          "y": 71.169,
+          "u": 0.26,
+          "v": 0.712,
+          "radius": 2.823,
+          "hitRadius": 12,
+          "normal": {
+            "x": -1,
+            "y": 0
+          }
+        },
+        {
+          "id": "right",
+          "side": "right",
+          "x": 118.347,
+          "y": 71.169,
+          "u": 0.74,
+          "v": 0.712,
+          "radius": 2.823,
+          "hitRadius": 12,
+          "normal": {
+            "x": 1,
+            "y": 0
+          }
+        }
+      ]
+    },
+    {
+      "id": "erp",
+      "label": "ERP 系統",
+      "kind": "device",
+      "src": "/topology-assets/v1/devices/erp.png",
+      "src2x": "/topology-assets/v1/devices/erp@2x.png",
+      "width": 160,
+      "height": 100,
+      "docks": [
+        {
+          "id": "left",
+          "side": "left",
+          "x": 34.476,
+          "y": 79.032,
+          "u": 0.215,
+          "v": 0.79,
+          "radius": 3.931,
+          "hitRadius": 12,
+          "normal": {
+            "x": -1,
+            "y": 0
+          }
+        },
+        {
+          "id": "right",
+          "side": "right",
+          "x": 125.302,
+          "y": 79.032,
+          "u": 0.783,
+          "v": 0.79,
+          "radius": 3.931,
+          "hitRadius": 12,
+          "normal": {
+            "x": 1,
+            "y": 0
+          }
+        }
+      ]
+    },
+    {
+      "id": "access-point",
+      "label": "無線 AP",
+      "kind": "device",
+      "src": "/topology-assets/v1/devices/access-point.png",
+      "src2x": "/topology-assets/v1/devices/access-point@2x.png",
+      "width": 160,
+      "height": 100,
+      "docks": [
+        {
+          "id": "left",
+          "side": "left",
+          "x": 33.569,
+          "y": 60.786,
+          "u": 0.21,
+          "v": 0.608,
+          "radius": 2.319,
+          "hitRadius": 12,
+          "normal": {
+            "x": -1,
+            "y": 0
+          }
+        },
+        {
+          "id": "right",
+          "side": "right",
+          "x": 126.411,
+          "y": 60.786,
+          "u": 0.79,
+          "v": 0.608,
+          "radius": 2.319,
+          "hitRadius": 12,
+          "normal": {
+            "x": 1,
+            "y": 0
+          }
+        }
+      ]
+    },
+    {
+      "id": "client",
+      "label": "終端設備",
+      "kind": "device",
+      "src": "/topology-assets/v1/devices/client.png",
+      "src2x": "/topology-assets/v1/devices/client@2x.png",
+      "width": 160,
+      "height": 100,
+      "docks": [
+        {
+          "id": "left",
+          "side": "left",
+          "x": 38.81,
+          "y": 59.879,
+          "u": 0.243,
+          "v": 0.599,
+          "radius": 2.319,
+          "hitRadius": 12,
+          "normal": {
+            "x": -1,
+            "y": 0
+          }
+        },
+        {
+          "id": "right",
+          "side": "right",
+          "x": 120.968,
+          "y": 59.879,
+          "u": 0.756,
+          "v": 0.599,
+          "radius": 2.319,
+          "hitRadius": 12,
+          "normal": {
+            "x": 1,
+            "y": 0
+          }
+        }
+      ]
+    },
+    {
+      "id": "ssid",
+      "label": "SSID 無線網路",
+      "kind": "device",
+      "src": "/topology-assets/v1/devices/ssid.png",
+      "src2x": "/topology-assets/v1/devices/ssid@2x.png",
+      "width": 160,
+      "height": 100,
+      "docks": [
+        {
+          "id": "left",
+          "side": "left",
+          "x": 43.75,
+          "y": 74.496,
+          "u": 0.273,
+          "v": 0.745,
+          "radius": 5.746,
+          "hitRadius": 12,
+          "normal": {
+            "x": -1,
+            "y": 0
+          }
+        },
+        {
+          "id": "right",
+          "side": "right",
+          "x": 116.331,
+          "y": 74.496,
+          "u": 0.727,
+          "v": 0.745,
+          "radius": 5.746,
+          "hitRadius": 12,
+          "normal": {
+            "x": 1,
+            "y": 0
+          }
+        }
+      ]
+    },
+    {
+      "id": "mesh-node",
+      "label": "Mesh 節點",
+      "kind": "device",
+      "src": "/topology-assets/v1/devices/mesh-node.png",
+      "src2x": "/topology-assets/v1/devices/mesh-node@2x.png",
+      "width": 160,
+      "height": 100,
+      "docks": [
+        {
+          "id": "left",
+          "side": "left",
+          "x": 50.806,
+          "y": 75.806,
+          "u": 0.318,
+          "v": 0.758,
+          "radius": 2.722,
+          "hitRadius": 12,
+          "normal": {
+            "x": -1,
+            "y": 0
+          }
+        },
+        {
+          "id": "right",
+          "side": "right",
+          "x": 108.972,
+          "y": 75.806,
+          "u": 0.681,
+          "v": 0.758,
+          "radius": 2.722,
+          "hitRadius": 12,
+          "normal": {
+            "x": 1,
+            "y": 0
+          }
+        }
+      ]
+    },
+    {
+      "id": "printer",
+      "label": "印表機",
+      "kind": "device",
+      "src": "/topology-assets/v1/devices/printer.png",
+      "src2x": "/topology-assets/v1/devices/printer@2x.png",
+      "width": 160,
+      "height": 100,
+      "docks": [
+        {
+          "id": "left",
+          "side": "left",
+          "x": 42.238,
+          "y": 73.69,
+          "u": 0.264,
+          "v": 0.737,
+          "radius": 2.621,
+          "hitRadius": 12,
+          "normal": {
+            "x": -1,
+            "y": 0
+          }
+        },
+        {
+          "id": "right",
+          "side": "right",
+          "x": 117.641,
+          "y": 73.69,
+          "u": 0.735,
+          "v": 0.737,
+          "radius": 2.621,
+          "hitRadius": 12,
+          "normal": {
+            "x": 1,
+            "y": 0
+          }
+        }
+      ]
+    },
+    {
+      "id": "camera",
+      "label": "監視器",
+      "kind": "device",
+      "src": "/topology-assets/v1/devices/camera.png",
+      "src2x": "/topology-assets/v1/devices/camera@2x.png",
+      "width": 160,
+      "height": 100,
+      "docks": [
+        {
+          "id": "left",
+          "side": "left",
+          "x": 55.04,
+          "y": 76.31,
+          "u": 0.344,
+          "v": 0.763,
+          "radius": 3.528,
+          "hitRadius": 12,
+          "normal": {
+            "x": -1,
+            "y": 0
+          }
+        },
+        {
+          "id": "right",
+          "side": "right",
+          "x": 102.823,
+          "y": 76.31,
+          "u": 0.643,
+          "v": 0.763,
+          "radius": 3.528,
+          "hitRadius": 12,
+          "normal": {
+            "x": 1,
+            "y": 0
+          }
+        }
+      ]
+    },
+    {
+      "id": "pos",
+      "label": "POS 終端機",
+      "kind": "device",
+      "src": "/topology-assets/v1/devices/pos.png",
+      "src2x": "/topology-assets/v1/devices/pos@2x.png",
+      "width": 160,
+      "height": 100,
+      "docks": [
+        {
+          "id": "left",
+          "side": "left",
+          "x": 36.492,
+          "y": 77.419,
+          "u": 0.228,
+          "v": 0.774,
+          "radius": 4.839,
+          "hitRadius": 12,
+          "normal": {
+            "x": -1,
+            "y": 0
+          }
+        },
+        {
+          "id": "right",
+          "side": "right",
+          "x": 123.286,
+          "y": 77.419,
+          "u": 0.771,
+          "v": 0.774,
+          "radius": 4.839,
+          "hitRadius": 12,
+          "normal": {
+            "x": 1,
+            "y": 0
+          }
+        }
+      ]
+    },
+    {
+      "id": "iot",
+      "label": "IoT 設備",
+      "kind": "device",
+      "src": "/topology-assets/v1/devices/iot.png",
+      "src2x": "/topology-assets/v1/devices/iot@2x.png",
+      "width": 160,
+      "height": 100,
+      "docks": [
+        {
+          "id": "left",
+          "side": "left",
+          "x": 33.569,
+          "y": 71.169,
+          "u": 0.21,
+          "v": 0.712,
+          "radius": 3.629,
+          "hitRadius": 12,
+          "normal": {
+            "x": -1,
+            "y": 0
+          }
+        },
+        {
+          "id": "right",
+          "side": "right",
+          "x": 126.411,
+          "y": 71.169,
+          "u": 0.79,
+          "v": 0.712,
+          "radius": 3.629,
+          "hitRadius": 12,
+          "normal": {
+            "x": 1,
+            "y": 0
+          }
+        }
+      ]
+    },
+    {
+      "id": "cat5e",
+      "label": "Cat5e 網路線",
+      "kind": "connection",
+      "src": "/topology-assets/v1/connections/cat5e.png",
+      "src2x": "/topology-assets/v1/connections/cat5e@2x.png",
+      "width": 160,
+      "height": 100,
+      "docks": []
+    },
+    {
+      "id": "cat6",
+      "label": "Cat6 網路線",
+      "kind": "connection",
+      "src": "/topology-assets/v1/connections/cat6.png",
+      "src2x": "/topology-assets/v1/connections/cat6@2x.png",
+      "width": 160,
+      "height": 100,
+      "docks": []
+    },
+    {
+      "id": "cat7",
+      "label": "Cat7 網路線",
+      "kind": "connection",
+      "src": "/topology-assets/v1/connections/cat7.png",
+      "src2x": "/topology-assets/v1/connections/cat7@2x.png",
+      "width": 160,
+      "height": 100,
+      "docks": []
+    },
+    {
+      "id": "fiber",
+      "label": "光纖",
+      "kind": "connection",
+      "src": "/topology-assets/v1/connections/fiber.png",
+      "src2x": "/topology-assets/v1/connections/fiber@2x.png",
+      "width": 160,
+      "height": 100,
+      "docks": []
+    },
+    {
+      "id": "wired",
+      "label": "一般有線／未指定",
+      "kind": "connection",
+      "src": "/topology-assets/v1/connections/wired.png",
+      "src2x": "/topology-assets/v1/connections/wired@2x.png",
+      "width": 160,
+      "height": 100,
+      "docks": []
+    },
+    {
+      "id": "wireless",
+      "label": "無線連線",
+      "kind": "connection",
+      "src": "/topology-assets/v1/connections/wireless.png",
+      "src2x": "/topology-assets/v1/connections/wireless@2x.png",
+      "width": 160,
+      "height": 100,
+      "docks": []
+    }
+  ]
+}

@@ -17,20 +17,156 @@ $logFile = Join-Path $logDirectory "postgres.log"
 $port = if ($env:NETTOPO_LOCAL_DB_PORT) { $env:NETTOPO_LOCAL_DB_PORT } else { "5432" }
 $databaseUser = "nettopo"
 $databaseName = "nettopo_studio"
-$databasePassword = if ($env:NETTOPO_LOCAL_DB_PASSWORD) {
-  $env:NETTOPO_LOCAL_DB_PASSWORD
-} else {
-  "nettopo_dev_password"
-}
+$envFile = Join-Path $projectRoot ".env.local"
 
 $initdb = Join-Path $postgresBin "initdb.exe"
 $pgCtl = Join-Path $postgresBin "pg_ctl.exe"
 $pgIsReady = Join-Path $postgresBin "pg_isready.exe"
 $psql = Join-Path $postgresBin "psql.exe"
 $createdb = Join-Path $postgresBin "createdb.exe"
+$postgres = Join-Path $postgresBin "postgres.exe"
+
+function Read-EnvFile {
+  param([string]$Path)
+
+  $values = [ordered]@{}
+  if (-not (Test-Path -LiteralPath $Path)) {
+    return $values
+  }
+
+  foreach ($line in [System.IO.File]::ReadAllLines($Path)) {
+    if ($line.Trim().Length -eq 0 -or $line.TrimStart().StartsWith("#")) {
+      continue
+    }
+    $separator = $line.IndexOf("=")
+    if ($separator -le 0) {
+      continue
+    }
+    $key = $line.Substring(0, $separator).Trim()
+    $value = $line.Substring($separator + 1).Trim()
+    $values[$key] = $value
+  }
+
+  return $values
+}
+
+function ConvertTo-PostgresUri {
+  param([string]$Value)
+
+  if ([string]::IsNullOrWhiteSpace($Value)) {
+    throw "A PostgreSQL DSN is empty."
+  }
+  $builder = [System.UriBuilder]::new($Value)
+  if ($builder.Scheme -eq "postgres") {
+    $builder.Scheme = "postgresql"
+  }
+  return $builder.Uri
+}
+
+function Get-UserInfoPart {
+  param([System.Uri]$Uri, [int]$Index)
+
+  $parts = $Uri.UserInfo.Split(":", 2)
+  if ($parts.Length -le $Index) {
+    return ""
+  }
+  return [System.Uri]::UnescapeDataString($parts[$Index])
+}
+
+function New-StrongPassword {
+  $bytes = [byte[]]::new(48)
+  $generator = [System.Security.Cryptography.RandomNumberGenerator]::Create()
+  try {
+    $generator.GetBytes($bytes)
+  } finally {
+    $generator.Dispose()
+  }
+  return [Convert]::ToBase64String($bytes).TrimEnd("=") -replace "\+", "-" -replace "/", "_"
+}
+
+function Set-EnvValue {
+  param(
+    [string[]]$Lines,
+    [string]$Key,
+    [string]$Value
+  )
+
+  $found = $false
+  $result = foreach ($line in $Lines) {
+    if ($line -match "^\s*$([regex]::Escape($Key))\s*=") {
+      $found = $true
+      "$Key=$Value"
+    } else {
+      $line
+    }
+  }
+  if (-not $found) {
+    $result += "$Key=$Value"
+  }
+  return [string[]]$result
+}
+
+function Write-EnvFileAtomic {
+  param([string[]]$Lines)
+
+  $tempFile = Join-Path (Split-Path -Parent $envFile) (".env.local.tmp." + [Guid]::NewGuid().ToString("N"))
+  [System.IO.File]::WriteAllLines($tempFile, $Lines, [System.Text.UTF8Encoding]::new($false))
+  Move-Item -LiteralPath $tempFile -Destination $envFile -Force
+}
+
+function New-MigrationDsn {
+  param([string]$Password)
+
+  $builder = [System.UriBuilder]::new("postgresql", "127.0.0.1", [int]$port, $databaseName)
+  $builder.UserName = $databaseUser
+  $builder.Password = $Password
+  return $builder.Uri.AbsoluteUri
+}
+
+function Get-LocalMigrationPassword {
+  param([bool]$AllowGenerate)
+
+  if ($env:NETTOPO_LOCAL_DB_PASSWORD) {
+    return $env:NETTOPO_LOCAL_DB_PASSWORD
+  }
+
+  $envValues = Read-EnvFile $envFile
+  if ($envValues.Contains("MIGRATION_DATABASE_URL")) {
+    $migrationUri = ConvertTo-PostgresUri $envValues["MIGRATION_DATABASE_URL"]
+    if ((Get-UserInfoPart $migrationUri 0) -ne $databaseUser) {
+      throw "MIGRATION_DATABASE_URL must use the local migration owner."
+    }
+    $password = Get-UserInfoPart $migrationUri 1
+    if (-not [string]::IsNullOrEmpty($password)) {
+      return $password
+    }
+  }
+
+  if (-not $AllowGenerate) {
+    throw "Local migration password is required in ignored .env.local or NETTOPO_LOCAL_DB_PASSWORD."
+  }
+
+  $password = New-StrongPassword
+  $lines = if (Test-Path -LiteralPath $envFile) {
+    [System.IO.File]::ReadAllLines($envFile)
+  } else {
+    [string[]]@(
+      "NETTOPO_RUNTIME_PROFILE=development",
+      "NETTOPO_AUTH_MODE=demo",
+      "NETTOPO_ENABLE_DEV_IDENTITY_HEADER=1",
+      "NETTOPO_ENABLE_DEMO_SEED=1",
+      "NEXT_PUBLIC_TOPOLOGY_STORAGE=server",
+      "POSTGRES_POOL_MAX=1"
+    )
+  }
+  $updatedLines = Set-EnvValue $lines "MIGRATION_DATABASE_URL" (New-MigrationDsn $password)
+  Write-EnvFileAtomic $updatedLines
+  Write-Output "Generated local migration credential in ignored .env.local."
+  return $password
+}
 
 function Assert-PostgresRuntime {
-  if (-not (Test-Path -LiteralPath $initdb) -or -not (Test-Path -LiteralPath $pgCtl)) {
+  if (-not (Test-Path -LiteralPath $initdb) -or -not (Test-Path -LiteralPath $pgCtl) -or -not (Test-Path -LiteralPath $postgres)) {
     throw "PostgreSQL 17.10 runtime was not found at $postgresRoot."
   }
 }
@@ -41,7 +177,39 @@ function Test-ClusterInitialized {
 
 function Test-ServerReady {
   & $pgIsReady -h 127.0.0.1 -p $port -U $databaseUser -d "postgres" *> $null
-  return $LASTEXITCODE -eq 0
+  return ($LASTEXITCODE -eq 0)
+}
+
+function Start-PostgresDirect {
+  New-Item -ItemType Directory -Force -Path $logDirectory | Out-Null
+  $launcher = Join-Path $logDirectory "postgres-direct-start.cmd"
+  $launcherBody = @(
+    "@echo off",
+    "cd /d `"$projectRoot`"",
+    "`"$postgres`" -D `"$dataDirectory`" -h 127.0.0.1 -p $port >> `"$logFile`" 2>&1"
+  ) -join "`r`n"
+  [System.IO.File]::WriteAllText($launcher, $launcherBody, [System.Text.UTF8Encoding]::new($false))
+
+  Start-Process `
+    -FilePath $launcher `
+    -WorkingDirectory $projectRoot `
+    -WindowStyle Hidden
+}
+
+function Wait-UntilServerReady {
+  param(
+    [int]$TimeoutSeconds = 60
+  )
+
+  $deadline = (Get-Date).AddSeconds($TimeoutSeconds)
+  do {
+    if (Test-ServerReady) {
+      return $true
+    }
+    Start-Sleep -Milliseconds 500
+  } while ((Get-Date) -lt $deadline)
+
+  return $false
 }
 
 function Ensure-AppDatabase {
@@ -81,6 +249,7 @@ switch ($Action) {
     New-Item -ItemType Directory -Force -Path $dataDirectory | Out-Null
     New-Item -ItemType Directory -Force -Path $logDirectory | Out-Null
     $passwordFile = Join-Path $projectRoot ".local\postgres-init-password.txt"
+    $databasePassword = Get-LocalMigrationPassword $true
 
     try {
       [System.IO.File]::WriteAllText(
@@ -108,6 +277,7 @@ switch ($Action) {
   }
 
   "start" {
+    $databasePassword = Get-LocalMigrationPassword $false
     if (-not (Test-ClusterInitialized)) {
       throw "PostgreSQL is not initialized. Run npm run db:local:init first."
     }
@@ -120,6 +290,10 @@ switch ($Action) {
     New-Item -ItemType Directory -Force -Path $logDirectory | Out-Null
     & $pgCtl -D $dataDirectory -l $logFile -o "-h 127.0.0.1 -p $port" -w -t 60 start
     if ($LASTEXITCODE -ne 0 -or -not (Test-ServerReady)) {
+      Write-Output "pg_ctl start did not report a ready server; trying direct postgres.exe startup against the existing data directory."
+      Start-PostgresDirect
+    }
+    if (-not (Wait-UntilServerReady 60)) {
       throw "PostgreSQL did not become ready. Check $logFile."
     }
     Ensure-AppDatabase
@@ -127,7 +301,7 @@ switch ($Action) {
   }
 
   "stop" {
-    if (-not (Test-ClusterInitialized) -or -not (Test-ServerReady)) {
+    if ((-not (Test-ClusterInitialized)) -or (-not (Test-ServerReady))) {
       Write-Output "PostgreSQL is already stopped."
       break
     }
@@ -140,7 +314,7 @@ switch ($Action) {
   }
 
   "status" {
-    if (Test-ClusterInitialized -and (Test-ServerReady)) {
+    if ((Test-ClusterInitialized) -and (Test-ServerReady)) {
       Write-Output "PostgreSQL is ready at 127.0.0.1:$port."
     } elseif (Test-ClusterInitialized) {
       Write-Output "PostgreSQL is initialized but stopped."

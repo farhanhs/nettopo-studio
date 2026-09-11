@@ -1,0 +1,174 @@
+{
+  "generator": "built-in image_gen",
+  "generatedOn": "2026-09-09",
+  "assets": [
+    {
+      "id": "router",
+      "label": "路由器",
+      "kind": "device",
+      "subject": "low rectangular enterprise router with four Ethernet ports and two short antennas",
+      "prompt": "Use case: product-mockup. Create ONE isolated enterprise network router asset for NetTopo Studio topology editor, intended display 160x100 pixels, landscape 8:5 composition. True transparent RGBA background, no backdrop, no checkerboard baked in, no floor or cast shadow. Cohesive clean premium miniature 3D technical product illustration, near-front view slightly elevated, dark slate metal chassis with silver bevels and tiny teal status LEDs. Subject: low rectangular enterprise router with four clear network sockets and two short rear antennas, no brand, no letters or labels. Large simple silhouette readable at small size, whole object centered with generous transparent margin. Include two visually distinct recessed circular connection docking sockets on the leftmost and rightmost chassis edges, aligned to horizontal midline of object; teal inner ring, dark hollow center, distinct from front Ethernet sockets. These are visual attachment points to be mapped by code. Crisp edges, realistic restrained materials, no text, no watermark. Save image for project asset router.png.",
+      "source": "C:\\Users\\DUS\\.codex\\generated_images\\01a08533-2745-73a0-9cfc-a2c9b7aa2699\\exec-05466ab9-59f4-4617-8960-2b4c73ed5b4a.png"
+    },
+    {
+      "id": "modem",
+      "label": "電信商數據機",
+      "kind": "device",
+      "subject": "compact low rounded broadband modem, ivory chassis, dark horizontal front panel, three status LEDs, one Ethernet jack, no antenna",
+      "prompt": "Use case: product-mockup. ONE isolated asset for NetTopo Studio network topology editor. Intended display 160x100 pixels, landscape 8:5 composition. True transparent RGBA background, no backdrop, no baked checkerboard, no floor, no cast shadow. Premium clean miniature 3D technical product illustration, near-front symmetrical view slightly elevated, silver bevels and slate materials with tiny teal accents. Large simple silhouette readable at 160x100, whole object centered with generous transparent margin, restrained realistic materials, crisp edges. No brand, no text, no letters, no watermark. Subject: compact low rounded broadband modem, ivory chassis, dark horizontal front panel, three status LEDs, one Ethernet jack, no antenna. Include two recessed round docking sockets with thin teal rings and hollow dark centers, integrated into leftmost and rightmost base edges at equal height. They are topology attachment markers, not real physical connectors. Match a coherent hardware illustration family. Asset ID: modem.",
+      "source": "C:\\Users\\DUS\\.codex\\generated_images\\01a08533-2745-73a0-9cfc-a2c9b7aa2699\\exec-dba35eac-70b5-42b6-a31f-221513d9f60f.png"
+    },
+    {
+      "id": "firewall",
+      "label": "防火牆",
+      "kind": "device",
+      "subject": "low rackmount firewall security appliance, dark slate metal, four Ethernet jacks, small bold amber shield emblem centered on top, no text",
+      "prompt": "Use case: product-mockup. ONE isolated asset for NetTopo Studio network topology editor. Intended display 160x100 pixels, landscape 8:5 composition. True transparent RGBA background, no backdrop, no baked checkerboard, no floor, no cast shadow. Premium clean miniature 3D technical product illustration, near-front symmetrical view slightly elevated, silver bevels and slate materials with tiny teal accents. Large simple silhouette readable at 160x100, whole object centered with generous transparent margin, restrained realistic materials, crisp edges. No brand, no text, no letters, no watermark. Subject: low rackmount firewall security appliance, dark slate metal, four Ethernet jacks, small bold amber shield emblem centered on top, no text. Include two recessed round docking sockets with thin teal rings and hollow dark centers, integrated into leftmost and rightmost base edges at equal height. They are topology attachment markers, not real physical connectors. Match a coherent hardware illustration family. Asset ID: firewall.",
+      "source": "C:\\Users\\DUS\\.codex\\generated_images\\01a08533-2745-73a0-9cfc-a2c9b7aa2699\\exec-80be524b-f226-47ee-9972-119ff0eb36f7.png"
+    },
+    {
+      "id": "switch",
+      "label": "交換器",
+      "kind": "device",
+      "subject": "wide shallow rackmount network switch with two tidy rows of eight Ethernet sockets, silver-gray chassis, teal LEDs, no antennas",
+      "prompt": "Use case: product-mockup. ONE isolated asset for NetTopo Studio network topology editor. Intended display 160x100 pixels, landscape 8:5 composition. True transparent RGBA background, no backdrop, no baked checkerboard, no floor, no cast shadow. Premium clean miniature 3D technical product illustration, near-front symmetrical view slightly elevated, silver bevels and slate materials with tiny teal accents. Large simple silhouette readable at 160x100, whole object centered with generous transparent margin, restrained realistic materials, crisp edges. No brand, no text, no letters, no watermark. Subject: wide shallow rackmount network switch with two tidy rows of eight Ethernet sockets, silver-gray chassis, teal LEDs, no antennas. Include two recessed round docking sockets with thin teal rings and hollow dark centers, integrated into leftmost and rightmost base edges at equal height. They are topology attachment markers, not real physical connectors. Match a coherent hardware illustration family. Asset ID: switch.",
+      "source": "C:\\Users\\DUS\\.codex\\generated_images\\01a08533-2745-73a0-9cfc-a2c9b7aa2699\\exec-678b8ebd-fffd-4e29-9833-87bdc1d01879.png"
+    },
+    {
+      "id": "server",
+      "label": "伺服器",
+      "kind": "device",
+      "subject": "compact tower server, dark slate, three horizontal hot-swap drive bays and tiny teal status lights, broad front view with slightly visible top",
+      "prompt": "Use case: product-mockup. ONE isolated asset for NetTopo Studio network topology editor. Intended display 160x100 pixels, landscape 8:5 composition. True transparent RGBA background, no backdrop, no baked checkerboard, no floor, no cast shadow. Premium clean miniature 3D technical product illustration, near-front symmetrical view slightly elevated, silver bevels and slate materials with tiny teal accents. Large simple silhouette readable at 160x100, whole object centered with generous transparent margin, restrained realistic materials, crisp edges. No brand, no text, no letters, no watermark. Subject: compact tower server, dark slate, three horizontal hot-swap drive bays and tiny teal status lights, broad front view with slightly visible top. Include two recessed round docking sockets with thin teal rings and hollow dark centers, integrated into leftmost and rightmost base edges at equal height. These are topology attachment markers, not physical connector specifications. Asset ID: server.",
+      "source": "C:\\Users\\DUS\\.codex\\generated_images\\01a08533-2745-73a0-9cfc-a2c9b7aa2699\\exec-2a8c6cc9-b5c7-42a2-9148-b722586ea87e.png"
+    },
+    {
+      "id": "nas",
+      "label": "網路儲存裝置",
+      "kind": "device",
+      "subject": "compact squat silver desktop NAS box with four vertical black drive trays and tiny teal status lights, no monitor",
+      "prompt": "Use case: product-mockup. ONE isolated asset for NetTopo Studio network topology editor. Intended display 160x100 pixels, landscape 8:5 composition. True transparent RGBA background, no backdrop, no baked checkerboard, no floor, no cast shadow. Premium clean miniature 3D technical product illustration, near-front symmetrical view slightly elevated, silver bevels and slate materials with tiny teal accents. Large simple silhouette readable at 160x100, whole object centered with generous transparent margin, restrained realistic materials, crisp edges. No brand, no text, no letters, no watermark. Subject: compact squat silver desktop NAS box with four vertical black drive trays and tiny teal status lights, no monitor. Include two recessed round docking sockets with thin teal rings and hollow dark centers, integrated into leftmost and rightmost base edges at equal height. These are topology attachment markers, not physical connector specifications. Asset ID: nas.",
+      "source": "C:\\Users\\DUS\\.codex\\generated_images\\01a08533-2745-73a0-9cfc-a2c9b7aa2699\\exec-6b5f51bd-7c45-4f42-a53a-e5dd58d515ad.png"
+    },
+    {
+      "id": "erp",
+      "label": "ERP 系統",
+      "kind": "device",
+      "subject": "desktop enterprise application terminal: dark silver widescreen monitor on a short pedestal, display has three simple teal dashboard tiles and a small amber database-cylinder emblem, no text",
+      "prompt": "Use case: product-mockup. ONE isolated asset for NetTopo Studio network topology editor. Intended display 160x100 pixels, landscape 8:5 composition. True transparent RGBA background, no backdrop, no baked checkerboard, no floor, no cast shadow. Premium clean miniature 3D technical product illustration, near-front symmetrical view slightly elevated, silver bevels and slate materials with tiny teal accents. Large simple silhouette readable at 160x100, whole object centered with generous transparent margin, restrained realistic materials, crisp edges. No brand, no text, no letters, no watermark. Subject: desktop enterprise application terminal: dark silver widescreen monitor on a short pedestal, display has three simple teal dashboard tiles and a small amber database-cylinder emblem, no text. Include two recessed round docking sockets with thin teal rings and hollow dark centers, integrated into leftmost and rightmost base edges at equal height. These are topology attachment markers, not physical connector specifications. Asset ID: erp.",
+      "source": "C:\\Users\\DUS\\.codex\\generated_images\\01a08533-2745-73a0-9cfc-a2c9b7aa2699\\exec-271c3020-d447-480e-b38a-e56c8efa8b1e.png"
+    },
+    {
+      "id": "access-point",
+      "label": "無線 AP",
+      "kind": "device",
+      "subject": "low white round ceiling wireless access point disc seen slightly from above, dark edge rim, one teal status light, small embossed wireless symbol",
+      "prompt": "Use case: product-mockup. ONE isolated asset for NetTopo Studio network topology editor. Intended display 160x100 pixels, landscape 8:5 composition. True transparent RGBA background, no backdrop, no baked checkerboard, no floor, no cast shadow. Premium clean miniature 3D technical product illustration, near-front symmetrical view slightly elevated, silver bevels and slate materials with tiny teal accents. Large simple silhouette readable at 160x100, whole object centered with generous transparent margin, restrained realistic materials, crisp edges. No brand, no text, no letters, no watermark. Subject: low white round ceiling wireless access point disc seen slightly from above, dark edge rim, one teal status light, small embossed wireless symbol. Include two recessed round docking sockets with thin teal rings and hollow dark centers, integrated into leftmost and rightmost base edges at equal height. These are topology attachment markers, not physical connector specifications. Asset ID: access-point.",
+      "source": "C:\\Users\\DUS\\.codex\\generated_images\\01a08533-2745-73a0-9cfc-a2c9b7aa2699\\exec-59cf0319-4a8b-4950-817c-d88ca13c4a4d.png"
+    },
+    {
+      "id": "client",
+      "label": "終端設備",
+      "kind": "device",
+      "subject": "silver desktop monitor with dark blue blank screen and compact keyboard beneath, simple compact office workstation, no letters",
+      "prompt": "Use case: product-mockup. ONE isolated asset for NetTopo Studio network topology editor. Intended display 160x100 pixels, landscape 8:5 composition. True transparent RGBA background, no backdrop, no baked checkerboard, no floor, no cast shadow. Premium clean miniature 3D technical product illustration, near-front symmetrical view slightly elevated, silver bevels and slate materials with tiny teal accents. Large simple silhouette readable at 160x100, whole object centered with generous transparent margin, restrained realistic materials, crisp edges. No brand, no text, no letters, no watermark. Subject: silver desktop monitor with dark blue blank screen and compact keyboard beneath, simple compact office workstation, no letters. Include two recessed round docking sockets with thin teal rings and hollow dark centers, integrated into leftmost and rightmost base edges at equal height. These are topology attachment markers, not physical connector specifications. Asset ID: client.",
+      "source": "C:\\Users\\DUS\\.codex\\generated_images\\01a08533-2745-73a0-9cfc-a2c9b7aa2699\\exec-4b9e869b-9cb2-487f-85e4-a1dd9dfc80ca.png"
+    },
+    {
+      "id": "ssid",
+      "label": "SSID 無線網路",
+      "kind": "device",
+      "subject": "logical wireless network token, freestanding sculpted teal three-arc Wi-Fi symbol above a small dark slate rounded base, represent logical network rather than physical access point, no text",
+      "prompt": "Use case: product-mockup. ONE isolated asset for NetTopo Studio network topology editor. Intended display 160x100 pixels, landscape 8:5 composition. True transparent RGBA background, no backdrop, no baked checkerboard, no floor, no cast shadow. Premium clean miniature 3D technical product illustration, near-front symmetrical view slightly elevated, silver bevels and slate materials with tiny teal accents. Large simple silhouette readable at 160x100, whole object centered with generous transparent margin, restrained realistic materials, crisp edges. No brand, no text, no letters, no watermark. Subject: logical wireless network token, freestanding sculpted teal three-arc Wi-Fi symbol above a small dark slate rounded base, represent logical network rather than physical access point, no text. Include two recessed round docking sockets with thin teal rings and hollow dark centers, integrated into leftmost and rightmost base edges at equal height. These are topology attachment markers, not physical connector specifications. Asset ID: ssid.",
+      "source": "C:\\Users\\DUS\\.codex\\generated_images\\01a08533-2745-73a0-9cfc-a2c9b7aa2699\\exec-7fcaedc8-25e0-4f90-afac-a8198f538405.png"
+    },
+    {
+      "id": "mesh-node",
+      "label": "Mesh 節點",
+      "kind": "device",
+      "subject": "single short rounded white vertical mesh Wi-Fi tower with teal glowing status slit, dark base, two small subtle wireless arcs above, no antennas",
+      "prompt": "Use case: product-mockup. ONE isolated asset for NetTopo Studio network topology editor. Intended display 160x100 pixels, landscape 8:5 composition. True transparent RGBA background, no backdrop, no baked checkerboard, no floor, no cast shadow. Premium clean miniature 3D technical product illustration, near-front symmetrical view slightly elevated, silver bevels and slate materials with tiny teal accents. Large simple silhouette readable at 160x100, whole object centered with generous transparent margin, restrained realistic materials, crisp edges. No brand, no text, no letters, no watermark. Subject: single short rounded white vertical mesh Wi-Fi tower with teal glowing status slit, dark base, two small subtle wireless arcs above, no antennas. Include two recessed round docking sockets with thin teal rings and hollow dark centers, integrated into leftmost and rightmost base edges at equal height. These are topology attachment markers, not physical connector specifications. Asset ID: mesh-node.",
+      "source": "C:\\Users\\DUS\\.codex\\generated_images\\01a08533-2745-73a0-9cfc-a2c9b7aa2699\\exec-c30973cc-5ee7-411f-99e4-7ae045d50ff6.png"
+    },
+    {
+      "id": "printer",
+      "label": "印表機",
+      "kind": "device",
+      "subject": "compact office laser printer, white and slate gray body, single blank sheet emerging from top and paper tray in front, small teal status display",
+      "prompt": "Use case: product-mockup. ONE isolated asset for NetTopo Studio network topology editor. Intended display 160x100 pixels, landscape 8:5 composition. True transparent RGBA background, no backdrop, no baked checkerboard, no floor, no cast shadow. Premium clean miniature 3D technical product illustration, near-front symmetrical view slightly elevated, silver bevels and slate materials with tiny teal accents. Large simple silhouette readable at 160x100, whole object centered with generous transparent margin, restrained realistic materials, crisp edges. No brand, no text, no letters, no watermark. Subject: compact office laser printer, white and slate gray body, single blank sheet emerging from top and paper tray in front, small teal status display. Include two recessed round docking sockets with thin teal rings and hollow dark centers, integrated into leftmost and rightmost base edges at equal height. These are topology attachment markers, not physical connector specifications. Asset ID: printer.",
+      "source": "C:\\Users\\DUS\\.codex\\generated_images\\01a08533-2745-73a0-9cfc-a2c9b7aa2699\\exec-8ec3389c-4c94-4e9d-a5af-82e0c852a18c.png"
+    },
+    {
+      "id": "camera",
+      "label": "監視器",
+      "kind": "device",
+      "subject": "compact security bullet IP camera, silver-white cylindrical body with prominent black circular lens facing viewer slightly right, short mounting foot",
+      "prompt": "Use case: product-mockup. ONE isolated asset for NetTopo Studio network topology editor. Intended display 160x100 pixels, landscape 8:5 composition. True transparent RGBA background, no backdrop, no baked checkerboard, no floor, no cast shadow. Premium clean miniature 3D technical product illustration, near-front symmetrical view slightly elevated, silver bevels and slate materials with tiny teal accents. Large simple silhouette readable at 160x100, whole object centered with generous transparent margin, restrained realistic materials, crisp edges. No brand, no text, no letters, no watermark. Subject: compact security bullet IP camera, silver-white cylindrical body with prominent black circular lens facing viewer slightly right, short mounting foot. Include two recessed round docking sockets with thin teal rings and hollow dark centers, integrated into leftmost and rightmost base edges at equal height. These are topology attachment markers, not physical connector specifications. Asset ID: camera.",
+      "source": "C:\\Users\\DUS\\.codex\\generated_images\\01a08533-2745-73a0-9cfc-a2c9b7aa2699\\exec-5d9e20af-60d3-428b-a1f4-232baa2a3bb7.png"
+    },
+    {
+      "id": "pos",
+      "label": "POS 終端機",
+      "kind": "device",
+      "subject": "compact retail point-of-sale touchscreen terminal tilted on a short dark pedestal with attached small payment keypad, teal simple blank interface tiles, no text",
+      "prompt": "Use case: product-mockup. ONE isolated asset for NetTopo Studio network topology editor. Intended display 160x100 pixels, landscape 8:5 composition. True transparent RGBA background, no backdrop, no baked checkerboard, no floor, no cast shadow. Premium clean miniature 3D technical product illustration, near-front symmetrical view slightly elevated, silver bevels and slate materials with tiny teal accents. Large simple silhouette readable at 160x100, whole object centered with generous transparent margin, restrained realistic materials, crisp edges. No brand, no text, no letters, no watermark. Subject: compact retail point-of-sale touchscreen terminal tilted on a short dark pedestal with attached small payment keypad, teal simple blank interface tiles, no text. Include two recessed round docking sockets with thin teal rings and hollow dark centers, integrated into leftmost and rightmost base edges at equal height. These are topology attachment markers, not physical connector specifications. Asset ID: pos.",
+      "source": "C:\\Users\\DUS\\.codex\\generated_images\\01a08533-2745-73a0-9cfc-a2c9b7aa2699\\exec-bfbd0c7a-f951-41de-9004-f80ad522a4d3.png"
+    },
+    {
+      "id": "iot",
+      "label": "IoT 設備",
+      "kind": "device",
+      "subject": "compact industrial IoT sensor gateway, squat dark slate box with one short stub antenna, small round sensor and teal status light, silver corners",
+      "prompt": "Use case: product-mockup. ONE isolated asset for NetTopo Studio network topology editor. Intended display 160x100 pixels, landscape 8:5 composition. True transparent RGBA background, no backdrop, no baked checkerboard, no floor, no cast shadow. Premium clean miniature 3D technical product illustration, near-front symmetrical view slightly elevated, silver bevels and slate materials with tiny teal accents. Large simple silhouette readable at 160x100, whole object centered with generous transparent margin, restrained realistic materials, crisp edges. No brand, no text, no letters, no watermark. Subject: compact industrial IoT sensor gateway, squat dark slate box with one short stub antenna, small round sensor and teal status light, silver corners. Include two recessed round docking sockets with thin teal rings and hollow dark centers, integrated into leftmost and rightmost base edges at equal height. These are topology attachment markers, not physical connector specifications. Asset ID: iot.",
+      "source": "C:\\Users\\DUS\\.codex\\generated_images\\01a08533-2745-73a0-9cfc-a2c9b7aa2699\\exec-30c29246-84a1-492d-ad67-67b1e8fda25c.png"
+    },
+    {
+      "id": "cat5e",
+      "label": "Cat5e 網路線",
+      "kind": "connection",
+      "subject": "short curved blue unshielded copper Ethernet patch cable with two transparent RJ45 connector plugs and visible gold contacts, both ends fully visible",
+      "prompt": "Use case: product-mockup. ONE isolated asset for NetTopo Studio network topology editor. Intended display 160x100 pixels, landscape 8:5 composition. True transparent RGBA background, no backdrop, no baked checkerboard, no floor, no cast shadow. Premium clean miniature 3D technical product illustration, near-front symmetrical view slightly elevated, silver bevels and slate materials with tiny teal accents. Large simple silhouette readable at 160x100, whole object centered with generous transparent margin, restrained realistic materials, crisp edges. No brand, no text, no letters, no watermark. Subject: short curved blue unshielded copper Ethernet patch cable with two transparent RJ45 connector plugs and visible gold contacts, both ends fully visible. No docking sockets. Cable plugs and cable silhouette must be easily recognizable; do not draw category text or speed labels. Asset ID: cat5e.",
+      "source": "C:\\Users\\DUS\\.codex\\generated_images\\01a08533-2745-73a0-9cfc-a2c9b7aa2699\\exec-ac43101c-e490-46ce-a8b6-c71e409b90cb.png"
+    },
+    {
+      "id": "cat6",
+      "label": "Cat6 網路線",
+      "kind": "connection",
+      "subject": "short curved green copper Ethernet patch cable with two clear RJ45 plugs, molded green strain relief boots and visible gold contacts, both ends fully visible",
+      "prompt": "Use case: product-mockup. ONE isolated asset for NetTopo Studio network topology editor. Intended display 160x100 pixels, landscape 8:5 composition. True transparent RGBA background, no backdrop, no baked checkerboard, no floor, no cast shadow. Premium clean miniature 3D technical product illustration, near-front symmetrical view slightly elevated, silver bevels and slate materials with tiny teal accents. Large simple silhouette readable at 160x100, whole object centered with generous transparent margin, restrained realistic materials, crisp edges. No brand, no text, no letters, no watermark. Subject: short curved green copper Ethernet patch cable with two clear RJ45 plugs, molded green strain relief boots and visible gold contacts, both ends fully visible. No docking sockets. Cable plugs and cable silhouette must be easily recognizable; do not draw category text or speed labels. Asset ID: cat6.",
+      "source": "C:\\Users\\DUS\\.codex\\generated_images\\01a08533-2745-73a0-9cfc-a2c9b7aa2699\\exec-ea3dea1c-a53c-4424-9664-d4b4f2d895e3.png"
+    },
+    {
+      "id": "cat7",
+      "label": "Cat7 網路線",
+      "kind": "connection",
+      "subject": "short curved purple shielded Ethernet patch cable with two clearly metallic shielded RJ45-style compatible plug housings and purple strain relief, both ends fully visible; illustrative cable category, not certification diagram",
+      "prompt": "Use case: product-mockup. ONE isolated asset for NetTopo Studio network topology editor. Intended display 160x100 pixels, landscape 8:5 composition. True transparent RGBA background, no backdrop, no baked checkerboard, no floor, no cast shadow. Premium clean miniature 3D technical product illustration, near-front symmetrical view slightly elevated, silver bevels and slate materials with tiny teal accents. Large simple silhouette readable at 160x100, whole object centered with generous transparent margin, restrained realistic materials, crisp edges. No brand, no text, no letters, no watermark. Subject: short curved purple shielded Ethernet patch cable with two clearly metallic shielded RJ45-style compatible plug housings and purple strain relief, both ends fully visible; illustrative cable category, not certification diagram. No docking sockets. Cable plugs and cable silhouette must be easily recognizable; do not draw category text or speed labels. Asset ID: cat7.",
+      "source": "C:\\Users\\DUS\\.codex\\generated_images\\01a08533-2745-73a0-9cfc-a2c9b7aa2699\\exec-493bd98c-43f3-4fc8-916c-f4ffa6925601.png"
+    },
+    {
+      "id": "fiber",
+      "label": "光纖",
+      "kind": "connection",
+      "subject": "short curved golden yellow duplex fiber optic patch cord with two pairs of compact aqua LC optical connector tips, white ferrules clearly visible, not Ethernet plugs",
+      "prompt": "Use case: product-mockup. ONE isolated asset for NetTopo Studio network topology editor. Intended display 160x100 pixels, landscape 8:5 composition. True transparent RGBA background, no backdrop, no baked checkerboard, no floor, no cast shadow. Premium clean miniature 3D technical product illustration, near-front symmetrical view slightly elevated, silver bevels and slate materials with tiny teal accents. Large simple silhouette readable at 160x100, whole object centered with generous transparent margin, restrained realistic materials, crisp edges. No brand, no text, no letters, no watermark. Subject: short curved golden yellow duplex fiber optic patch cord with two pairs of compact aqua LC optical connector tips, white ferrules clearly visible, not Ethernet plugs. No docking sockets. Cable plugs and cable silhouette must be easily recognizable; do not draw category text or speed labels. Asset ID: fiber.",
+      "source": "C:\\Users\\DUS\\.codex\\generated_images\\01a08533-2745-73a0-9cfc-a2c9b7aa2699\\exec-25a3e8e3-22bd-4545-8e1e-686cc14e3b17.png"
+    },
+    {
+      "id": "wired",
+      "label": "一般有線／未指定",
+      "kind": "connection",
+      "subject": "short curved neutral gray network patch cable with two clear modular Ethernet plugs and dark gray boots, both ends fully visible",
+      "prompt": "Use case: product-mockup. ONE isolated asset for NetTopo Studio network topology editor. Intended display 160x100 pixels, landscape 8:5 composition. True transparent RGBA background, no backdrop, no baked checkerboard, no floor, no cast shadow. Premium clean miniature 3D technical product illustration, near-front symmetrical view slightly elevated, silver bevels and slate materials with tiny teal accents. Large simple silhouette readable at 160x100, whole object centered with generous transparent margin, restrained realistic materials, crisp edges. No brand, no text, no letters, no watermark. Subject: short curved neutral gray network patch cable with two clear modular Ethernet plugs and dark gray boots, both ends fully visible. No docking sockets. Cable plugs and cable silhouette must be easily recognizable; do not draw category text or speed labels. Asset ID: wired.",
+      "source": "C:\\Users\\DUS\\.codex\\generated_images\\01a08533-2745-73a0-9cfc-a2c9b7aa2699\\exec-461adb5b-4de2-4a3b-998f-24e7c2cac764.png"
+    },
+    {
+      "id": "wireless",
+      "label": "無線連線",
+      "kind": "connection",
+      "subject": "three freestanding sculpted translucent blue Wi-Fi signal arcs with a small spherical dot below, crisp technical icon, no device, no base",
+      "prompt": "Use case: product-mockup. ONE isolated asset for NetTopo Studio network topology editor. Intended display 160x100 pixels, landscape 8:5 composition. True transparent RGBA background, no backdrop, no baked checkerboard, no floor, no cast shadow. Premium clean miniature 3D technical product illustration, near-front symmetrical view slightly elevated, silver bevels and slate materials with tiny teal accents. Large simple silhouette readable at 160x100, whole object centered with generous transparent margin, restrained realistic materials, crisp edges. No brand, no text, no letters, no watermark. Subject: three freestanding sculpted translucent blue Wi-Fi signal arcs with a small spherical dot below, crisp technical icon, no device, no base. No docking sockets. Cable plugs and cable silhouette must be easily recognizable; do not draw category text or speed labels. Asset ID: wireless.",
+      "source": "C:\\Users\\DUS\\.codex\\generated_images\\01a08533-2745-73a0-9cfc-a2c9b7aa2699\\exec-a34186f2-067c-466c-80a0-9b260d854c94.png"
+    }
+  ]
+}

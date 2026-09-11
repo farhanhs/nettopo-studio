@@ -11,9 +11,9 @@
 
 ## 結論
 
-`DEV_PIL_002` 的新增拓樸站點修正通過本票核心驗收：browser-local 在站點清單為空時可顯示「未指定」、可建立拓樸、持久化為 `siteId: undefined`，reload 後仍顯示「未指定站點」，且不產生 `unspecified` / `none` / `local` / `default-site` 等 fake site id。
+`DEV_PIL_002` 的新增拓樸站點修正通過本票核心驗收。2026-09-08 依 PM scope review return 補強後，最終結果維持 `QA_PASSED`：browser-local 在站點清單為空時可顯示「未指定」、可建立拓樸、持久化為 `siteId: undefined`，reload 後仍顯示「未指定站點」，且不產生 `unspecified` / `none` / `local` / `default-site` 等 fake site id。
 
-Pilot/server 權限邊界沒有放寬：已由 targeted guard 驗證 server/Pilot empty-site fail-closed、`addTopology()` 不再繼承 active topology site、Pilot checkpoint 不退步。另重跑既有 Pilot Engineer UAT 作為 supporting evidence，真 PostgreSQL fixture 可建立 Pilot site/users/customer/topology、Engineer login 200、跨站資料不可見、credential/audit deny、import/canvas/reload/cleanup 已完成；該 supporting UAT 最後停在既有 QA_PIL_003 export modal close selector timeout，與本票 `DEV_PIL_002` 新增拓樸站點行為無直接關聯。
+Pilot/server 權限邊界沒有放寬：已由 targeted guard 驗證 server/Pilot empty-site fail-closed、`addTopology()` 不再繼承 active topology site、Pilot checkpoint 不退步。2026-09-08 已修正 QA-owned `QA_PIL_003` supporting UAT selector，從舊的 visible glyph `×` 改為產品 accessibility 的 accessible name `關閉`；完整 supporting Pilot UAT 已走完 export、round-trip、secret scan、logout/tamper、cleanup=0。
 
 ## 新增 / 使用測試腳本
 
@@ -41,7 +41,12 @@ Summary：
 Screenshots：
 
 - `docs/dev測試紀錄/screenshots/qa-pil-004-local-empty-initial.png`
-- `docs/dev測試紀錄/screenshots/qa-pil-004-responsive-unspecified-modal.png`
+- `docs/dev測試紀錄/screenshots/qa-pil-004-responsive-360x520.png`
+- `docs/dev測試紀錄/screenshots/qa-pil-004-responsive-768x720.png`
+- `docs/dev測試紀錄/screenshots/qa-pil-004-responsive-1280x850.png`
+- `docs/dev測試紀錄/screenshots/qa-pil-004-responsive-short-height-720x420.png`
+- `docs/dev測試紀錄/screenshots/qa-pil-004-responsive-long-text-360x520.png`
+- `docs/dev測試紀錄/screenshots/qa-pil-004-responsive-device-scale-2-360x520.png`
 - `docs/dev測試紀錄/screenshots/qa-pil-004-created-unspecified-topology.png`
 - `docs/dev測試紀錄/screenshots/qa-pil-004-device-persist-before-reload.png`
 - `docs/dev測試紀錄/screenshots/qa-pil-004-reload-persisted-unspecified.png`
@@ -65,6 +70,28 @@ Browser UAT summary 重點：
 | Modal layout | single column |
 | Footer reachable | true |
 
+2026-09-08 responsive review補強：
+
+| Scenario | scrollWidth | modalWidth | grid | footer reachable | keyboard focus/action | overflow |
+|---|---:|---:|---|---|---|---|
+| 360x520 | 360 | 344 | 1 column | Pass | close/input/site/copy/cancel/submit reachable | none |
+| 768x720 | 768 | 744 | 2 columns | Pass | close/input/site/copy/cancel/submit reachable | none |
+| 1280x850 | 1280 | 920 | 2 columns | Pass | close/input/site/copy/cancel/submit reachable | none |
+| 720x420 short height | 720 | 704 | 1 column | Pass | close/input/site/copy/cancel/submit reachable | none |
+| 360x520 long text stress | 360 | 344 | 1 column | Pass | close/input/site/copy/cancel/submit reachable | none |
+| 360x520 deviceScaleFactor=2 | 360 | 344 | 1 column | Pass | close/input/site/copy/cancel/submit reachable | none |
+
+200% zoom method：使用 Playwright `deviceScaleFactor=2` 的獨立 browser context，模擬 200% display scaling，不修改產品碼。長文字 method：在 QA-only script 內對已開啟的 modal 注入超長站點/錯誤提示文字到 DOM 作 stress measurement；產品碼未修改。
+
+Candidate file SHA256 before re-test：
+
+| File | SHA256 |
+|---|---|
+| `app/page.tsx` | `1E8B2F74F094EF969B46D77399A82905D56CD460B90B280DA7EE25B97DAEDF3D` |
+| `app/globals.css` | `1D874F787CEA7BF22C8E70DB876D3AC0D9D2863B1E4506DB473BDD00AF4A0BBF` |
+| `app/lib/topology-store.ts` | `8A5D2B7BCA304683AE484E7F5D05165AFD2ACF64541C4C477A8B133F755A0003` |
+| `docs/engineerticket/active/DEV_PIL_002.md` | `6968520D36AED6A8DDC36628AD5FEA96AABE265261FBF34C8F91E190EBC9AFDA` |
+
 Network evidence：
 
 - `/api/runtime-capabilities` returned 200 with `Cache-Control: no-store` and `X-Content-Type-Options: nosniff`.
@@ -82,7 +109,7 @@ Second supporting run reached browser flow and produced:
 
 - `docs/dev測試紀錄/qa-pil-004-supporting-pilot-uat-summary.json`
 
-Relevant supporting results:
+Relevant supporting results after 2026-09-08 selector sync:
 
 | 項目 | 結果 |
 |---|---|
@@ -99,12 +126,18 @@ Relevant supporting results:
 | Engineer audit read | 403 |
 | Canvas route evidence | 3 wired orthogonal resolved, 1 wireless resolved |
 | Reload persistence | devices=3, links=4, groups=1; moved router persisted |
+| Safe ZIP export | fixed five files |
+| Secret scan | PASS |
+| Formula neutralization | PASS |
+| Safe canonical round-trip equality | PASS |
+| Logout / tampered cookie | 401 / 401 |
 | Cleanup | sites=0, users=0, customers=0, topologies=0, credentials=0, audit_logs=0 |
 
-Caveat：
+Caveat resolved：
 
-- `QA_PIL_003` supporting UAT final result remains `QA_FAILED` because it stopped after the above evidence at export modal close selector timeout: `locator('.modal').last().getByRole('button', { name: '×' })`.
-- This is recorded as an existing QA_PIL_003 script/sync issue and is not used to fail `QA_PIL_004`, because `QA_PIL_004` focuses on `DEV_PIL_002` add-topology site selection / unspecified-site behavior.
+- 2026-09-04 supporting UAT had stopped at export modal close selector timeout because QA script still used `name: "×"` after the product accessible name was corrected to `關閉`.
+- 2026-09-08 updated only the QA-owned selector to `getByRole("button", { name: "關閉" })`; product accessibility was not changed back.
+- Full supporting UAT now passes.
 
 ## 驗收矩陣
 
@@ -130,7 +163,7 @@ node --test tests\dev-pil-002-topology-site.test.mjs tests\pilot-checkpoint.test
 PASS — 14/14
 
 node tests\qa-pil-004-topology-site-uat.mjs
-PASS — summary docs\dev測試紀錄\qa-pil-004-topology-site-summary.json
+PASS — 2026-09-08 re-run summary docs\dev測試紀錄\qa-pil-004-topology-site-summary.json
 
 node node_modules\typescript\bin\tsc --noEmit --pretty false
 PASS
@@ -146,19 +179,22 @@ Supporting commands:
 
 ```text
 node --env-file-if-exists=.env.local --env-file-if-exists=.env tests\qa-pil-003-engineer-uat.mjs
-FIRST RUN: environment blocked by local PostgreSQL ECONNREFUSED 127.0.0.1:5432
+2026-09-04 first supporting run: environment blocked by local PostgreSQL ECONNREFUSED 127.0.0.1:5432
 
 npm.cmd run db:local:start
 PASS — PostgreSQL accepting connections on 127.0.0.1:5432
 
 node --env-file-if-exists=.env.local --env-file-if-exists=.env tests\qa-pil-003-engineer-uat.mjs
-SUPPORTING PARTIAL — reached Pilot browser/DB flow and cleanup=0; final stopped at existing export modal close selector timeout
+2026-09-04 supporting partial — reached Pilot browser/DB flow and cleanup=0; final stopped at export modal close selector timeout
+
+node --env-file-if-exists=.env.local --env-file-if-exists=.env tests\qa-pil-003-engineer-uat.mjs
+2026-09-08 supporting re-run PASS — export/round-trip/secret scan/logout/tamper/cleanup=0
 ```
 
 ## 風險 / 未覆蓋
 
 - `QA_PIL_004` local with-sites scenario cannot be represented in current browser-local Dexie durable schema because local DB only contains `customers`, `topologies`, `meta`; `sites=[]` is returned by local store. This is why with-sites behavior is validated through Pilot supporting evidence and targeted guard, not by injecting fake local `sites` storage.
-- Existing `QA_PIL_003` Browser UAT has a selector/sync issue at export modal close. It should be tracked under QA_PIL_003 / browser script maintenance if that ticket is reopened, but it does not indicate a `DEV_PIL_002` product regression.
+- The previous `QA_PIL_003` selector/sync issue is resolved in QA-owned test code for this review; product accessibility remains `關閉`.
 - Full npm lint was not rerun because project has a known Windows `bash` script blocker; scoped ESLint passed.
 
 ## Final Recommendation

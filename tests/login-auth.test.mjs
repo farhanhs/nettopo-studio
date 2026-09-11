@@ -1,25 +1,15 @@
 import assert from "node:assert/strict";
+import { readFile } from "node:fs/promises";
 import test from "node:test";
 
-import {
-  LOGIN_ACCOUNT,
-  LOGIN_PASSWORD,
-  LOGIN_PROFILE,
-  validateLogin,
-} from "../app/lib/login-auth.ts";
+import { DEMO_LOGIN_PROFILE } from "../app/lib/login-auth.ts";
 
-test("accepts the configured employee login", () => {
-  assert.equal(validateLogin("sean.sie", "sean002002dus"), true);
-  assert.equal(LOGIN_ACCOUNT, "sean.sie");
-  assert.equal(LOGIN_PASSWORD, "sean002002dus");
-  assert.deepEqual(LOGIN_PROFILE, {
-    name: "謝慶宣",
-    employeeId: "140901",
+test("login auth exposes a passwordless demo profile only", async () => {
+  assert.deepEqual(DEMO_LOGIN_PROFILE, {
+    name: "本機 Demo",
+    employeeId: "DEV-DEMO",
   });
-});
 
-test("rejects incorrect account and password combinations", () => {
-  assert.equal(validateLogin("sean.sie", "incorrect"), false);
-  assert.equal(validateLogin("other.user", "sean002002dus"), false);
-  assert.equal(validateLogin("", ""), false);
+  const source = await readFile(new URL("../app/lib/login-auth.ts", import.meta.url), "utf8");
+  assert.doesNotMatch(source, /LOGIN_PASSWORD|validateLogin|sean002002dus/);
 });

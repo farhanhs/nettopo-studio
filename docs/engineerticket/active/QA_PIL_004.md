@@ -116,3 +116,44 @@ Notes：
 
 - Browser-local empty-site UAT uses an ephemeral Playwright context and validates IndexedDB snapshot; no persistent QA DB fixture is created in that local-mode flow.
 - Pilot/PostgreSQL fixture evidence is taken from a supporting `QA_PIL_003` UAT rerun: the relevant site/user/customer/topology, Pilot scope, import/canvas/reload, and cleanup=0 checks completed before that supporting script stopped at an existing export modal close selector timeout. This selector issue is not a `DEV_PIL_002` regression.
+
+## PM Scope Review Return — 2026-09-08
+
+Status was moved to `IN_QA_REVIEW` per PM review return, then completed as `QA_PASSED` after the required same-ticket reinforcement. The original 2026-09-04 `QA_PASSED` history is preserved above.
+
+补強範圍：
+
+- Update QA-owned `QA_PIL_003` supporting UAT selector to use role + accessible name `關閉`, matching the product accessibility change.
+- Re-run complete supporting Pilot UAT through export and cleanup=0.
+- Add repeatable responsive evidence for 360px, 768px, 1280px, short height, 200% zoom, long text, keyboard focus/action reachability, and horizontal overflow checks.
+- Record candidate file SHA256 before re-test to prevent tested-version drift.
+
+Final review result：`QA_PASSED`
+
+Evidence：
+
+- `docs/dev測試紀錄/qa-pil-004-topology-site-2026-09-04.md`
+- `docs/dev測試紀錄/qa-pil-004-topology-site-summary.json`
+- `docs/dev測試紀錄/qa-pil-004-supporting-pilot-uat-summary.json`
+- `docs/dev測試紀錄/screenshots/qa-pil-004-responsive-360x520.png`
+- `docs/dev測試紀錄/screenshots/qa-pil-004-responsive-768x720.png`
+- `docs/dev測試紀錄/screenshots/qa-pil-004-responsive-1280x850.png`
+- `docs/dev測試紀錄/screenshots/qa-pil-004-responsive-short-height-720x420.png`
+- `docs/dev測試紀錄/screenshots/qa-pil-004-responsive-long-text-360x520.png`
+- `docs/dev測試紀錄/screenshots/qa-pil-004-responsive-device-scale-2-360x520.png`
+
+Commands：
+
+- `node --check tests\qa-pil-003-engineer-uat.mjs`：PASS
+- `node --check tests\qa-pil-004-topology-site-uat.mjs`：PASS
+- `node --test tests\dev-pil-002-topology-site.test.mjs tests\pilot-checkpoint.test.mjs`：PASS，14/14
+- `npm.cmd run db:local:start`：PASS，PostgreSQL accepting connections on `127.0.0.1:5432`
+- `node --env-file-if-exists=.env.local --env-file-if-exists=.env tests\qa-pil-003-engineer-uat.mjs`：PASS，supporting Pilot UAT completed export/round-trip/cleanup=0
+- `node tests\qa-pil-004-topology-site-uat.mjs`：PASS，responsive matrix and local empty-site flow completed
+
+Candidate SHA256：
+
+- `app/page.tsx`：`1E8B2F74F094EF969B46D77399A82905D56CD460B90B280DA7EE25B97DAEDF3D`
+- `app/globals.css`：`1D874F787CEA7BF22C8E70DB876D3AC0D9D2863B1E4506DB473BDD00AF4A0BBF`
+- `app/lib/topology-store.ts`：`8A5D2B7BCA304683AE484E7F5D05165AFD2ACF64541C4C477A8B133F755A0003`
+- `docs/engineerticket/active/DEV_PIL_002.md`：`6968520D36AED6A8DDC36628AD5FEA96AABE265261FBF34C8F91E190EBC9AFDA`

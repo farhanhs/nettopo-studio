@@ -99,3 +99,17 @@ const server = createServer(async (request, response) => {
 server.listen(port, host, () => {
   console.log(`NetTopo preview running at http://${host}:${port}/`);
 });
+
+function shutdown() {
+  server.closeIdleConnections?.();
+  server.close(() => {
+    process.exit(0);
+  });
+  setTimeout(() => {
+    server.closeAllConnections?.();
+    process.exit(0);
+  }, 1_000).unref();
+}
+
+process.on("SIGINT", shutdown);
+process.on("SIGTERM", shutdown);

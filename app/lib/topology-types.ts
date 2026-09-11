@@ -24,8 +24,6 @@ export type Device = {
   model?: string;
   location?: string;
   url?: string;
-  username?: string;
-  password?: string;
   quantity?: number;
   x: number;
   y: number;
@@ -152,7 +150,17 @@ export const SAMPLE_PROJECT: Project = {
 
 export function cloneProject(project: Project): Project {
   return {
-    devices: project.devices.map((device) => ({ ...device })),
+    devices: project.devices.map((device) => {
+      const safeDevice = { ...(device as Device & {
+        username?: unknown;
+        password?: unknown;
+        secret?: unknown;
+      }) };
+      delete safeDevice.username;
+      delete safeDevice.password;
+      delete safeDevice.secret;
+      return { ...safeDevice };
+    }),
     links: project.links.map((link) => ({ ...link })),
     groups: project.groups.map((group) => ({ ...group })),
   };

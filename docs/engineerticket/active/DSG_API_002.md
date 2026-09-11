@@ -23,7 +23,7 @@
 |---|---|
 | User Intent | 把 DEV_API_001 的功能與驗證規劃到可直接交接，避免只補一行順序後留下錯誤契約與測試漏洞 |
 | Historical Sources | `DSG_API_001`、`DEV_API_001.md`、`ARCHITECTURE-MAP.md`、`api-auth-order.test.mjs`、Migration Boundary／RBAC 驗收紀錄 |
-| Approved Decisions | `PM_GOV_001-D03`、`D06`、`D11`、`D12`、`D13` |
+| Approved Decisions | `PM_GOV_001-D03`、`D06`、`D11`、`D12`、`D13`、`D14` |
 | Change Type | `EXTEND`：細化既有 auth-first hard boundary，不改 Audit read RBAC |
 | Affected Layers | API、Identity/Session、Repository、Security Headers、QA；不影響 UI、Domain、DB schema、Migration |
 | Preserved Invariants | Pilot/production 不接受 dev identity header；Audit boss-only；runtime 不 migrate；no-store；安全錯誤不洩漏內部資訊 |
@@ -203,7 +203,7 @@ createAuditLogsGetHandler(deps: {
 
 ### Resolved User Decision
 
-2026-08-20 使用者已核准 Strict `limit` 契約，`DEV_API_001` 可依本設計開工。
+`PM_GOV_001-D14` 已核准 Strict `limit` 契約，`DEV_API_001` 已依本設計完成並通過 `QA_API_001`。
 
 ## Handoff Rule
 

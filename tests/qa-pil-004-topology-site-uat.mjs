@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { spawn } from "node:child_process";
-import { mkdir, writeFile } from "node:fs/promises";
+import { createHash } from "node:crypto";
+import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { resolve } from "node:path";
 
 import { chromium } from "playwright";
@@ -13,6 +14,12 @@ const screenshotsDir = resolve("docs/dev測試紀錄/screenshots");
 const summaryPath = resolve("docs/dev測試紀錄/qa-pil-004-topology-site-summary.json");
 const topologyName = `QA PIL 004 未指定拓樸 ${Date.now()}`;
 const deviceName = "QA PIL 004 Router";
+const candidateFiles = [
+  "app/page.tsx",
+  "app/globals.css",
+  "app/lib/topology-store.ts",
+  "docs/engineerticket/active/DEV_PIL_002.md",
+];
 
 const evidence = {
   ticket,
@@ -20,6 +27,7 @@ const evidence = {
   mode: "browser-local / Playwright Chromium / loopback preview",
   baseUrl,
   startedAt: new Date().toISOString(),
+  candidateHashes: {},
   durationMs: 0,
   screenshots: [],
   network: [],
@@ -119,6 +127,13 @@ async function screenshot(page, name) {
   return path;
 }
 
+async function hashCandidateFiles() {
+  return Object.fromEntries(await Promise.all(candidateFiles.map(async (path) => {
+    const bytes = await readFile(resolve(path));
+    return [path, createHash("sha256").update(bytes).digest("hex").toUpperCase()];
+  })));
+}
+
 async function idbSnapshot(page) {
   return await page.evaluate(async () => {
     const db = await new Promise((resolveOpen, rejectOpen) => {
@@ -191,14 +206,43 @@ async function addDeviceAndWaitForSave(page) {
   await page.waitForTimeout(800);
 }
 
-async function verifyResponsiveModal(page) {
-  await page.setViewportSize({ width: 360, height: 520 });
+async function measureOpenTopologyModal(page, scenario, { width, height, cssZoom = 1, stressLongText = false } = {}) {
+  await page.setViewportSize({ width, height });
+  await page.evaluate((zoom) => {
+    document.documentElement.style.zoom = String(zoom);
+  }, cssZoom);
   const dialog = await openCreateTopologyModal(page);
+  if (stressLongText) {
+    const longText = "QA_PIL_004_超長站點或錯誤提示文字_stress_" + "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789".repeat(4);
+    await dialog.locator("input[name='name']").fill(longText);
+    await dialog.evaluate((node, text) => {
+      const fieldNote = node.querySelector(".field-note");
+      const option = node.querySelector("select[name='siteId'] option");
+      if (fieldNote) fieldNote.textContent = text;
+      if (option) option.textContent = text;
+    }, longText);
+  }
+  await dialog.locator("input[name='name']").focus();
+  const focusAudit = await dialog.evaluate((node) => {
+    const focusables = Array.from(node.querySelectorAll("input, select, button")).filter((element) => {
+      const htmlElement = element;
+      return !htmlElement.disabled && htmlElement.offsetParent !== null;
+    });
+    return focusables.map((element) => ({
+      tag: element.tagName.toLowerCase(),
+      name: element.getAttribute("name") ?? element.getAttribute("aria-label") ?? element.textContent?.trim() ?? "",
+      type: element.getAttribute("type") ?? "",
+    }));
+  });
   const measurements = await page.evaluate(() => {
     const modal = document.querySelector(".modal")?.getBoundingClientRect();
     const form = document.querySelector(".modal .form-grid");
     const actions = document.querySelector(".modal .form-actions")?.getBoundingClientRect();
+    const fieldNote = document.querySelector(".modal .field-note")?.getBoundingClientRect();
+    const siteSelect = document.querySelector(".modal select[name='siteId']")?.getBoundingClientRect();
     const style = form ? getComputedStyle(form) : undefined;
+    const fieldNoteElement = document.querySelector(".modal .field-note");
+    const fieldNoteStyle = fieldNoteElement ? getComputedStyle(fieldNoteElement) : undefined;
     return {
       innerWidth,
       scrollWidth: document.documentElement.scrollWidth,
@@ -206,18 +250,56 @@ async function verifyResponsiveModal(page) {
       gridColumns: style?.gridTemplateColumns ?? "",
       actionsBottom: actions?.bottom ?? 0,
       actionsTop: actions?.top ?? 0,
+      fieldNoteWidth: fieldNote?.width ?? 0,
+      siteSelectWidth: siteSelect?.width ?? 0,
+      fieldNoteOverflowWrap: fieldNoteStyle?.overflowWrap ?? "",
       innerHeight,
     };
   });
-  assert.ok(measurements.scrollWidth <= measurements.innerWidth + 1, "360px modal should not create horizontal overflow");
-  assert.ok(measurements.modalWidth <= measurements.innerWidth, "modal must fit inside 360px viewport");
-  assert.equal(measurements.gridColumns.trim().split(" ").length, 1, "small viewport modal should be single-column");
-  assert.ok(measurements.actionsTop < measurements.innerHeight, "footer actions should be reachable in short viewport");
-  evidence.responsive = measurements;
-  await screenshot(page, "qa-pil-004-responsive-unspecified-modal");
+  assert.ok(measurements.scrollWidth <= measurements.innerWidth + 1, `${scenario} should not create horizontal overflow`);
+  assert.ok(measurements.modalWidth <= measurements.innerWidth, `${scenario} modal must fit inside viewport`);
+  if (width <= 640 || height <= 520) {
+    assert.equal(measurements.gridColumns.trim().split(" ").length, 1, `${scenario} modal should be single-column`);
+  }
+  assert.ok(measurements.actionsTop < measurements.innerHeight, `${scenario} footer actions should be reachable`);
+  assert.ok(focusAudit.some((item) => item.name === "siteId"), `${scenario} site select must be keyboard focusable`);
+  assert.ok(focusAudit.some((item) => item.name.includes("建立拓樸")), `${scenario} submit button must be keyboard reachable`);
+  await screenshot(page, `qa-pil-004-responsive-${scenario}`);
   await dialog.getByLabel("關閉").click();
   await dialog.waitFor({ state: "hidden", timeout: 10_000 });
+  await page.evaluate(() => {
+    document.documentElement.style.zoom = "";
+  });
+  return { scenario, viewport: { width, height }, cssZoom, stressLongText, focusAudit, measurements };
+}
+
+async function verifyResponsiveModal(page) {
+  const matrix = [];
+  matrix.push(await measureOpenTopologyModal(page, "360x520", { width: 360, height: 520 }));
+  matrix.push(await measureOpenTopologyModal(page, "768x720", { width: 768, height: 720 }));
+  matrix.push(await measureOpenTopologyModal(page, "1280x850", { width: 1280, height: 850 }));
+  matrix.push(await measureOpenTopologyModal(page, "short-height-720x420", { width: 720, height: 420 }));
+  matrix.push(await measureOpenTopologyModal(page, "long-text-360x520", { width: 360, height: 520, stressLongText: true }));
+  evidence.responsive = {
+    method: "viewport matrix with direct DOM measurements; 200% zoom is covered by a separate Playwright context using deviceScaleFactor=2",
+    matrix,
+  };
   await page.setViewportSize({ width: 1280, height: 850 });
+}
+
+async function verifyDeviceScaleZoom(browser) {
+  const context = await browser.newContext({ viewport: { width: 360, height: 520 }, deviceScaleFactor: 2 });
+  try {
+    const page = await context.newPage();
+    await loginDemo(page);
+    const measurement = await measureOpenTopologyModal(page, "device-scale-2-360x520", { width: 360, height: 520 });
+    evidence.responsive.deviceScaleFactor2 = {
+      method: "Playwright browser context deviceScaleFactor=2, representing 200% display scaling without modifying product code",
+      measurement,
+    };
+  } finally {
+    await context.close();
+  }
 }
 
 async function main() {
@@ -226,6 +308,7 @@ async function main() {
   let preview;
   try {
     await mkdir(screenshotsDir, { recursive: true });
+    evidence.candidateHashes = await hashCandidateFiles();
     await run("npm.cmd", ["run", "build:local"], { env: qaEnv() });
     preview = startPreview();
     await waitForServer();
@@ -248,6 +331,7 @@ async function main() {
     await page.getByText("未指定站點").waitFor({ timeout: 10_000 });
     await screenshot(page, "qa-pil-004-local-empty-initial");
     await verifyResponsiveModal(page);
+    await verifyDeviceScaleZoom(browser);
     await createUnspecifiedTopology(page);
     await screenshot(page, "qa-pil-004-created-unspecified-topology");
     await addDeviceAndWaitForSave(page);

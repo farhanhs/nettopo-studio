@@ -1,0 +1,317 @@
+{
+  "status": "passed",
+  "images": [
+    {
+      "alt": "路由器",
+      "loaded": true,
+      "displayedWidth": 160,
+      "displayedHeight": 100
+    },
+    {
+      "alt": "電信商數據機",
+      "loaded": true,
+      "displayedWidth": 160,
+      "displayedHeight": 100
+    },
+    {
+      "alt": "防火牆",
+      "loaded": true,
+      "displayedWidth": 160,
+      "displayedHeight": 100
+    },
+    {
+      "alt": "交換器",
+      "loaded": true,
+      "displayedWidth": 160,
+      "displayedHeight": 100
+    },
+    {
+      "alt": "伺服器",
+      "loaded": true,
+      "displayedWidth": 160,
+      "displayedHeight": 100
+    },
+    {
+      "alt": "網路儲存裝置",
+      "loaded": true,
+      "displayedWidth": 160,
+      "displayedHeight": 100
+    },
+    {
+      "alt": "ERP 系統",
+      "loaded": true,
+      "displayedWidth": 160,
+      "displayedHeight": 100
+    },
+    {
+      "alt": "無線 AP",
+      "loaded": true,
+      "displayedWidth": 160,
+      "displayedHeight": 100
+    },
+    {
+      "alt": "終端設備",
+      "loaded": true,
+      "displayedWidth": 160,
+      "displayedHeight": 100
+    },
+    {
+      "alt": "SSID 無線網路",
+      "loaded": true,
+      "displayedWidth": 160,
+      "displayedHeight": 100
+    },
+    {
+      "alt": "Mesh 節點",
+      "loaded": true,
+      "displayedWidth": 160,
+      "displayedHeight": 100
+    },
+    {
+      "alt": "印表機",
+      "loaded": true,
+      "displayedWidth": 160,
+      "displayedHeight": 100
+    },
+    {
+      "alt": "監視器",
+      "loaded": true,
+      "displayedWidth": 160,
+      "displayedHeight": 100
+    },
+    {
+      "alt": "POS 終端機",
+      "loaded": true,
+      "displayedWidth": 160,
+      "displayedHeight": 100
+    },
+    {
+      "alt": "IoT 設備",
+      "loaded": true,
+      "displayedWidth": 160,
+      "displayedHeight": 100
+    },
+    {
+      "alt": "Cat5e 網路線",
+      "loaded": true,
+      "displayedWidth": 160,
+      "displayedHeight": 100
+    },
+    {
+      "alt": "Cat6 網路線",
+      "loaded": true,
+      "displayedWidth": 160,
+      "displayedHeight": 100
+    },
+    {
+      "alt": "Cat7 網路線",
+      "loaded": true,
+      "displayedWidth": 160,
+      "displayedHeight": 100
+    },
+    {
+      "alt": "光纖",
+      "loaded": true,
+      "displayedWidth": 160,
+      "displayedHeight": 100
+    },
+    {
+      "alt": "一般有線／未指定",
+      "loaded": true,
+      "displayedWidth": 160,
+      "displayedHeight": 100
+    },
+    {
+      "alt": "無線連線",
+      "loaded": true,
+      "displayedWidth": 160,
+      "displayedHeight": 100
+    }
+  ],
+  "dockCount": 30,
+  "geometry": [
+    {
+      "asset": "router",
+      "dock": "left",
+      "cyanPixels": 32,
+      "centerDeviationPx": 0.41
+    },
+    {
+      "asset": "router",
+      "dock": "right",
+      "cyanPixels": 34,
+      "centerDeviationPx": 0.03
+    },
+    {
+      "asset": "modem",
+      "dock": "left",
+      "cyanPixels": 29,
+      "centerDeviationPx": 0.52
+    },
+    {
+      "asset": "modem",
+      "dock": "right",
+      "cyanPixels": 25,
+      "centerDeviationPx": 0.62
+    },
+    {
+      "asset": "firewall",
+      "dock": "left",
+      "cyanPixels": 22,
+      "centerDeviationPx": 0.32
+    },
+    {
+      "asset": "firewall",
+      "dock": "right",
+      "cyanPixels": 23,
+      "centerDeviationPx": 0.22
+    },
+    {
+      "asset": "switch",
+      "dock": "left",
+      "cyanPixels": 29,
+      "centerDeviationPx": 0.3
+    },
+    {
+      "asset": "switch",
+      "dock": "right",
+      "cyanPixels": 29,
+      "centerDeviationPx": 0.31
+    },
+    {
+      "asset": "server",
+      "dock": "left",
+      "cyanPixels": 19,
+      "centerDeviationPx": 0.19
+    },
+    {
+      "asset": "server",
+      "dock": "right",
+      "cyanPixels": 20,
+      "centerDeviationPx": 0.37
+    },
+    {
+      "asset": "nas",
+      "dock": "left",
+      "cyanPixels": 22,
+      "centerDeviationPx": 0.29
+    },
+    {
+      "asset": "nas",
+      "dock": "right",
+      "cyanPixels": 21,
+      "centerDeviationPx": 0.43
+    },
+    {
+      "asset": "erp",
+      "dock": "left",
+      "cyanPixels": 38,
+      "centerDeviationPx": 0.18
+    },
+    {
+      "asset": "erp",
+      "dock": "right",
+      "cyanPixels": 34,
+      "centerDeviationPx": 0.31
+    },
+    {
+      "asset": "access-point",
+      "dock": "left",
+      "cyanPixels": 18,
+      "centerDeviationPx": 0.07
+    },
+    {
+      "asset": "access-point",
+      "dock": "right",
+      "cyanPixels": 18,
+      "centerDeviationPx": 0.09
+    },
+    {
+      "asset": "client",
+      "dock": "left",
+      "cyanPixels": 20,
+      "centerDeviationPx": 0.23
+    },
+    {
+      "asset": "client",
+      "dock": "right",
+      "cyanPixels": 19,
+      "centerDeviationPx": 0.11
+    },
+    {
+      "asset": "ssid",
+      "dock": "left",
+      "cyanPixels": 44,
+      "centerDeviationPx": 0.05
+    },
+    {
+      "asset": "ssid",
+      "dock": "right",
+      "cyanPixels": 45,
+      "centerDeviationPx": 0.34
+    },
+    {
+      "asset": "mesh-node",
+      "dock": "left",
+      "cyanPixels": 15,
+      "centerDeviationPx": 0.33
+    },
+    {
+      "asset": "mesh-node",
+      "dock": "right",
+      "cyanPixels": 17,
+      "centerDeviationPx": 0.26
+    },
+    {
+      "asset": "printer",
+      "dock": "left",
+      "cyanPixels": 25,
+      "centerDeviationPx": 0.18
+    },
+    {
+      "asset": "printer",
+      "dock": "right",
+      "cyanPixels": 25,
+      "centerDeviationPx": 0.07
+    },
+    {
+      "asset": "camera",
+      "dock": "left",
+      "cyanPixels": 16,
+      "centerDeviationPx": 0.34
+    },
+    {
+      "asset": "camera",
+      "dock": "right",
+      "cyanPixels": 17,
+      "centerDeviationPx": 0.32
+    },
+    {
+      "asset": "pos",
+      "dock": "left",
+      "cyanPixels": 23,
+      "centerDeviationPx": 0.32
+    },
+    {
+      "asset": "pos",
+      "dock": "right",
+      "cyanPixels": 22,
+      "centerDeviationPx": 0.37
+    },
+    {
+      "asset": "iot",
+      "dock": "left",
+      "cyanPixels": 29,
+      "centerDeviationPx": 0.38
+    },
+    {
+      "asset": "iot",
+      "dock": "right",
+      "cyanPixels": 28,
+      "centerDeviationPx": 0.24
+    }
+  ],
+  "mobileOverflow": false,
+  "pageErrors": [],
+  "scope": "Asset gallery only; product integration remains PM/DEV/QA work."
+}

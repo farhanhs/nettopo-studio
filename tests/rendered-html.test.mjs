@@ -49,76 +49,43 @@ test("renders development preview metadata", async () => {
   assert.match(await response.text(), developmentPreviewMeta);
 });
 
-test("renders login guidance on the root path without a URL suffix", async () => {
+test("renders passwordless login shell without legacy demo password", async () => {
   const response = await fetchWorker("/", {
     headers: { accept: "text/html" },
   });
   const html = await response.text();
 
   assert.equal(response.status, 200);
-  assert.match(html, /數位聯合服務網路設備拓樸工具/);
-  assert.match(html, /登入工作平台/);
-  assert.match(html, /帳號/);
-  assert.match(html, /密碼/);
-  assert.doesNotMatch(html, /action=["'][^"']+/i);
-  assert.match(html, /<form[^>]*class=["'][^"']*login-card/i);
-  assert.match(html, /<button[^>]*type=["']submit["'][^>]*>登入系統/i);
-  assert.doesNotMatch(html, /\/login\b/i);
-  assert.doesNotMatch(html, /sean002002dus/);
+  assert.match(html, /DIGITAL UNITED SERVICE|登入工作平台|檢查登入狀態/);
+  assert.match(html, /login-card/i);
+  assert.doesNotMatch(html, /type=["']password["']/i);
+  assert.doesNotMatch(html, /sean002002dus|LOGIN_PASSWORD|validateLogin/);
+  assert.doesNotMatch(html, /x-nettopo-user-email/);
 });
 
-test("topology API rejects unsupported actions", async () => {
+test("topology API requires authentication before actions are handled", async () => {
   const response = await fetchWorker("/api/topology", {
     method: "POST",
     headers: { "content-type": "application/json" },
     body: JSON.stringify({ action: "unknown" }),
   });
 
-  assert.equal(response.status, 400);
-  assert.deepEqual(await response.json(), {
-    error: "Unsupported topology action.",
-  });
+  assert.equal(response.status, 401);
+  assert.match((await response.json()).error, /Authentication|disabled|required/i);
 });
 
-test("topology API validates required text fields", async () => {
-  const response = await fetchWorker("/api/topology", {
-    method: "POST",
-    headers: { "content-type": "application/json" },
-    body: JSON.stringify({ action: "renameTopology", topologyId: " ", name: "New name" }),
-  });
-
-  assert.equal(response.status, 400);
-  assert.deepEqual(await response.json(), { error: "topologyId is required." });
-});
-
-test("topology API validates project structure before storage access", async () => {
-  const response = await fetchWorker("/api/topology", {
-    method: "POST",
-    headers: { "content-type": "application/json" },
-    body: JSON.stringify({
-      action: "createTopology",
-      customerId: "customer-1",
-      name: "Branch office",
-      project: { devices: [], links: [] },
-    }),
-  });
-
-  assert.equal(response.status, 400);
-  assert.deepEqual(await response.json(), { error: "Invalid project: groups: Invalid input" });
-});
-
-test("topology API returns a client error for malformed JSON", async () => {
+test("topology API authenticates before parsing malformed JSON", async () => {
   const response = await fetchWorker("/api/topology", {
     method: "POST",
     headers: { "content-type": "application/json" },
     body: "{",
   });
 
-  assert.equal(response.status, 400);
-  assert.match((await response.json()).error, /json|unexpected|position/i);
+  assert.equal(response.status, 401);
+  assert.match((await response.json()).error, /Authentication|disabled|required/i);
 });
 
-test("storage-backed endpoints report missing database configuration", async () => {
+test("protected endpoints ignore the legacy identity header and fail closed", async () => {
   const previousDatabaseUrl = process.env.DATABASE_URL;
   delete process.env.DATABASE_URL;
 
@@ -132,10 +99,8 @@ test("storage-backed endpoints report missing database configuration", async () 
       const response = await fetchWorker(path, {
         headers: { "x-nettopo-user-email": "engineer@company.local" },
       });
-      assert.equal(response.status, 503, path);
-      assert.deepEqual(await response.json(), {
-        error: "DATABASE_URL is required when NEXT_PUBLIC_TOPOLOGY_STORAGE=server.",
-      });
+      assert.equal(response.status, 401, path);
+      assert.match((await response.json()).error, /Authentication|disabled|required|forbidden/i);
     }
   } finally {
     if (previousDatabaseUrl === undefined) delete process.env.DATABASE_URL;

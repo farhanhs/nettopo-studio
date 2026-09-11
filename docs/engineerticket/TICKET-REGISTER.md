@@ -6,15 +6,26 @@
 
 ## P0／P1 執行佇列
 
-### 最新功能指示：DEV_PIL_002 QA completed
+### 2026-09-08 UI／Canvas Bug 分流（D31）
 
-`QA_PIL_004` 已於 2026-09-04 完成 `DEV_PIL_002` 獨立 UAT；空站點「未指定」新增拓樸、IndexedDB 持久化、responsive guard 與 Pilot scope supporting evidence 均已記錄。D29 release gate 與 commit/push 禁令仍維持。
+本輪只完成 PM 審查、發單與排序，不直接修改產品。三項既有語意缺陷可按序進 DEV；路由交叉最小化屬延伸能力，必須先完成設計並回 PM/使用者核准。
+
+| 順序 | Ticket chain | 狀態 | 判定 |
+|---:|---|---|---|
+| 1 | DEV_UIX_006 → QA_UIX_002 | READY → BLOCKED | Inspector selection 資料殘留，CORRECT |
+| 2 | DEV_UIX_007 → QA_UIX_003 | READY → BLOCKED | Topbar 中等寬度/zoom 重疊，CORRECT；回歸 DEV_UIX_004 |
+| 3 | DEV_UIX_008 → QA_UIX_004 | READY → BLOCKED | 登入後 Canvas 初始 viewport/resize，CORRECT |
+| 4 | DSG_UIX_003 → DEV_UIX_009 → DEV_UIX_003 → QA_UIX_005 | READY → BLOCKED | 多成本繞線，EXTEND；設計批准前不得開發 |
+
+### 最新功能結果：DEV_PIL_002 checkpoint pushed
+
+`DSG_PIL_002` 設計完成；`DEV_PIL_002` 功能完成。2026-09-08 QA 已補齊 accessible close selector 完整 Pilot UAT，以及 360/768/1280/短高度/長文字/200% scaling responsive Browser 證據，結果 `QA_PASSED`。三段 ticket commits 已 push 至 `origin/codex/dev-rel-001-checkpoint`，remote-tracking HEAD `1b0b084518886cda347f175bfc959401fd1d18ed`；未 merge、未 deploy。
 
 | Ticket | Status | 工作 |
 |---|---|---|
-| DSG_PIL_002 | READY | 新增拓樸欄位及響應式容器設計；對接 DEV_PIL_002、QA_PIL_004 |
-| DEV_PIL_002 | READY_FOR_QA | 新增拓樸站點/未指定站點修正已交 QA |
-| QA_PIL_004 | QA_PASSED | 2026-09-04 獨立 UAT 通過；詳見 `docs/dev測試紀錄/qa-pil-004-topology-site-2026-09-04.md` |
+| DSG_PIL_002 | DONE | 新增拓樸欄位及響應式容器契約已完成 |
+| DEV_PIL_002 | QA_PASSED | 新增拓樸站點/未指定站點修正已通過補強驗收並 checkpoint |
+| QA_PIL_004 | QA_PASSED | 完整 Pilot UAT、responsive Browser matrix、cleanup=0 均通過 |
 
 ### D29 當前優先指示（優先於下方歷史摘要）
 
@@ -45,9 +56,9 @@
 | 031 | `QA_PIL_001` | QA | P0 | `QA_PASSED` | Pilot | DEV_PIL_001 READY_FOR_QA, DEV_API_001 QA_PASSED, QA_DBM_001 QA_PASSED | 同票 Re-test 通過：RBAC precedence 修復、Pilot real DB scope、security/export matrix 與 full serial tests 已驗證 | [active/QA_PIL_001.md](active/QA_PIL_001.md) |
 | 032 | `QA_PIL_002` | QA | P0 | `QA_PASSED` | Pilot | QA_DBM_001 QA_PASSED, QA_PIL_001 QA_PASSED | 2026-08-24 quick re-test 通過：Pilot session identity display、reload、logout/tamper/revoke、cleanup；Browser critical flow 維持通過 | [active/QA_PIL_002.md](active/QA_PIL_002.md) |
 | 033 | `QA_PIL_003` | QA | P1 | `QA_PASSED` | Functional UAT | DEV_UIX_004/005 READY_FOR_QA, DEV_PIL_003 READY_FOR_QA, QA_PIL_002/QA_IMP_001/QA_UIX_001 QA_PASSED, D25 | 2026-09-01 同票完整 UAT 通過：topbar 不遮擋、drag/reload persistence、Pilot-only logout、TXT/MD/CSV import、routing、Safe ZIP、secret/formula scan、round-trip、Admin/Engineer spot check 與 cleanup=0 | [active/QA_PIL_003.md](active/QA_PIL_003.md) |
-| 034 | `DEV_PIL_002` | DEV | P1 | `READY_FOR_QA` | Functional UAT | QA_PIL_003 evidence, D25 | 修正新增拓樸 modal 在站點清單為空時被 required select 阻擋；本機 demo／允許未指定情境預設為「未指定站點」，Pilot scope 不放寬 | [active/DEV_PIL_002.md](active/DEV_PIL_002.md) |
-| 035 | `QA_PIL_004` | QA | P1 | `QA_PASSED` | Functional UAT | DEV_PIL_002 READY_FOR_QA, QA_PIL_003 evidence | 2026-09-04 獨立 UAT 通過；空站點「未指定」新增拓樸、IndexedDB 持久化、responsive、Pilot scope supporting evidence、cleanup=0 | [active/QA_PIL_004.md](active/QA_PIL_004.md) |
-| 036 | `DEV_UIX_003` | DEV | P1 | `PROPOSED` | Functional UAT | DEV_UIX_002/QA_UIX_001, QA_PIL_003 evidence, D25 | 改善連線無效告警，讓使用者知道缺 port、重複端點、port 被占用或 route no-path 的具體原因 | [active/DEV_UIX_003.md](active/DEV_UIX_003.md) |
+| 034 | `DEV_PIL_002` | DEV | P1 | `QA_PASSED` | Functional UAT | QA_PIL_003 evidence, D25/D30 | 空站點本機可建立未指定拓樸；server/Pilot 不放寬；已 checkpoint/push | [active/DEV_PIL_002.md](active/DEV_PIL_002.md) |
+| 035 | `QA_PIL_004` | QA | P1 | `QA_PASSED` | Functional UAT | DEV_PIL_002, QA_PIL_003 evidence | 完整 Pilot UAT、responsive Browser matrix、secret/round-trip 與 cleanup=0 通過 | [active/QA_PIL_004.md](active/QA_PIL_004.md) |
+| 036 | `DEV_UIX_003` | DEV | P1 | `BLOCKED` | Functional UAT | DEV_UIX_009 READY_FOR_QA, DEV_UIX_002/QA_UIX_001, QA_PIL_003 evidence, D25/D31 | 改善連線無效告警，僅負責路由仍無解時的具體 fallback 原因；等待多成本路由契約與 DEV_UIX_009 | [active/DEV_UIX_003.md](active/DEV_UIX_003.md) |
 | 037 | `DEV_UIX_004` | DEV | P1 | `QA_PASSED` | Functional UAT Fix | QA_PIL_003 QA_PASSED, D25 | 登入者資料卡進入 responsive topbar flow；1280px 下正常 pointer 操作不再被遮擋 | [active/DEV_UIX_004.md](active/DEV_UIX_004.md) |
 | 038 | `DEV_UIX_005` | DEV | P1 | `QA_PASSED` | Functional UAT Fix | QA_PIL_003 QA_PASSED, DEV_UIX_004 QA_PASSED, D25 | Canvas transient drag + drag-stop durable write；真 Browser reload persistence 通過 | [active/DEV_UIX_005.md](active/DEV_UIX_005.md) |
 | 039 | `DEV_PIL_003` | DEV | P1 | `QA_PASSED` | Functional UAT Fix | QA_PIL_003 QA_PASSED, D06/D20/D21/D25 | Runtime profile 唯一 logout endpoint；Pilot logout 200、登出後與 tampered cookie 均 401 | [active/DEV_PIL_003.md](active/DEV_PIL_003.md) |
@@ -61,6 +72,15 @@
 | 047 | `DEV_IMP_002` | DEV | P0 | `READY_FOR_QA` | Transfer Import Correction | DSG_IMP_002 READY | QA Re-test return fix：移除 legacy Preview 控制樹，確保 summary／issue／strategy／confirm 唯一且不可繞過 | [active/DEV_IMP_002.md](active/DEV_IMP_002.md) |
 | 048 | `DEV_EXP_002` | DEV | P0 | `READY_FOR_QA` | Transfer Export Correction | DSG_IMP_002 approved, DEV_IMP_002 READY_FOR_QA | 五檔 canonical ZIP、Safe／Full 與 round-trip equality | [active/DEV_EXP_002.md](active/DEV_EXP_002.md) |
 | 049 | `DEV_SEC_002` | DEV | P0 | `READY_FOR_QA` | Transfer Security Correction | DEV_IMP_002/DEV_EXP_002 READY_FOR_QA | Import／Export persistence、DOM、network、JSON／CSV／ZIP secret hardening | [active/DEV_SEC_002.md](active/DEV_SEC_002.md) |
+| 070 | `DEV_UIX_006` | DEV | P1 | `READY` | UI Bug Fix | D31 | Inspector 切換設備／連線時表單資料必須同步，不得殘留前一筆 defaultValue | [active/DEV_UIX_006.md](active/DEV_UIX_006.md) |
+| 071 | `QA_UIX_002` | QA | P1 | `BLOCKED` | UI Bug QA | DEV_UIX_006 READY_FOR_QA | 真 Browser 驗證 selection/form/save/reload 不交叉寫入 | [active/QA_UIX_002.md](active/QA_UIX_002.md) |
+| 072 | `DEV_UIX_007` | DEV | P1 | `READY` | UI Responsive Fix | D31, DEV_UIX_004 QA_PASSED | Topbar 登入者、測試身分、排版與動作區在中等寬度及 zoom 不重疊 | [active/DEV_UIX_007.md](active/DEV_UIX_007.md) |
+| 073 | `QA_UIX_003` | QA | P1 | `BLOCKED` | UI Responsive QA | DEV_UIX_007 READY_FOR_QA | 768/1024/1280、長身分、200% zoom bounding-box 與操作驗收 | [active/QA_UIX_003.md](active/QA_UIX_003.md) |
+| 074 | `DEV_UIX_008` | DEV | P1 | `READY` | Canvas Resize Fix | D31 | 登入後首幀 Canvas 滿版、PanelGroup/React Flow resize/fit 同步 | [active/DEV_UIX_008.md](active/DEV_UIX_008.md) |
+| 075 | `QA_UIX_004` | QA | P1 | `BLOCKED` | Canvas Resize QA | DEV_UIX_008 READY_FOR_QA | fresh login/reload/panel restore 的初始 viewport 與 pan/zoom regression | [active/QA_UIX_004.md](active/QA_UIX_004.md) |
+| 076 | `DSG_UIX_003` | DSG | P1 | `READY` | Routing Extension Design | D31, DSG_UIX_002 DONE | 設備避障為硬限制，交叉／重疊／標籤／彎折／長度／穩定性為成本 | [active/DSG_UIX_003.md](active/DSG_UIX_003.md) |
+| 077 | `DEV_UIX_009` | DEV | P1 | `BLOCKED` | Routing Extension | DSG_UIX_003 approved READY | 實作 deterministic bounded 多成本自動繞線 | [active/DEV_UIX_009.md](active/DEV_UIX_009.md) |
+| 078 | `QA_UIX_005` | QA | P1 | `BLOCKED` | Routing QA | DEV_UIX_009/DEV_UIX_003 READY_FOR_QA | 幾何改善、穩定性、no-path、效能與真 Browser 驗收 | [active/QA_UIX_005.md](active/QA_UIX_005.md) |
 | 049 | `DSG_REL_001` | DSG | P0 | `READY` | Release Design | DEV_REL_001 recovery artifact stop evidence, R1 APPROVED | R1 修訂 recovery artifact secret boundary：canonical format 改為 sanitized overlay bundle，已核准作為 DEV_REL_001 執行基線 | [active/DSG_REL_001.md](active/DSG_REL_001.md) |
 | 050 | `PM_REL_001` | PM | P0 | `READY` | Release | D24 APPROVED, Release QA passed, DSG_REL_001-R1 APPROVED | Pilot scope freeze 與 R1 recovery artifact secret boundary 已核准；deploy 仍未授權 | [active/PM_REL_001.md](active/PM_REL_001.md) |
 | 051 | `DEV_REL_001` | DEV | P0 | `READY_FOR_QA` | Release | QA_PIL_003 QA_PASSED, DSG_REL_001-R1 APPROVED, D24/D26/D27/D28 | Recovery、checkpoint chain、DB/Browser/security gates 與 DEV final equivalence 已完成；等待 QA_REL_001 獨立驗收 | [active/DEV_REL_001.md](active/DEV_REL_001.md) |

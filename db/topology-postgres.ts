@@ -1,17 +1,23 @@
-import postgres, { type Sql, type TransactionSql } from "postgres";
-import { postgresMigrations } from "@/db/postgres-migration-manifest";
-import { runPostgresMigrations } from "@/db/postgres-migrations.js";
-import { encryptCredentialEnvelope } from "@/db/credential-crypto";
-import { stripProjectCredentials, validateProject } from "@/app/lib/topology-validation";
+﻿import { type Sql, type TransactionSql } from "postgres";
+import { encryptCredentialEnvelope } from "./credential-crypto.ts";
+import { createRuntimeSql } from "./postgres-connection.ts";
+import { assertPostgresSchemaReady } from "./postgres-schema-check.ts";
+import { loadActiveUser, loadCustomer, loadSite, loadTopology } from "./topology-scope.ts";
 import {
-  SEAN_SPINE_LEAF_PROJECT,
-  SEAN_SPINE_LEAF_TOPOLOGY_ID,
-  SEAN_SPINE_LEAF_TOPOLOGY_NAME,
-} from "@/app/lib/demo-topologies";
+  canCreateTopology as policyCanCreateTopology,
+  canReadTopology as policyCanReadTopology,
+  canWriteCustomer,
+  canWriteTopology as policyCanWriteTopology,
+  roleCanReadAudit,
+  rolePermissions as policyRolePermissions,
+} from "../app/lib/server/rbac-policy.ts";
+import type { IdentitySource } from "../app/lib/server/request-identity.ts";
+import { canPilotEngineerCreateSyntheticCustomer, isPilotSubjectBound, pilotAuditMetadata } from "../app/lib/server/pilot-policy.ts";
+import { pilotSiteId, type PilotPrincipal } from "../app/lib/server/pilot-session.ts";
+import { stripProjectCredentials, validateProject } from "../app/lib/topology-validation.ts";
 import {
   cloneProject,
   EMPTY_PROJECT,
-  SAMPLE_PROJECT,
   type AuditLogRecord,
   type CredentialKind,
   type CustomerRecord,
@@ -22,9 +28,7 @@ import {
   type SiteRecord,
   type TopologyRecord,
   type UserRecord,
-} from "@/app/lib/topology-types";
-
-let databaseBootstrapped = false;
+} from "../app/lib/topology-types.ts";
 
 export type TopologyDataset = {
   customers: CustomerRecord[];
@@ -49,16 +53,6 @@ type CustomerRow = {
 type SiteRow = {
   id: string;
   name: string;
-  created_at: string | Date;
-  updated_at: string | Date;
-};
-
-type UserRow = {
-  id: string;
-  email: string;
-  name: string;
-  role: RoleCode;
-  site_ids: string[] | null;
   created_at: string | Date;
   updated_at: string | Date;
 };
@@ -105,6 +99,7 @@ type AuditLogRow = {
 
 type AuditEntry = {
   actorUserId: string;
+  identitySource?: IdentitySource;
   action: string;
   entityType: string;
   entityId?: string;
@@ -114,17 +109,10 @@ type AuditEntry = {
   metadata?: Record<string, string | number | boolean | null>;
 };
 
-function createSql() {
-  const databaseUrl = process.env.DATABASE_URL;
-  if (!databaseUrl) {
-    throw new Error("DATABASE_URL is required when NEXT_PUBLIC_TOPOLOGY_STORAGE=server.");
-  }
-  return postgres(databaseUrl, {
-    max: Number(process.env.POSTGRES_POOL_MAX ?? 1),
-    idle_timeout: 20,
-    prepare: false,
-  });
-}
+export type RepositoryContext = {
+  identitySource?: IdentitySource;
+  pilotPrincipal?: PilotPrincipal;
+};
 
 function uid(prefix: string) {
   return `${prefix}-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 7)}`;
@@ -152,18 +140,6 @@ function mapSite(row: SiteRow): SiteRecord {
   return {
     id: row.id,
     name: row.name,
-    createdAt: toIso(row.created_at),
-    updatedAt: toIso(row.updated_at),
-  };
-}
-
-function mapUser(row: UserRow): UserRecord {
-  return {
-    id: row.id,
-    email: row.email,
-    name: row.name,
-    role: row.role,
-    siteIds: row.site_ids ?? [],
     createdAt: toIso(row.created_at),
     updatedAt: toIso(row.updated_at),
   };
@@ -220,138 +196,25 @@ function sortByUpdatedAt<T extends { updatedAt: string }>(records: T[]) {
 }
 
 async function withReadySql<T>(operation: (sql: Sql) => Promise<T>) {
-  const sql = createSql();
+  const sql = createRuntimeSql();
   try {
-    if (!databaseBootstrapped) {
-      await runPostgresMigrations(sql, postgresMigrations);
-      await seedDictionaries(sql);
-      await seedOrganization(sql);
-      await seedIfEmpty(sql);
-      await seedSeanSpineLeafDemo(sql);
-      databaseBootstrapped = true;
-    }
+    await assertPostgresSchemaReady(sql);
     return await operation(sql);
   } finally {
     await sql.end({ timeout: 5 });
   }
 }
 
-async function seedDictionaries(sql: Sql) {
-  const timestamp = nowIso();
-  await sql.begin(async (tx) => {
-    const roles = [
-      ["boss", "Boss", "Read and edit every customer and topology."],
-      ["site_manager", "Site manager", "Read and edit data for assigned sites."],
-      ["engineer", "Engineer", "Create and edit owned topology files."],
-      ["sales_procurement", "Sales and procurement", "Read all files without write access."],
-    ];
-    for (const [code, name, description] of roles) {
-      await tx`
-        insert into roles (code, name, description, created_at, updated_at)
-        values (${code}, ${name}, ${description}, ${timestamp}, ${timestamp})
-        on conflict (code) do update set name = excluded.name, description = excluded.description, updated_at = excluded.updated_at
-      `;
-    }
-
-    const permissions = [
-      ["customer.read.all", "Read all customers", "Can read all customer records."],
-      ["customer.write.all", "Write all customers", "Can edit all customer records."],
-      ["topology.read.all", "Read all topologies", "Can read all topology records."],
-      ["topology.write.all", "Write all topologies", "Can edit all topology records."],
-      ["topology.read.site", "Read site topologies", "Can read topology records in assigned sites."],
-      ["topology.write.site", "Write site topologies", "Can edit topology records in assigned sites."],
-      ["topology.write.owned", "Write owned topologies", "Can edit topology records created or owned by the user."],
-      ["credential.read.masked", "Read masked credentials", "Can read masked credential fields."],
-      ["credential.write", "Write credentials", "Can create or rotate encrypted credential records."],
-      ["audit.read", "Read audit logs", "Can review audit log records."],
-    ];
-    for (const [code, name, description] of permissions) {
-      await tx`
-        insert into permissions (code, name, description, created_at, updated_at)
-        values (${code}, ${name}, ${description}, ${timestamp}, ${timestamp})
-        on conflict (code) do update set name = excluded.name, description = excluded.description, updated_at = excluded.updated_at
-      `;
-    }
-
-    const rolePermissions = [
-      ["boss", "customer.read.all"],
-      ["boss", "customer.write.all"],
-      ["boss", "topology.read.all"],
-      ["boss", "topology.write.all"],
-      ["boss", "credential.read.masked"],
-      ["boss", "credential.write"],
-      ["boss", "audit.read"],
-      ["site_manager", "topology.read.site"],
-      ["site_manager", "topology.write.site"],
-      ["site_manager", "credential.read.masked"],
-      ["engineer", "topology.write.owned"],
-      ["engineer", "credential.read.masked"],
-      ["sales_procurement", "customer.read.all"],
-      ["sales_procurement", "topology.read.all"],
-      ["sales_procurement", "credential.read.masked"],
-    ];
-    for (const [roleCode, permissionCode] of rolePermissions) {
-      await tx`
-        insert into role_permissions (role_code, permission_code)
-        values (${roleCode}, ${permissionCode})
-        on conflict do nothing
-      `;
-    }
-
-    const configKinds = [
-      ["customer_profile", "Customer profile", "Structured customer settings and metadata."],
-      ["topology_profile", "Topology profile", "Structured topology settings and metadata."],
-      ["import_mapping", "Import mapping", "CSV or document import mapping settings."],
-      ["export_template", "Export template", "Export and report template settings."],
-    ];
-    for (const [code, name, description] of configKinds) {
-      await tx`
-        insert into config_kinds (code, name, description, created_at, updated_at)
-        values (${code}, ${name}, ${description}, ${timestamp}, ${timestamp})
-        on conflict (code) do update set name = excluded.name, description = excluded.description, updated_at = excluded.updated_at
-      `;
-    }
-
-    const deviceTypes = ["router", "modem", "firewall", "switch", "server", "nas", "erp", "access-point", "client", "ssid", "mesh-node", "printer", "camera", "pos", "iot"];
-    for (const code of deviceTypes) {
-      await tx`
-        insert into device_types (code, name, created_at, updated_at)
-        values (${code}, ${code}, ${timestamp}, ${timestamp})
-        on conflict (code) do update set name = excluded.name, updated_at = excluded.updated_at
-      `;
-    }
-
-    for (const code of ["site", "domain", "vlan"]) {
-      await tx`
-        insert into group_kinds (code, name, created_at, updated_at)
-        values (${code}, ${code}, ${timestamp}, ${timestamp})
-        on conflict (code) do update set name = excluded.name, updated_at = excluded.updated_at
-      `;
-    }
-
-    for (const code of ["wired", "wireless"]) {
-      await tx`
-        insert into link_kinds (code, name, created_at, updated_at)
-        values (${code}, ${code}, ${timestamp}, ${timestamp})
-        on conflict (code) do update set name = excluded.name, updated_at = excluded.updated_at
-      `;
-    }
-
-    const credentialKinds = [
-      ["device_admin", "Device admin", "Administrative credential for a network device."],
-      ["device_readonly", "Device read only", "Read-only credential for a network device."],
-      ["wifi", "Wi-Fi", "Wireless network credential."],
-      ["vpn", "VPN", "VPN credential."],
-      ["external_service", "External service", "Credential for an external service."],
-    ];
-    for (const [code, name, description] of credentialKinds) {
-      await tx`
-        insert into credential_kinds (code, name, description, created_at, updated_at)
-        values (${code}, ${name}, ${description}, ${timestamp}, ${timestamp})
-        on conflict (code) do update set name = excluded.name, description = excluded.description, updated_at = excluded.updated_at
-      `;
-    }
-  });
+export async function seedDemoDatabase() {
+  const sql = createRuntimeSql();
+  try {
+    await assertPostgresSchemaReady(sql, true);
+    await seedOrganization(sql);
+    await seedIfEmpty(sql);
+    await seedSeanSpineLeafDemo(sql);
+  } finally {
+    await sql.end({ timeout: 5 });
+  }
 }
 
 async function seedOrganization(sql: Sql) {
@@ -359,20 +222,20 @@ async function seedOrganization(sql: Sql) {
   const northOneId = "site-north-1";
   const northTwoId = "site-north-2";
   const users = [
-    { id: "user-sean-sie", email: "sean.sie@dus.local", name: "謝慶宣", role: "engineer" as RoleCode, siteIds: [northOneId, northTwoId] },
+    { id: "user-sean-sie", email: "sean.sie@dus.local", name: "Sean Sie", role: "engineer" as RoleCode, siteIds: [northOneId, northTwoId] },
     { id: "user-boss-manner", email: "manner@company.local", name: "manner", role: "boss" as RoleCode, siteIds: [northOneId, northTwoId] },
-    { id: "user-manager-north-1", email: "north1.manager@company.local", name: "北一站站長", role: "site_manager" as RoleCode, siteIds: [northOneId] },
-    { id: "user-manager-north-2", email: "north2.manager@company.local", name: "北二站站長", role: "site_manager" as RoleCode, siteIds: [northTwoId] },
-    { id: "user-engineer-demo", email: "engineer@company.local", name: "工程師", role: "engineer" as RoleCode, siteIds: [northOneId] },
-    { id: "user-sales-demo", email: "sales@company.local", name: "採購與業務", role: "sales_procurement" as RoleCode, siteIds: [northOneId, northTwoId] },
+    { id: "user-manager-north-1", email: "north1.manager@company.local", name: "North 1 Manager", role: "site_manager" as RoleCode, siteIds: [northOneId] },
+    { id: "user-manager-north-2", email: "north2.manager@company.local", name: "North 2 Manager", role: "site_manager" as RoleCode, siteIds: [northTwoId] },
+    { id: "user-engineer-demo", email: "engineer@company.local", name: "Demo Engineer", role: "engineer" as RoleCode, siteIds: [northOneId] },
+    { id: "user-sales-demo", email: "sales@company.local", name: "Sales Procurement", role: "sales_procurement" as RoleCode, siteIds: [northOneId, northTwoId] },
   ];
 
   await sql.begin(async (tx) => {
     await tx`
       insert into sites (id, name, created_at, updated_at)
       values
-        (${northOneId}, ${"北一站"}, ${timestamp}, ${timestamp}),
-        (${northTwoId}, ${"北二站"}, ${timestamp}, ${timestamp})
+        (${northOneId}, ${"North 1"}, ${timestamp}, ${timestamp}),
+        (${northTwoId}, ${"North 2"}, ${timestamp}, ${timestamp})
       on conflict (id) do nothing
     `;
     for (const user of users) {
@@ -393,13 +256,14 @@ async function seedOrganization(sql: Sql) {
 }
 
 async function seedIfEmpty(sql: Sql) {
+  const { SAMPLE_PROJECT } = await import("../app/lib/topology-types.ts");
   const [{ count }] = await sql<{ count: string }[]>`select count(*)::text as count from customers`;
   if (Number(count) > 0) return;
 
   const timestamp = nowIso();
   const customer: CustomerRecord = {
     id: uid("customer"),
-    name: "示範客戶",
+    name: "Demo Customer",
     createdAt: timestamp,
     updatedAt: timestamp,
   };
@@ -410,7 +274,7 @@ async function seedIfEmpty(sql: Sql) {
     ownerUserId: "user-boss-manner",
     createdByUserId: "user-boss-manner",
     updatedByUserId: "user-boss-manner",
-    name: "我的網路架構",
+    name: "????祈璆???",
     versionLabel: "v1",
     project: cloneProject(SAMPLE_PROJECT),
     createdAt: timestamp,
@@ -430,6 +294,11 @@ async function seedIfEmpty(sql: Sql) {
 }
 
 async function seedSeanSpineLeafDemo(sql: Sql) {
+  const {
+    SEAN_SPINE_LEAF_PROJECT,
+    SEAN_SPINE_LEAF_TOPOLOGY_ID,
+    SEAN_SPINE_LEAF_TOPOLOGY_NAME,
+  } = await import("../app/lib/demo-topologies.ts");
   const [customer] = await sql<{ id: string }[]>`select id from customers order by created_at asc limit 1`;
   if (!customer) return;
   const timestamp = nowIso();
@@ -446,43 +315,95 @@ async function seedSeanSpineLeafDemo(sql: Sql) {
 }
 
 async function getCurrentUser(sql: Sql, email: string) {
-  const [row] = await sql<UserRow[]>`
-    select u.id, u.email, u.name, u.role::text as role, coalesce(array_agg(us.site_id) filter (where us.site_id is not null), '{}') as site_ids, u.created_at, u.updated_at
-    from users u
-    left join user_sites us on us.user_id = u.id
-    where lower(u.email) = lower(${email})
-    group by u.id
-  `;
-  if (!row) throw new Error("Current user is not registered.");
-  return mapUser(row);
+  const user = await loadActiveUser(sql, email);
+  if (!user) throw new Error("Authentication required.");
+  return user;
 }
 
 function rolePermissions(user: UserRecord) {
-  return {
-    canCreate: user.role !== "sales_procurement",
-    canWriteAll: user.role === "boss",
-    canReadAll: user.role === "boss" || user.role === "sales_procurement",
-  };
+  return policyRolePermissions(user);
 }
 
 function canReadTopology(user: UserRecord, topology: TopologyRecord) {
-  if (user.role === "boss" || user.role === "sales_procurement") return true;
-  if (user.role === "site_manager") return Boolean(topology.siteId && user.siteIds.includes(topology.siteId));
-  return topology.ownerUserId === user.id || topology.createdByUserId === user.id;
+  return policyCanReadTopology(user, topology);
 }
 
 function canWriteTopology(user: UserRecord, topology: TopologyRecord) {
-  if (user.role === "boss") return true;
-  if (user.role === "sales_procurement") return false;
-  if (user.role === "site_manager") return Boolean(topology.siteId && user.siteIds.includes(topology.siteId));
-  return topology.ownerUserId === user.id || topology.createdByUserId === user.id;
+  return policyCanWriteTopology(user, topology);
 }
 
-function assertCanCreate(user: UserRecord) {
-  if (!rolePermissions(user).canCreate) throw new Error("Permission denied: this role is read-only.");
+function assertCanWriteCustomer(user: UserRecord) {
+  if (!canWriteCustomer(user)) throw new Error("Permission denied: this role cannot mutate customers.");
 }
 
-async function hasPermission(sql: Sql, user: UserRecord, permissionCode: string) {
+function assertCanCreateTopology(user: UserRecord, targetSiteId: string) {
+  if (!policyCanCreateTopology(user, targetSiteId)) throw new Error("Permission denied: cannot create topology for this site.");
+}
+
+function isPilotContext(context?: RepositoryContext | IdentitySource) {
+  return typeof context === "string" ? context === "pilot-session" : context?.identitySource === "pilot-session";
+}
+
+function normalizeRepositoryContext(context?: RepositoryContext | IdentitySource): RepositoryContext {
+  return typeof context === "string" ? { identitySource: context } : (context ?? {});
+}
+
+function assertPilotSite(siteId: string | undefined | null, context?: RepositoryContext | IdentitySource) {
+  if (isPilotContext(context) && siteId !== pilotSiteId()) throw new Error("Resource not found.");
+}
+
+export function assertPilotRepositorySubject(user: UserRecord, context?: RepositoryContext | IdentitySource) {
+  if (!isPilotContext(context)) return;
+  const principal = normalizeRepositoryContext(context).pilotPrincipal;
+  if (!principal || !isPilotSubjectBound(user, principal, pilotSiteId())) {
+    throw new Error("Authentication required.");
+  }
+}
+
+function pilotReadableTopology(user: UserRecord, topology: TopologyRecord, context?: RepositoryContext | IdentitySource) {
+  if (isPilotContext(context) && topology.siteId !== pilotSiteId()) return false;
+  return canReadTopology(user, topology);
+}
+
+function pilotWritableTopology(user: UserRecord, topology: TopologyRecord, context?: RepositoryContext | IdentitySource) {
+  if (isPilotContext(context) && topology.siteId !== pilotSiteId()) return false;
+  return canWriteTopology(user, topology);
+}
+
+async function customerVisibleInPilotSite(sql: Sql | TransactionSql, customerId: string) {
+  const [{ visible }] = await sql<{ visible: boolean }[]>`
+    select exists (
+      select 1 from topologies
+      where customer_id = ${customerId} and site_id = ${pilotSiteId()}
+    ) as visible
+  `;
+  return visible;
+}
+
+async function customerIsPilotOnly(sql: Sql | TransactionSql, customerId: string) {
+  const [{ allowed }] = await sql<{ allowed: boolean }[]>`
+    select
+      exists (
+        select 1 from topologies
+        where customer_id = ${customerId} and site_id = ${pilotSiteId()}
+      )
+      and not exists (
+        select 1 from topologies
+        where customer_id = ${customerId} and (site_id is distinct from ${pilotSiteId()})
+      ) as allowed
+  `;
+  return allowed;
+}
+
+async function assertPilotOnlyCustomer(sql: Sql | TransactionSql, customerId: string, context: RepositoryContext = {}) {
+  if (isPilotContext(context) && !await customerIsPilotOnly(sql, customerId)) throw new Error("Resource not found.");
+}
+
+export function isPilotOnlyCustomerScope(siteIds: Array<string | null | undefined>, siteId = pilotSiteId()) {
+  return siteIds.some((candidate) => candidate === siteId) && siteIds.every((candidate) => candidate === siteId);
+}
+
+async function hasPermission(sql: Sql | TransactionSql, user: UserRecord, permissionCode: string) {
   const [{ allowed }] = await sql<{ allowed: boolean }[]>`
     select exists (
       select 1 from role_permissions
@@ -493,6 +414,9 @@ async function hasPermission(sql: Sql, user: UserRecord, permissionCode: string)
 }
 
 async function writeAuditLog(tx: TransactionSql, entry: AuditEntry) {
+  const metadata = entry.identitySource
+    ? { ...(entry.metadata ?? {}), identitySource: entry.identitySource }
+    : entry.metadata ?? {};
   await tx`
     insert into audit_logs (
       id, actor_user_id, action, entity_type, entity_id,
@@ -500,7 +424,7 @@ async function writeAuditLog(tx: TransactionSql, entry: AuditEntry) {
     ) values (
       ${uid("audit")}, ${entry.actorUserId}, ${entry.action}, ${entry.entityType}, ${entry.entityId ?? null},
       ${entry.siteId ?? null}, ${entry.customerId ?? null}, ${entry.topologyId ?? null},
-      ${tx.json(entry.metadata ?? {})}, ${nowIso()}
+      ${tx.json(metadata)}, ${nowIso()}
     )
   `;
 }
@@ -524,9 +448,11 @@ async function readAllSites(sql: Sql) {
   return rows.map(mapSite);
 }
 
-export async function readTopologyDataset(email: string): Promise<TopologyDataset> {
+export async function readTopologyDataset(email: string, context?: RepositoryContext | IdentitySource): Promise<TopologyDataset> {
   return withReadySql(async (sql) => {
+  const repositoryContext = normalizeRepositoryContext(context);
   const currentUser = await getCurrentUser(sql, email);
+  assertPilotRepositorySubject(currentUser, repositoryContext);
   const customers = await sql<CustomerRow[]>`
     select id, name, notes, created_at, updated_at
     from customers
@@ -537,26 +463,31 @@ export async function readTopologyDataset(email: string): Promise<TopologyDatase
     from topologies
     order by updated_at desc
   `;
-  const readableTopologies = topologies.map(mapTopology).filter((topology) => canReadTopology(currentUser, topology));
+  const readableTopologies = topologies.map(mapTopology).filter((topology) => pilotReadableTopology(currentUser, topology, repositoryContext));
   const readableCustomerIds = new Set(readableTopologies.map((topology) => topology.customerId));
+  const readableSites = isPilotContext(repositoryContext)
+    ? (await readAllSites(sql)).filter((site) => site.id === pilotSiteId())
+    : await readAllSites(sql);
   return {
     customers: sortByUpdatedAt(customers.map(mapCustomer).filter((customer) =>
-      rolePermissions(currentUser).canReadAll || readableCustomerIds.has(customer.id),
+      isPilotContext(repositoryContext) ? readableCustomerIds.has(customer.id) : rolePermissions(currentUser).canReadAll || readableCustomerIds.has(customer.id),
     )),
     topologies: sortByUpdatedAt(readableTopologies),
-    sites: await readAllSites(sql),
+    sites: readableSites,
     currentUser,
     permissions: rolePermissions(currentUser),
   };
   });
 }
 
-export async function readDeviceCredentials(email: string, topologyId: string) {
+export async function readDeviceCredentials(email: string, topologyId: string, context?: RepositoryContext | IdentitySource) {
   return withReadySql(async (sql) => {
+  const repositoryContext = normalizeRepositoryContext(context);
   const currentUser = await getCurrentUser(sql, email);
+  assertPilotRepositorySubject(currentUser, repositoryContext);
   const topology = await readTopology(sql, topologyId);
-  if (!topology || !canReadTopology(currentUser, topology)) {
-    throw new Error("Permission denied: cannot read credentials for this topology.");
+  if (!topology || !pilotReadableTopology(currentUser, topology, repositoryContext)) {
+    throw new Error("Resource not found.");
   }
   if (!await hasPermission(sql, currentUser, "credential.read.masked")) {
     throw new Error("Permission denied: this role cannot read credential metadata.");
@@ -573,12 +504,17 @@ export async function readDeviceCredentials(email: string, topologyId: string) {
   });
 }
 
-export async function upsertDeviceCredential(email: string, input: DeviceCredentialWriteInput) {
+export async function upsertDeviceCredential(email: string, input: DeviceCredentialWriteInput, context?: RepositoryContext | IdentitySource) {
   return withReadySql(async (sql) => {
+  const repositoryContext = normalizeRepositoryContext(context);
   const currentUser = await getCurrentUser(sql, email);
+  assertPilotRepositorySubject(currentUser, repositoryContext);
   const topology = await readTopology(sql, input.topologyId);
-  if (!topology || !canWriteTopology(currentUser, topology)) {
-    throw new Error("Permission denied: cannot edit credentials for this topology.");
+  if (!topology || !pilotReadableTopology(currentUser, topology, repositoryContext)) {
+    throw new Error("Resource not found.");
+  }
+  if (!pilotWritableTopology(currentUser, topology, repositoryContext)) {
+    throw new Error("Permission denied: this role cannot write this topology.");
   }
   if (!await hasPermission(sql, currentUser, "credential.write")) {
     throw new Error("Permission denied: this role cannot write credentials.");
@@ -595,6 +531,20 @@ export async function upsertDeviceCredential(email: string, input: DeviceCredent
   const timestamp = nowIso();
 
   await sql.begin(async (tx) => {
+    const txUser = await loadActiveUser(tx, email);
+    if (!txUser) throw new Error("Authentication required.");
+    assertPilotRepositorySubject(txUser, repositoryContext);
+    const lockedTopology = await loadTopology(tx, input.topologyId, true);
+    if (!lockedTopology || !pilotReadableTopology(txUser, lockedTopology, repositoryContext)) throw new Error("Resource not found.");
+    if (!pilotWritableTopology(txUser, lockedTopology, repositoryContext)) {
+      throw new Error("Permission denied: this role cannot write this topology.");
+    }
+    if (!await hasPermission(tx, txUser, "credential.write")) {
+      throw new Error("Permission denied: this role cannot write credentials.");
+    }
+    if (!lockedTopology.project.devices.some((device) => device.id === input.projectDeviceId)) {
+      throw new Error(`Credential device "${input.projectDeviceId}" does not exist in this topology.`);
+    }
     const [saved] = await tx<{ id: string }[]>`
       insert into device_credentials (
         id, topology_id, device_id, project_device_id, kind,
@@ -604,7 +554,7 @@ export async function upsertDeviceCredential(email: string, input: DeviceCredent
       ) values (
         ${uid("credential")}, ${input.topologyId}, ${null}, ${input.projectDeviceId}, ${input.kind},
         ${encrypted.usernameMasked ?? null}, ${null}, ${encrypted.secretMasked}, ${encrypted.secretCiphertext},
-        ${encrypted.secretNonce}, ${encrypted.keyVersion}, ${currentUser.id}, ${currentUser.id},
+        ${encrypted.secretNonce}, ${encrypted.keyVersion}, ${txUser.id}, ${txUser.id},
         ${timestamp}, ${timestamp}, ${timestamp}
       )
       on conflict (topology_id, project_device_id, kind) where project_device_id is not null
@@ -621,24 +571,26 @@ export async function upsertDeviceCredential(email: string, input: DeviceCredent
       returning id
     `;
     await writeAuditLog(tx, {
-      actorUserId: currentUser.id,
+      actorUserId: txUser.id,
       action: "credential.upsert",
       entityType: "device_credential",
       entityId: saved.id,
-      siteId: topology.siteId,
-      customerId: topology.customerId,
-      topologyId: topology.id,
+      siteId: lockedTopology.siteId,
+      customerId: lockedTopology.customerId,
+      topologyId: lockedTopology.id,
       metadata: { projectDeviceId: input.projectDeviceId, kind: input.kind, keyVersion: encrypted.keyVersion },
     });
   });
 
-  return readDeviceCredentials(email, input.topologyId);
+  return readDeviceCredentials(email, input.topologyId, repositoryContext);
   });
 }
 
-export async function deleteDeviceCredential(email: string, credentialId: string) {
+export async function deleteDeviceCredential(email: string, credentialId: string, context?: RepositoryContext | IdentitySource) {
   return withReadySql(async (sql) => {
+  const repositoryContext = normalizeRepositoryContext(context);
   const currentUser = await getCurrentUser(sql, email);
+  assertPilotRepositorySubject(currentUser, repositoryContext);
   const [credential] = await sql<DeviceCredentialRow[]>`
     select id, topology_id, project_device_id, kind, username_masked, secret_masked,
       key_version, last_rotated_at, created_at, updated_at
@@ -647,39 +599,64 @@ export async function deleteDeviceCredential(email: string, credentialId: string
   `;
   if (!credential) throw new Error("Credential not found.");
   const topology = await readTopology(sql, credential.topology_id);
-  if (!topology || !canWriteTopology(currentUser, topology)) {
-    throw new Error("Permission denied: cannot delete credentials for this topology.");
+  if (!topology || !pilotReadableTopology(currentUser, topology, repositoryContext)) {
+    throw new Error("Resource not found.");
+  }
+  if (!pilotWritableTopology(currentUser, topology, repositoryContext)) {
+    throw new Error("Permission denied: this role cannot write this topology.");
   }
   if (!await hasPermission(sql, currentUser, "credential.write")) {
     throw new Error("Permission denied: this role cannot write credentials.");
   }
 
   await sql.begin(async (tx) => {
+    const txUser = await loadActiveUser(tx, email);
+    if (!txUser) throw new Error("Authentication required.");
+    assertPilotRepositorySubject(txUser, repositoryContext);
+    const lockedTopology = await loadTopology(tx, credential.topology_id, true);
+    if (!lockedTopology || !pilotReadableTopology(txUser, lockedTopology, repositoryContext)) throw new Error("Resource not found.");
+    if (!pilotWritableTopology(txUser, lockedTopology, repositoryContext)) {
+      throw new Error("Permission denied: this role cannot write this topology.");
+    }
+    if (!await hasPermission(tx, txUser, "credential.write")) {
+      throw new Error("Permission denied: this role cannot write credentials.");
+    }
     await tx`delete from device_credentials where id = ${credentialId}`;
     await writeAuditLog(tx, {
-      actorUserId: currentUser.id,
+      actorUserId: txUser.id,
       action: "credential.delete",
       entityType: "device_credential",
       entityId: credential.id,
-      siteId: topology.siteId,
-      customerId: topology.customerId,
-      topologyId: topology.id,
+      siteId: lockedTopology.siteId,
+      customerId: lockedTopology.customerId,
+      topologyId: lockedTopology.id,
       metadata: { projectDeviceId: credential.project_device_id, kind: credential.kind },
     });
   });
 
-  return readDeviceCredentials(email, credential.topology_id);
+  return readDeviceCredentials(email, credential.topology_id, repositoryContext);
   });
 }
 
-export async function readAuditLogs(email: string, requestedLimit = 100) {
+export async function readAuditLogs(email: string, requestedLimit = 100, context?: RepositoryContext | IdentitySource) {
   return withReadySql(async (sql) => {
+  const repositoryContext = normalizeRepositoryContext(context);
   const currentUser = await getCurrentUser(sql, email);
-  if (!await hasPermission(sql, currentUser, "audit.read")) {
+  assertPilotRepositorySubject(currentUser, repositoryContext);
+  if (!roleCanReadAudit(currentUser.role) || !await hasPermission(sql, currentUser, "audit.read")) {
     throw new Error("Permission denied: this role cannot read audit logs.");
   }
   const limit = Math.max(1, Math.min(200, Math.trunc(requestedLimit)));
-  const rows = await sql<AuditLogRow[]>`
+  const rows = isPilotContext(repositoryContext)
+    ? await sql<AuditLogRow[]>`
+    select id, actor_user_id, action, entity_type, entity_id, site_id,
+      customer_id, topology_id, metadata, created_at
+    from audit_logs
+    where site_id = ${pilotSiteId()}
+    order by created_at desc
+    limit ${limit}
+  `
+    : await sql<AuditLogRow[]>`
     select id, actor_user_id, action, entity_type, entity_id, site_id,
       customer_id, topology_id, metadata, created_at
     from audit_logs
@@ -690,12 +667,33 @@ export async function readAuditLogs(email: string, requestedLimit = 100) {
   });
 }
 
-export async function createCustomer(email: string, name: string, siteId?: string) {
+type CreateCustomerOptions = {
+  identitySource?: IdentitySource;
+  pilotPrincipal?: PilotPrincipal;
+  synthetic?: boolean;
+};
+
+function canCreateCustomerForContext(user: UserRecord, options: CreateCustomerOptions, siteId: string) {
+  if (canWriteCustomer(user)) return true;
+  return options.identitySource === "pilot-session" &&
+    options.synthetic === true &&
+    canPilotEngineerCreateSyntheticCustomer(user, options.pilotPrincipal, siteId);
+}
+
+export async function loadPilotSessionUser(email: string) {
+  return withReadySql(async (sql) => getCurrentUser(sql, email));
+}
+
+export async function createCustomer(email: string, name: string, siteId?: string, options: CreateCustomerOptions = {}) {
   return withReadySql(async (sql) => {
-  const currentUser = await getCurrentUser(sql, email);
-  assertCanCreate(currentUser);
-  const nextSiteId = defaultSiteFor(currentUser, siteId);
+  const initialUser = await getCurrentUser(sql, email);
+  assertPilotRepositorySubject(initialUser, options);
+  if (isPilotContext(options) && siteId && siteId !== pilotSiteId()) throw new Error("Resource not found.");
+  const nextSiteId = options.identitySource === "pilot-session" ? (siteId || pilotSiteId()) : defaultSiteFor(initialUser, siteId);
   if (!nextSiteId) throw new Error("A site is required before creating topology data.");
+  if (!canCreateCustomerForContext(initialUser, options, nextSiteId)) {
+    throw new Error("Permission denied: this role cannot mutate customers.");
+  }
   const timestamp = nowIso();
   const customer: CustomerRecord = {
     id: uid("customer"),
@@ -707,10 +705,10 @@ export async function createCustomer(email: string, name: string, siteId?: strin
     id: uid("topology"),
     customerId: customer.id,
     siteId: nextSiteId,
-    ownerUserId: currentUser.id,
-    createdByUserId: currentUser.id,
-    updatedByUserId: currentUser.id,
-    name: "現況拓樸",
+    ownerUserId: initialUser.id,
+    createdByUserId: initialUser.id,
+    updatedByUserId: initialUser.id,
+    name: options.synthetic ? "Pilot Topology" : "Default Topology",
     versionLabel: "v1",
     project: cloneProject(EMPTY_PROJECT),
     createdAt: timestamp,
@@ -718,6 +716,13 @@ export async function createCustomer(email: string, name: string, siteId?: strin
   };
 
   await sql.begin(async (tx) => {
+    const currentUser = await loadActiveUser(tx, email);
+    if (!currentUser) throw new Error("Authentication required.");
+    assertPilotRepositorySubject(currentUser, options);
+    if (!canCreateCustomerForContext(currentUser, options, nextSiteId)) {
+      throw new Error("Permission denied: this role cannot mutate customers.");
+    }
+    if (!await loadSite(tx, nextSiteId)) throw new Error("Resource not found.");
     await tx`
       insert into customers (id, name, created_at, updated_at)
       values (${customer.id}, ${customer.name}, ${customer.createdAt}, ${customer.updatedAt})
@@ -733,7 +738,10 @@ export async function createCustomer(email: string, name: string, siteId?: strin
       entityId: customer.id,
       siteId: nextSiteId,
       customerId: customer.id,
-      metadata: { name: customer.name },
+      identitySource: options.identitySource,
+      metadata: options.synthetic && options.pilotPrincipal
+        ? pilotAuditMetadata(options.pilotPrincipal, { name: customer.name, synthetic: true })
+        : { name: customer.name },
     });
     await writeAuditLog(tx, {
       actorUserId: currentUser.id,
@@ -743,76 +751,112 @@ export async function createCustomer(email: string, name: string, siteId?: strin
       siteId: nextSiteId,
       customerId: customer.id,
       topologyId: topology.id,
-      metadata: { name: topology.name, versionLabel: topology.versionLabel, source: "customer.create" },
+      identitySource: options.identitySource,
+      metadata: options.synthetic && options.pilotPrincipal
+        ? pilotAuditMetadata(options.pilotPrincipal, { name: topology.name, versionLabel: topology.versionLabel, synthetic: true })
+        : { name: topology.name, versionLabel: topology.versionLabel, source: "customer.create" },
     });
   });
 
-  return readTopologyDataset(email);
+  return readTopologyDataset(email, options);
   });
 }
 
-export async function createTopology(email: string, customerId: string, name: string, project: Project, siteId?: string) {
-  return withReadySql(async (sql) => {
-  const currentUser = await getCurrentUser(sql, email);
-  assertCanCreate(currentUser);
-  const nextSiteId = defaultSiteFor(currentUser, siteId);
-  if (!nextSiteId) throw new Error("A site is required before creating topology data.");
-  const [{ count }] = await sql<{ count: string }[]>`
-    select count(*)::text as count from topologies where customer_id = ${customerId}
+async function canUseCustomerForTopologyCreate(sql: Sql | TransactionSql, user: UserRecord, customerId: string, targetSiteId: string, context: RepositoryContext = {}) {
+  if (user.role === "boss" && !isPilotContext(context)) return true;
+  const rows = await sql<TopologyRow[]>`
+    select id, customer_id, site_id, owner_user_id, created_by_user_id, updated_by_user_id, name, version_label, project, created_at, updated_at
+    from topologies
+    where customer_id = ${customerId} and site_id = ${targetSiteId}
   `;
+  return rows.map(mapTopology).some((topology) => canReadTopology(user, topology));
+}
+
+export async function createTopology(email: string, customerId: string, name: string, project: Project, siteId?: string, context: RepositoryContext = {}) {
+  return withReadySql(async (sql) => {
+  const initialUser = await getCurrentUser(sql, email);
+  assertPilotRepositorySubject(initialUser, context);
+  if (isPilotContext(context) && siteId && siteId !== pilotSiteId()) throw new Error("Resource not found.");
+  siteId = isPilotContext(context) ? pilotSiteId() : siteId;
+  if (!siteId) throw new Error("siteId is required.");
+  const targetSiteId = siteId;
+  assertPilotSite(targetSiteId, context);
+  if (!await loadSite(sql, targetSiteId)) throw new Error("Resource not found.");
+  if (!await loadCustomer(sql, customerId)) throw new Error("Resource not found.");
+  await assertPilotOnlyCustomer(sql, customerId, context);
+  if (!await canUseCustomerForTopologyCreate(sql, initialUser, customerId, targetSiteId, context)) throw new Error("Resource not found.");
+  assertCanCreateTopology(initialUser, targetSiteId);
   const validatedProject = validateProject(project);
   const timestamp = nowIso();
   const topology: TopologyRecord = {
     id: uid("topology"),
     customerId,
-    siteId: nextSiteId,
-    ownerUserId: currentUser.id,
-    createdByUserId: currentUser.id,
-    updatedByUserId: currentUser.id,
+    siteId: targetSiteId,
+    ownerUserId: initialUser.id,
+    createdByUserId: initialUser.id,
+    updatedByUserId: initialUser.id,
     name,
-    versionLabel: `v${Number(count) + 1}`,
+    versionLabel: "v1",
     project: cloneProject(validatedProject),
     createdAt: timestamp,
     updatedAt: timestamp,
   };
 
   await sql.begin(async (tx) => {
+    const currentUser = await loadActiveUser(tx, email);
+    if (!currentUser) throw new Error("Authentication required.");
+    assertPilotRepositorySubject(currentUser, context);
+    if (!await loadSite(tx, targetSiteId)) throw new Error("Resource not found.");
+    if (!await loadCustomer(tx, customerId)) throw new Error("Resource not found.");
+    await assertPilotOnlyCustomer(tx, customerId, context);
+    if (!await canUseCustomerForTopologyCreate(tx, currentUser, customerId, targetSiteId, context)) throw new Error("Resource not found.");
+    assertCanCreateTopology(currentUser, targetSiteId);
+    const [{ count }] = await tx<{ count: string }[]>`
+      select count(*)::text as count from topologies where customer_id = ${customerId}
+    `;
+    const versionLabel = `v${Number(count) + 1}`;
     await tx`
       insert into topologies (id, customer_id, site_id, owner_user_id, created_by_user_id, updated_by_user_id, name, version_label, project, created_at, updated_at)
-      values (${topology.id}, ${topology.customerId}, ${nextSiteId}, ${currentUser.id}, ${currentUser.id}, ${currentUser.id}, ${topology.name}, ${topology.versionLabel}, ${tx.json(topology.project)}, ${topology.createdAt}, ${topology.updatedAt})
+      values (${topology.id}, ${topology.customerId}, ${targetSiteId}, ${currentUser.id}, ${currentUser.id}, ${currentUser.id}, ${topology.name}, ${versionLabel}, ${tx.json(topology.project)}, ${topology.createdAt}, ${topology.updatedAt})
     `;
     await writeAuditLog(tx, {
       actorUserId: currentUser.id,
       action: "topology.create",
       entityType: "topology",
       entityId: topology.id,
-      siteId: nextSiteId,
+      siteId,
       customerId: topology.customerId,
       topologyId: topology.id,
       metadata: {
         name: topology.name,
-        versionLabel: topology.versionLabel,
+        versionLabel,
         deviceCount: topology.project.devices.length,
         linkCount: topology.project.links.length,
         groupCount: topology.project.groups.length,
       },
     });
   });
-  return readTopologyDataset(email);
+  return readTopologyDataset(email, context);
   });
 }
 
-export async function saveTopologyProject(email: string, topologyId: string, project: Project) {
+export async function saveTopologyProject(email: string, topologyId: string, project: Project, context: RepositoryContext = {}) {
   return withReadySql(async (sql) => {
   const currentUser = await getCurrentUser(sql, email);
+  assertPilotRepositorySubject(currentUser, context);
   const topology = await readTopology(sql, topologyId);
-  if (!topology || !canWriteTopology(currentUser, topology)) throw new Error("Permission denied: cannot edit this topology.");
+  if (!topology || !pilotWritableTopology(currentUser, topology, context)) throw new Error("Resource not found.");
   const validatedProject = validateProject(project);
   const timestamp = nowIso();
   await sql.begin(async (tx) => {
+    const txUser = await loadActiveUser(tx, email);
+    if (!txUser) throw new Error("Authentication required.");
+    assertPilotRepositorySubject(txUser, context);
+    const lockedTopology = await loadTopology(tx, topologyId, true);
+    if (!lockedTopology || !pilotWritableTopology(txUser, lockedTopology, context)) throw new Error("Resource not found.");
     await tx`
       update topologies
-      set project = ${tx.json(validatedProject)}, updated_by_user_id = ${currentUser.id}, updated_at = ${timestamp}
+      set project = ${tx.json(validatedProject)}, updated_by_user_id = ${txUser.id}, updated_at = ${timestamp}
       where id = ${topologyId}
     `;
     const retainedDeviceIds = new Set(validatedProject.devices.map((device) => device.id));
@@ -826,13 +870,13 @@ export async function saveTopologyProject(email: string, topologyId: string, pro
       if (retainedDeviceIds.has(credential.project_device_id)) continue;
       await tx`delete from device_credentials where id = ${credential.id}`;
       await writeAuditLog(tx, {
-        actorUserId: currentUser.id,
+        actorUserId: txUser.id,
         action: "credential.delete",
         entityType: "device_credential",
         entityId: credential.id,
-        siteId: topology.siteId,
-        customerId: topology.customerId,
-        topologyId: topology.id,
+        siteId: lockedTopology.siteId,
+        customerId: lockedTopology.customerId,
+        topologyId: lockedTopology.id,
         metadata: {
           projectDeviceId: credential.project_device_id,
           kind: credential.kind,
@@ -841,13 +885,13 @@ export async function saveTopologyProject(email: string, topologyId: string, pro
       });
     }
     await writeAuditLog(tx, {
-      actorUserId: currentUser.id,
+      actorUserId: txUser.id,
       action: "topology.project.save",
       entityType: "topology",
-      entityId: topology.id,
-      siteId: topology.siteId,
-      customerId: topology.customerId,
-      topologyId: topology.id,
+      entityId: lockedTopology.id,
+      siteId: lockedTopology.siteId,
+      customerId: lockedTopology.customerId,
+      topologyId: lockedTopology.id,
       metadata: {
         deviceCount: validatedProject.devices.length,
         linkCount: validatedProject.links.length,
@@ -855,103 +899,120 @@ export async function saveTopologyProject(email: string, topologyId: string, pro
       },
     });
   });
-  return readTopologyDataset(email);
+  return readTopologyDataset(email, context);
   });
 }
 
-export async function renameCustomer(email: string, customerId: string, name: string) {
+export async function renameCustomer(email: string, customerId: string, name: string, context: RepositoryContext = {}) {
   return withReadySql(async (sql) => {
   const currentUser = await getCurrentUser(sql, email);
-  const [customer] = await sql<CustomerRow[]>`
-    select id, name, notes, created_at, updated_at from customers where id = ${customerId}
-  `;
-  if (!customer) throw new Error("Customer not found.");
+  assertPilotRepositorySubject(currentUser, context);
+  assertCanWriteCustomer(currentUser);
+  await assertPilotOnlyCustomer(sql, customerId, context);
+  const customer = await loadCustomer(sql, customerId);
+  if (!customer) throw new Error("Resource not found.");
   const topologies = await sql<TopologyRow[]>`
     select id, customer_id, site_id, owner_user_id, created_by_user_id, updated_by_user_id, name, version_label, project, created_at, updated_at
     from topologies
     where customer_id = ${customerId}
   `;
-  if (!topologies.map(mapTopology).some((topology) => canWriteTopology(currentUser, topology))) {
-    throw new Error("Permission denied: cannot rename this customer.");
-  }
   const writableTopologies = topologies.map(mapTopology).filter((topology) => canWriteTopology(currentUser, topology));
   await sql.begin(async (tx) => {
+    const txUser = await loadActiveUser(tx, email);
+    if (!txUser) throw new Error("Authentication required.");
+    assertPilotRepositorySubject(txUser, context);
+    assertCanWriteCustomer(txUser);
+    await assertPilotOnlyCustomer(tx, customerId, context);
+    const lockedCustomer = await loadCustomer(tx, customerId, true);
+    if (!lockedCustomer) throw new Error("Resource not found.");
     await tx`
       update customers
       set name = ${name}, updated_at = ${nowIso()}
       where id = ${customerId}
     `;
     await writeAuditLog(tx, {
-      actorUserId: currentUser.id,
+      actorUserId: txUser.id,
       action: "customer.rename",
       entityType: "customer",
       entityId: customerId,
       siteId: writableTopologies[0]?.siteId,
       customerId,
-      metadata: { previousName: customer.name, nextName: name },
+      metadata: { previousName: lockedCustomer.name, nextName: name },
     });
   });
-  return readTopologyDataset(email);
+  return readTopologyDataset(email, context);
   });
 }
 
-export async function renameTopology(email: string, topologyId: string, name: string) {
+export async function renameTopology(email: string, topologyId: string, name: string, context: RepositoryContext = {}) {
   return withReadySql(async (sql) => {
   const currentUser = await getCurrentUser(sql, email);
+  assertPilotRepositorySubject(currentUser, context);
   const topology = await readTopology(sql, topologyId);
-  if (!topology || !canWriteTopology(currentUser, topology)) throw new Error("Permission denied: cannot rename this topology.");
+  if (!topology || !pilotWritableTopology(currentUser, topology, context)) throw new Error("Resource not found.");
   await sql.begin(async (tx) => {
+    const txUser = await loadActiveUser(tx, email);
+    if (!txUser) throw new Error("Authentication required.");
+    assertPilotRepositorySubject(txUser, context);
+    const lockedTopology = await loadTopology(tx, topologyId, true);
+    if (!lockedTopology || !pilotWritableTopology(txUser, lockedTopology, context)) throw new Error("Resource not found.");
     await tx`
       update topologies
-      set name = ${name}, updated_by_user_id = ${currentUser.id}, updated_at = ${nowIso()}
+      set name = ${name}, updated_by_user_id = ${txUser.id}, updated_at = ${nowIso()}
       where id = ${topologyId}
     `;
     await writeAuditLog(tx, {
-      actorUserId: currentUser.id,
+      actorUserId: txUser.id,
       action: "topology.rename",
       entityType: "topology",
-      entityId: topology.id,
-      siteId: topology.siteId,
-      customerId: topology.customerId,
-      topologyId: topology.id,
-      metadata: { previousName: topology.name, nextName: name },
+      entityId: lockedTopology.id,
+      siteId: lockedTopology.siteId,
+      customerId: lockedTopology.customerId,
+      topologyId: lockedTopology.id,
+      metadata: { previousName: lockedTopology.name, nextName: name },
     });
   });
-  return readTopologyDataset(email);
+  return readTopologyDataset(email, context);
   });
 }
 
-export async function duplicateCustomer(email: string, customerId: string) {
+export async function duplicateCustomer(email: string, customerId: string, context: RepositoryContext = {}) {
   return withReadySql(async (sql) => {
   const currentUser = await getCurrentUser(sql, email);
-  assertCanCreate(currentUser);
-  const [sourceCustomer] = await sql<CustomerRow[]>`
-    select id, name, notes, created_at, updated_at from customers where id = ${customerId}
-  `;
-  if (!sourceCustomer) return readTopologyDataset(email);
-  const sourceTopologies = (await sql<TopologyRow[]>`
-    select id, customer_id, site_id, owner_user_id, created_by_user_id, updated_by_user_id, name, version_label, project, created_at, updated_at
-    from topologies
-    where customer_id = ${customerId}
-    order by updated_at desc
-  `).map(mapTopology).filter((topology) => canReadTopology(currentUser, topology));
-  if (sourceTopologies.length === 0) throw new Error("Permission denied: no readable topology to duplicate.");
+  assertPilotRepositorySubject(currentUser, context);
+  assertCanWriteCustomer(currentUser);
+  if (isPilotContext(context) && !await customerVisibleInPilotSite(sql, customerId)) throw new Error("Resource not found.");
+  const sourceCustomer = await loadCustomer(sql, customerId);
+  if (!sourceCustomer) throw new Error("Resource not found.");
   const timestamp = nowIso();
   const nextCustomer: CustomerRecord = {
     id: uid("customer"),
-    name: `${sourceCustomer.name} 複本`,
+    name: `${sourceCustomer.name} copy`,
     notes: sourceCustomer.notes ?? undefined,
     createdAt: timestamp,
     updatedAt: timestamp,
   };
 
   await sql.begin(async (tx) => {
+    const txUser = await loadActiveUser(tx, email);
+    if (!txUser) throw new Error("Authentication required.");
+    assertPilotRepositorySubject(txUser, context);
+    assertCanWriteCustomer(txUser);
+    await assertPilotOnlyCustomer(tx, customerId, context);
+    const lockedCustomer = await loadCustomer(tx, customerId, true);
+    if (!lockedCustomer) throw new Error("Resource not found.");
+    const sourceTopologies = (await tx<TopologyRow[]>`
+      select id, customer_id, site_id, owner_user_id, created_by_user_id, updated_by_user_id, name, version_label, project, created_at, updated_at
+      from topologies
+      where customer_id = ${customerId}
+      order by updated_at desc
+    `).map(mapTopology).filter((topology) => !isPilotContext(context) || topology.siteId === pilotSiteId());
     await tx`
       insert into customers (id, name, notes, created_at, updated_at)
       values (${nextCustomer.id}, ${nextCustomer.name}, ${nextCustomer.notes ?? null}, ${nextCustomer.createdAt}, ${nextCustomer.updatedAt})
     `;
     await writeAuditLog(tx, {
-      actorUserId: currentUser.id,
+      actorUserId: txUser.id,
       action: "customer.duplicate",
       entityType: "customer",
       entityId: nextCustomer.id,
@@ -963,14 +1024,14 @@ export async function duplicateCustomer(email: string, customerId: string) {
       const copiedTopologyId = uid("topology");
       await tx`
         insert into topologies (id, customer_id, site_id, owner_user_id, created_by_user_id, updated_by_user_id, name, version_label, project, created_at, updated_at)
-        values (${copiedTopologyId}, ${nextCustomer.id}, ${source.siteId ?? defaultSiteFor(currentUser)}, ${currentUser.id}, ${currentUser.id}, ${currentUser.id}, ${source.name}, ${source.versionLabel}, ${tx.json(source.project)}, ${timestamp}, ${timestamp})
+        values (${copiedTopologyId}, ${nextCustomer.id}, ${source.siteId ?? defaultSiteFor(txUser)}, ${txUser.id}, ${txUser.id}, ${txUser.id}, ${source.name}, ${source.versionLabel}, ${tx.json(source.project)}, ${timestamp}, ${timestamp})
       `;
       await writeAuditLog(tx, {
-        actorUserId: currentUser.id,
+        actorUserId: txUser.id,
         action: "topology.duplicate",
         entityType: "topology",
         entityId: copiedTopologyId,
-        siteId: source.siteId ?? defaultSiteFor(currentUser),
+        siteId: source.siteId ?? defaultSiteFor(txUser),
         customerId: nextCustomer.id,
         topologyId: copiedTopologyId,
         metadata: { sourceTopologyId: source.id, sourceCustomerId: customerId },
@@ -978,121 +1039,133 @@ export async function duplicateCustomer(email: string, customerId: string) {
     }
   });
 
-  return readTopologyDataset(email);
+  return readTopologyDataset(email, context);
   });
 }
 
-export async function duplicateTopology(email: string, topologyId: string) {
+export async function duplicateTopology(email: string, topologyId: string, context: RepositoryContext = {}) {
   return withReadySql(async (sql) => {
   const currentUser = await getCurrentUser(sql, email);
-  assertCanCreate(currentUser);
+  assertPilotRepositorySubject(currentUser, context);
   const source = await readTopology(sql, topologyId);
-  if (!source || !canReadTopology(currentUser, source)) throw new Error("Permission denied: cannot duplicate this topology.");
+  if (!source || !source.siteId || !pilotReadableTopology(currentUser, source, context)) throw new Error("Resource not found.");
+  assertCanCreateTopology(currentUser, source.siteId);
   const [{ count }] = await sql<{ count: string }[]>`
     select count(*)::text as count from topologies where customer_id = ${source.customerId}
   `;
   const timestamp = nowIso();
   await sql.begin(async (tx) => {
+    const txUser = await loadActiveUser(tx, email);
+    if (!txUser) throw new Error("Authentication required.");
+    assertPilotRepositorySubject(txUser, context);
+    const lockedSource = await loadTopology(tx, topologyId, true);
+    if (!lockedSource || !lockedSource.siteId || !pilotReadableTopology(txUser, lockedSource, context)) throw new Error("Resource not found.");
+    assertCanCreateTopology(txUser, lockedSource.siteId);
+    const copiedTopologyId = uid("topology");
     await tx`
       insert into topologies (id, customer_id, site_id, owner_user_id, created_by_user_id, updated_by_user_id, name, version_label, project, created_at, updated_at)
-    values (${uid("topology")}, ${source.customerId}, ${source.siteId ?? defaultSiteFor(currentUser)}, ${currentUser.id}, ${currentUser.id}, ${currentUser.id}, ${`${source.name} 複本`}, ${`v${Number(count) + 1}`}, ${sql.json(source.project)}, ${timestamp}, ${timestamp})
-    `;
-    const [created] = await tx<{ id: string }[]>`
-      select id from topologies
-      where customer_id = ${source.customerId}
-        and created_by_user_id = ${currentUser.id}
-        and created_at = ${timestamp}
-      order by id desc
-      limit 1
+      values (${copiedTopologyId}, ${lockedSource.customerId}, ${lockedSource.siteId}, ${txUser.id}, ${txUser.id}, ${txUser.id}, ${`${lockedSource.name} copy`}, ${`v${Number(count) + 1}`}, ${tx.json(lockedSource.project)}, ${timestamp}, ${timestamp})
     `;
     await writeAuditLog(tx, {
-      actorUserId: currentUser.id,
+      actorUserId: txUser.id,
       action: "topology.duplicate",
       entityType: "topology",
-      entityId: created.id,
-      siteId: source.siteId ?? defaultSiteFor(currentUser),
-      customerId: source.customerId,
-      topologyId: created.id,
-      metadata: { sourceTopologyId: source.id },
+      entityId: copiedTopologyId,
+      siteId: lockedSource.siteId,
+      customerId: lockedSource.customerId,
+      topologyId: copiedTopologyId,
+      metadata: { sourceTopologyId: lockedSource.id },
     });
   });
-  return readTopologyDataset(email);
+  return readTopologyDataset(email, context);
   });
 }
 
-export async function deleteCustomer(email: string, customerId: string) {
+export async function deleteCustomer(email: string, customerId: string, context: RepositoryContext = {}) {
   return withReadySql(async (sql) => {
   const currentUser = await getCurrentUser(sql, email);
-  if (currentUser.role !== "boss") throw new Error("Permission denied: only boss can delete customers.");
-  const [customer] = await sql<CustomerRow[]>`
-    select id, name, notes, created_at, updated_at from customers where id = ${customerId}
-  `;
-  if (!customer) throw new Error("Customer not found.");
+  assertPilotRepositorySubject(currentUser, context);
+  assertCanWriteCustomer(currentUser);
+  await assertPilotOnlyCustomer(sql, customerId, context);
+  const customer = await loadCustomer(sql, customerId);
+  if (!customer) throw new Error("Resource not found.");
   const [scope] = await sql<{ site_id: string | null }[]>`
     select site_id from topologies where customer_id = ${customerId} order by updated_at desc limit 1
   `;
   await sql.begin(async (tx) => {
+    const txUser = await loadActiveUser(tx, email);
+    if (!txUser) throw new Error("Authentication required.");
+    assertPilotRepositorySubject(txUser, context);
+    assertCanWriteCustomer(txUser);
+    await assertPilotOnlyCustomer(tx, customerId, context);
+    const lockedCustomer = await loadCustomer(tx, customerId, true);
+    if (!lockedCustomer) throw new Error("Resource not found.");
     await writeAuditLog(tx, {
-      actorUserId: currentUser.id,
+      actorUserId: txUser.id,
       action: "customer.delete",
       entityType: "customer",
-      entityId: customer.id,
+      entityId: lockedCustomer.id,
       siteId: scope?.site_id ?? undefined,
-      customerId: customer.id,
-      metadata: { name: customer.name },
+      customerId: lockedCustomer.id,
+      metadata: { name: lockedCustomer.name },
     });
     await tx`delete from customers where id = ${customerId}`;
   });
-  const dataset = await readTopologyDataset(email);
+  const dataset = await readTopologyDataset(email, context);
   if (dataset.customers.length > 0 && dataset.topologies.length > 0) return dataset;
-  await createCustomer(email, "示範客戶", defaultSiteFor(currentUser));
-  return readTopologyDataset(email);
+  return dataset;
   });
 }
 
-export async function deleteTopology(email: string, topologyId: string) {
+export async function deleteTopology(email: string, topologyId: string, context: RepositoryContext = {}) {
   return withReadySql(async (sql) => {
   const currentUser = await getCurrentUser(sql, email);
+  assertPilotRepositorySubject(currentUser, context);
   const source = await readTopology(sql, topologyId);
-  if (!source || !canWriteTopology(currentUser, source)) throw new Error("Permission denied: cannot delete this topology.");
+  if (!source || !pilotWritableTopology(currentUser, source, context)) throw new Error("Resource not found.");
   await sql.begin(async (tx) => {
+    const txUser = await loadActiveUser(tx, email);
+    if (!txUser) throw new Error("Authentication required.");
+    assertPilotRepositorySubject(txUser, context);
+    const lockedSource = await loadTopology(tx, topologyId, true);
+    if (!lockedSource || !pilotWritableTopology(txUser, lockedSource, context)) throw new Error("Resource not found.");
     await writeAuditLog(tx, {
-      actorUserId: currentUser.id,
+      actorUserId: txUser.id,
       action: "topology.delete",
       entityType: "topology",
-      entityId: source.id,
-      siteId: source.siteId,
-      customerId: source.customerId,
-      topologyId: source.id,
-      metadata: { name: source.name, versionLabel: source.versionLabel },
+      entityId: lockedSource.id,
+      siteId: lockedSource.siteId,
+      customerId: lockedSource.customerId,
+      topologyId: lockedSource.id,
+      metadata: { name: lockedSource.name, versionLabel: lockedSource.versionLabel },
     });
     await tx`delete from topologies where id = ${topologyId}`;
     const [{ count }] = await tx<{ count: string }[]>`
-      select count(*)::text as count from topologies where customer_id = ${source.customerId}
+      select count(*)::text as count from topologies where customer_id = ${lockedSource.customerId}
     `;
     if (Number(count) === 0) {
       const timestamp = nowIso();
       await tx`
       insert into topologies (id, customer_id, site_id, owner_user_id, created_by_user_id, updated_by_user_id, name, version_label, project, created_at, updated_at)
-      values (${uid("topology")}, ${source.customerId}, ${source.siteId ?? defaultSiteFor(currentUser)}, ${currentUser.id}, ${currentUser.id}, ${currentUser.id}, ${"現況拓樸"}, ${"v1"}, ${sql.json(EMPTY_PROJECT)}, ${timestamp}, ${timestamp})
+      values (${uid("topology")}, ${lockedSource.customerId}, ${lockedSource.siteId ?? defaultSiteFor(txUser)}, ${txUser.id}, ${txUser.id}, ${txUser.id}, ${"Default Topology"}, ${"v1"}, ${tx.json(EMPTY_PROJECT)}, ${timestamp}, ${timestamp})
       `;
       const [replacement] = await tx<{ id: string }[]>`
         select id from topologies
-        where customer_id = ${source.customerId} and created_at = ${timestamp}
+        where customer_id = ${lockedSource.customerId} and created_at = ${timestamp}
         order by id desc limit 1
       `;
       await writeAuditLog(tx, {
-        actorUserId: currentUser.id,
+        actorUserId: txUser.id,
         action: "topology.create",
         entityType: "topology",
         entityId: replacement.id,
-        siteId: source.siteId ?? defaultSiteFor(currentUser),
-        customerId: source.customerId,
+        siteId: lockedSource.siteId ?? defaultSiteFor(txUser),
+        customerId: lockedSource.customerId,
         topologyId: replacement.id,
         metadata: { source: "last-topology-deleted", versionLabel: "v1" },
       });
     }
   });
-  return readTopologyDataset(email);
+  return readTopologyDataset(email, context);
   });
 }
