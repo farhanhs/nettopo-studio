@@ -13,7 +13,7 @@ function isEndpoint(device: Device) {
 }
 
 function isNamedSpine(device: Device) {
-  const name = device.name.toLocaleLowerCase();
+  const name = device.name.toLowerCase();
   return ["spine", "main switch", "core", "backbone", "主幹", "核心"].some((keyword) => name.includes(keyword));
 }
 
@@ -103,7 +103,9 @@ export function orderLayersByConnectivity(layers: Device[][], project: Project) 
       const bAverage = bPositions.length
         ? bPositions.reduce((sum, value) => sum + value, 0) / bPositions.length
         : Number.POSITIVE_INFINITY;
-      return aAverage - bAverage || a.name.localeCompare(b.name);
+      return aAverage - bAverage ||
+        (a.name < b.name ? -1 : a.name > b.name ? 1 : 0) ||
+        (a.id < b.id ? -1 : a.id > b.id ? 1 : 0);
     });
     next.forEach((device, index) => positioned.set(device.id, index));
     ordered.push(next);
