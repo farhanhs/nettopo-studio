@@ -9,6 +9,10 @@
 | Planned Order | `<000>` |
 | Checkpoint | `<name>` |
 | Owner | `<group/thread>` |
+| Development Branch | `<exact branch name>` |
+| Worktree | `<absolute worktree path>` |
+| Base Commit | `<full SHA>` |
+| Integration Target | `<exact target branch; integration authorization separate>` |
 | Created | `<YYYY-MM-DD>` |
 | Updated | `<YYYY-MM-DD>` |
 

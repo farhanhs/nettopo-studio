@@ -1,5 +1,19 @@
 # Product Decision Log
 
+
+## D33 — 2026-09-11 智慧整理分支與雙軌資料對接
+
+- ID：PM_GOV_001-D33；Status：APPROVED。
+- 來源：使用者同意建立分支、在後續單號標示開發分支，採「快速整理／智慧整理」雙軌，先整理目前拓樸供設計／開發對接。
+- 建立 codex/ai-layout-poc，base=1b0b084518886cda347f175bfc959401fd1d18ed，worktree=.local/worktrees/ai-layout-poc。精確位置與跨樹差異見 BRANCH-MAP.md。
+- 快速整理使用本地排版；智慧整理由模型產生有限結構化意圖，再交同一排版核心／既有 router；首期只變更既有 Device.x/y。D01 的監控與防禦 agent 仍歸 netNNassist；圖面整理屬 NetTopo Studio。
+- 已授權 PM_AIL_001 的分支／文件與 DSG_AIL_001 設計對接；DEV_AIL_001–003、QA_AIL_001–002 依詳細契約與前置驗收排程。詳細設計中的一般工程預設由組別收斂，不重問已核准雙軌方向。
+- 首期外送限 synthetic、欄位 allowlist／匿名 refs；credential、原始設定與完整 Project 不送模型；真實 provider 請求另按 QA_AIL_002 環境與预算執行。
+- 分支不是 deployment 或 Git 發布授權；本輪未授權 stage/commit/push/merge/deploy。UIX_006–008 既有 dirty 候選與 AST/MED/UIX 待核准票不因本決策自動整合／放行。
+- 所有新工單及後續重新啟動的舊票須填 Development Branch、Worktree、Base Commit、Integration Target；交接先驗實際 branch/HEAD/status。共用檔案仍依 primary Ticket 管理 hunk。
+- 2026-09-13 追加授權：使用者明確要求「commit／push」，可將本分支已完成的AIL規劃、設計與DEV_AIL_001 contract/core進度分票提交並推送origin/codex/ai-layout-poc。這是進度保存，不是QA/release checkpoint；不授權merge/deploy，DEV_AIL_001維持IN_PROGRESS。
+
+
 此表用來防止「推薦」在跨組轉述後被誤認為「已批准」。只有 `APPROVED` 可以成為 `READY` 工單的產品依據。
 
 | Decision ID | Status | 決策 | 影響 Tickets | 備註 |

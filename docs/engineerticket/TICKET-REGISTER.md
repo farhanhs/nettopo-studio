@@ -1,5 +1,24 @@
 # Engineer Ticket Register
 
+## 2026-09-11 AIL 雙軌整理工作線（D33）
+
+分支／資料入口：[BRANCH-MAP.md](BRANCH-MAP.md)。AIL 票面與狀態唯一維護於 codex/ai-layout-poc worktree；其他 worktree 本段僅為發單時索引，不更新既有工作線歷史。
+下表全票 Development Branch=codex/ai-layout-poc；Worktree=C:/Users/DUS/Desktop/project/nettopo-studio/.local/worktrees/ai-layout-poc；Base=1b0b084518886cda347f175bfc959401fd1d18ed；Integration Target=codex/dev-rel-001-checkpoint。
+
+| Order | Ticket | 目前狀態（2026-09-13） | 工作 |
+|---:|---|---|---|
+| 089 | [PM_AIL_001](active/PM_AIL_001.md) | READY | 分支建立、功能盤點與雙軌交接 |
+| 090 | [DSG_AIL_001](active/DSG_AIL_001.md) | READY | 雙軌整理資料與介面詳細設計 |
+| 091 | [DEV_AIL_001](active/DEV_AIL_001.md) | IN_PROGRESS | 2026-09-13 contract/core slice已實作；63/63 tests、tsc/scoped ESLint PASS；尚待scorer/worker/page及獨立build，不解鎖QA |
+| 092 | [DEV_AIL_002](active/DEV_AIL_002.md) | BLOCKED | 智慧整理後端與模型介面 |
+| 093 | [DEV_AIL_003](active/DEV_AIL_003.md) | BLOCKED | 雙軌 UI、預覽套用與復原 |
+| 094 | [QA_AIL_001](active/QA_AIL_001.md) | BLOCKED | 雙軌 mock／Browser／儲存獨立驗收 |
+| 095 | [QA_AIL_002](active/QA_AIL_002.md) | BLOCKED | 智慧整理 synthetic 模型品質比較 |
+
+功能與欄位盤點：[TOPOLOGY-FUNCTION-DATA-MAP](C:/Users/DUS/Desktop/project/nettopo-studio/.local/worktrees/ai-layout-poc/docs/engineerticket/contracts/TOPOLOGY-FUNCTION-DATA-MAP.md)。
+雙軌交接：[AI-LAYOUT-DUAL-TRACK-HANDOFF](C:/Users/DUS/Desktop/project/nettopo-studio/.local/worktrees/ai-layout-poc/docs/engineerticket/contracts/AI-LAYOUT-DUAL-TRACK-HANDOFF.md)。
+
+
 - 更新日期：2026-09-08
 - 排序：Priority → Planned Order → Ticket ID
 - 狀態來源：目前工作樹、開發／測試紀錄與已確認產品方向

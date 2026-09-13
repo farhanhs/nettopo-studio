@@ -182,6 +182,10 @@ Ticket 進入 `READY` 前必須具備：
 
 ## 7. Branch／Commit／文件規則
 
+- D33：所有新票與後續重新啟動／交接的舊票必填 Development Branch、Worktree、Base Commit、Integration Target；開始前驗 git branch --show-current、git rev-parse HEAD、git status --short。
+- AIL 使用使用者核准的共用功能分支 `codex/ai-layout-poc`，為下列預設命名的明確例外；各票仍保留獨立 ID。工作線位置見 [BRANCH-MAP.md](BRANCH-MAP.md)。
+- 跨 worktree QA／dirty 內容不自動屬於新分支；需要明確的 committed integration 與回歸。分支建立不等於 commit/push/merge/deploy 授權。
+
 - Branch：`codex/<ticket-id-lowercase>-<short-name>`。
 - Commit：`[TICKET_ID] type(scope): summary`。
 - 一個 commit 原則上只有一個 primary Ticket。

@@ -1,5 +1,12 @@
 # NetTopo Studio 架構與 Ticket Map
 
+## 2026-09-11 AIL 雙軌整理擴充（D33）
+
+- 發展分支與狀態請先看 [BRANCH-MAP.md](BRANCH-MAP.md)。
+- [功能／欄位基線](C:/Users/DUS/Desktop/project/nettopo-studio/.local/worktrees/ai-layout-poc/docs/engineerticket/contracts/TOPOLOGY-FUNCTION-DATA-MAP.md) 與 [雙軌對接契約](C:/Users/DUS/Desktop/project/nettopo-studio/.local/worktrees/ai-layout-poc/docs/engineerticket/contracts/AI-LAYOUT-DUAL-TRACK-HANDOFF.md) 為本輪設計開發入口。
+- 共用資料路徑：Project snapshot → 快速本地策略／智慧模型意圖 → layout core → 既有 router/scorer → preview → revision/permission guard → Zustand → Dexie/server repository。
+- PM_AIL_001 → DSG_AIL_001 → DEV_AIL_001/002 → DEV_AIL_003 → QA_AIL_001 → QA_AIL_002；AI 只協助圖面呈現，不修改網路設備或防禦配置。
+
 - 狀態：`DSG_ARC_001 READY／使用者已核准`
 - 核准日期：2026-08-19
 
