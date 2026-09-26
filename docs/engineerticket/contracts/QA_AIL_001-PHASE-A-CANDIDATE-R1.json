@@ -1,0 +1,23 @@
+{
+  "ticket": "QA_AIL_001",
+  "phase": "A",
+  "capturedAt": "2026-09-22",
+  "branch": "codex/ai-layout-poc",
+  "head": "2e77d3fe299d2e231268bf7f3a124608ab7d9030",
+  "files": {
+    "app/page.tsx": "352b1ca8d694acce5cc1dfd15780ec0749b82db8bb5e5bcbc3f3bbedd6fbd713",
+    "app/lib/topology-layout-contract.ts": "ee77546c417ccae4433389324b8c13711765277becda14bb9ecf26ffe6a0e609",
+    "app/lib/topology-layout-core.ts": "55bc4ba3968b2f0f9d6540bb091f77e2d8616d291b0978d621381ef101626ef0",
+    "app/lib/topology-layout-quality.ts": "a67794f520f91e62e21ba0a9cfafb4270afce9111adfbe4c723c331230455415",
+    "app/lib/topology-layout-runner.ts": "b649f9acaa0aea542545f4bf9d7626cbb8b63bc473527a763d95708370af60de",
+    "app/lib/topology-layout-worker.ts": "d378db035352bb0d5ff3638b10f96126e9a8ebeddf86fadf025ca8a5874b1629",
+    "app/lib/topology-geometry.ts": "a8d8720a9da433f2d39ee25dd3b39bb97b7ebe5313b032b705243d07fbdfdda0",
+    "app/lib/topology-layout.ts": "18fd1efe0cf301014f53cdcb55bae9bb5724fe7ff853383cf684bc10a8326ce1",
+    "app/lib/topology-routing.ts": "910920f8fffe6564a4f63d2a6056ce2ea14c3a274c0bd109ed1f48934f5e0c0a",
+    "tests/dev-ail-001-contract.test.mjs": "c8373012e19e7a6e2f0ea2773fec14068899091dd69bed1b585dd85a5176901f",
+    "tests/dev-ail-001-core.test.mjs": "6c0e1f1a41daf88be000ae4a5331f10a8baed871c11a47084456e0c06dd08c83",
+    "tests/dev-ail-001-quality-worker.test.mjs": "ec9bb8f53f6d3cc2f154b49bec9e6810bbc0360385acddbe4ebc1da3a1b9da8a",
+    "tests/qa-ail-001-phase-a.test.mjs": "f77691527ceb05e60fc0df6a13db42170988d41e64a082fac9a7761693759db2",
+    "tests/qa-ail-001-worker-browser.test.mjs": "3861e0049e8c81c0c3b2f317203fe3b25807847e7e33f0193179979c85fccbe3"
+  }
+}

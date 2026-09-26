@@ -1,6 +1,5 @@
 "use client";
 
-import ELK from "elkjs/lib/elk.bundled.js";
 import {
   Background,
   BackgroundVariant,
@@ -24,9 +23,10 @@ import { FileDropZone } from "./components/import/FileDropZone";
 import { ImportPreviewModal } from "./components/import/ImportPreviewModal";
 import {
   LAYOUT_DESCRIPTIONS,
-  orderLayersByConnectivity,
   resolveLayoutMode,
 } from "./lib/topology-layout";
+import { runQuickLayout } from "./lib/topology-layout-runner";
+import { projectWithLayoutPositions } from "./lib/topology-layout-core";
 import {
   linkVisualClass,
   routePath,
@@ -55,11 +55,6 @@ import {
 import type { Device, DeviceCredentialRecord, DeviceType, Group, Link, Project, SiteRecord, TopologyRecord, UserRecord } from "./lib/topology-types";
 type Selection = { kind: "device"; id: string } | { kind: "link"; id: string };
 type LayoutMode = "auto-detect" | "three-tier" | "spine-leaf" | "layered";
-type DeviceGraph = {
-  degree: Map<string, number>;
-  switchDegree: Map<string, number>;
-  endpointDegree: Map<string, number>;
-};
 
 const TYPES: { value: DeviceType; label: string; glyph: string }[] = [
   { value: "router", label: "Router", glyph: "R" },
@@ -80,7 +75,6 @@ const TYPES: { value: DeviceType; label: string; glyph: string }[] = [
 ];
 
 const TYPE_MAP = Object.fromEntries(TYPES.map((item) => [item.value, item])) as Record<DeviceType, (typeof TYPES)[number]>;
-const DEVICE_ORDER: DeviceType[] = ["modem", "router", "firewall", "switch", "access-point", "mesh-node", "ssid", "server", "nas", "erp", "pos", "printer", "camera", "iot", "client"];
 const LAYOUT_LABELS: Record<LayoutMode, string> = {
   "auto-detect": "自動偵測",
   "three-tier": "三層式",
@@ -103,7 +97,6 @@ const PANEL_LIMITS = {
   inspector: { minPercent: 16, maxPercent: 36, minSize: "300px", maxSize: "520px" },
 };
 
-const elk = new ELK();
 const LOGIN_SESSION_KEY = "nettopo-login-session";
 const USE_SERVER_STORAGE = process.env.NEXT_PUBLIC_TOPOLOGY_STORAGE === "server";
 
@@ -292,40 +285,6 @@ function linkToEdge(link: CanvasLink, selected: boolean, project: Project): Edge
   };
 }
 
-function deviceName(device: Device) {
-  return `${device.name} ${device.model ?? ""} ${device.location ?? ""}`.toLowerCase();
-}
-
-function hasAnyKeyword(device: Device, keywords: string[]) {
-  const text = deviceName(device);
-  return keywords.some((keyword) => text.includes(keyword.toLowerCase()));
-}
-
-function buildDeviceGraph(project: Project): DeviceGraph {
-  const byId = new Map(project.devices.map((device) => [device.id, device]));
-  const degree = new Map(project.devices.map((device) => [device.id, 0]));
-  const switchDegree = new Map(project.devices.map((device) => [device.id, 0]));
-  const endpointDegree = new Map(project.devices.map((device) => [device.id, 0]));
-
-  for (const link of project.links) {
-    const from = byId.get(link.from);
-    const to = byId.get(link.to);
-    if (!from || !to) continue;
-    degree.set(from.id, (degree.get(from.id) ?? 0) + 1);
-    degree.set(to.id, (degree.get(to.id) ?? 0) + 1);
-    if (to.type === "switch") switchDegree.set(from.id, (switchDegree.get(from.id) ?? 0) + 1);
-    if (from.type === "switch") switchDegree.set(to.id, (switchDegree.get(to.id) ?? 0) + 1);
-    if (isEndpointDevice(to)) endpointDegree.set(from.id, (endpointDegree.get(from.id) ?? 0) + 1);
-    if (isEndpointDevice(from)) endpointDegree.set(to.id, (endpointDegree.get(to.id) ?? 0) + 1);
-  }
-
-  return { degree, switchDegree, endpointDegree };
-}
-
-function isEndpointDevice(device: Device) {
-  return ["server", "nas", "erp", "client", "access-point", "mesh-node", "ssid", "printer", "camera", "pos", "iot"].includes(device.type);
-}
-
 function canWriteTopology(user: UserRecord | undefined, topology: TopologyRecord | undefined) {
   if (!user) return false;
   if (user.role === "boss") return true;
@@ -338,153 +297,6 @@ function canWriteTopology(user: UserRecord | undefined, topology: TopologyRecord
 function editableSites(user: UserRecord | undefined, sites: SiteRecord[]) {
   if (!user || user.role === "boss" || user.role === "sales_procurement") return sites;
   return sites.filter((site) => user.siteIds.includes(site.id));
-}
-
-function sortDevices(devices: Device[], graph: DeviceGraph) {
-  return [...devices].sort((a, b) => {
-    const degreeDiff = (graph.degree.get(b.id) ?? 0) - (graph.degree.get(a.id) ?? 0);
-    if (degreeDiff) return degreeDiff;
-    const typeDiff = DEVICE_ORDER.indexOf(a.type) - DEVICE_ORDER.indexOf(b.type);
-    if (typeDiff) return typeDiff;
-    return a.name.localeCompare(b.name);
-  });
-}
-
-function applyColumnLayout(project: Project, layers: Device[][]) {
-  const left = 80;
-  const top = 90;
-  const columnGap = 260;
-  const rowGap = 150;
-  const devices = project.devices.map((device) => ({ ...device }));
-  const byId = new Map(devices.map((device) => [device.id, device]));
-
-  orderLayersByConnectivity(layers, project).forEach((layer, layerIndex) => {
-    const layerHeight = Math.max(0, (layer.length - 1) * rowGap);
-    layer.forEach((device, rowIndex) => {
-      const target = byId.get(device.id);
-      if (!target) return;
-      target.x = left + layerIndex * columnGap;
-      target.y = top + rowIndex * rowGap - layerHeight / 2 + 220;
-    });
-  });
-
-  return { ...project, devices };
-}
-
-function applyRowLayout(project: Project, rows: Device[][]) {
-  const left = 120;
-  const top = 90;
-  const columnGap = 240;
-  const rowGap = 170;
-  const devices = project.devices.map((device) => ({ ...device }));
-  const byId = new Map(devices.map((device) => [device.id, device]));
-
-  orderLayersByConnectivity(rows, project).forEach((row, rowIndex) => {
-    const rowWidth = Math.max(0, (row.length - 1) * columnGap);
-    row.forEach((device, columnIndex) => {
-      const target = byId.get(device.id);
-      if (!target) return;
-      target.x = left + columnIndex * columnGap - rowWidth / 2 + 360;
-      target.y = top + rowIndex * rowGap;
-    });
-  });
-
-  return { ...project, devices };
-}
-
-function classifyThreeTier(project: Project) {
-  const graph = buildDeviceGraph(project);
-  const devices = project.devices;
-  const source = sortDevices(devices.filter((device) => device.type === "modem" || hasAnyKeyword(device, ["wan", "internet", "isp", "電信", "數據機"])), graph);
-  const edge = sortDevices(devices.filter((device) => device.type === "firewall" || device.type === "router"), graph);
-  const switches = devices.filter((device) => device.type === "switch");
-  const namedCore = switches.filter((device) => hasAnyKeyword(device, ["core", "backbone", "核心", "主幹"]));
-  const core = namedCore.length > 0
-    ? sortDevices(namedCore, graph)
-    : sortDevices([...switches], graph).slice(0, Math.max(1, Math.min(2, Math.ceil(switches.length / 4))));
-  const coreIds = new Set(core.map((device) => device.id));
-  const distribution = sortDevices(
-    switches.filter((device) =>
-      !coreIds.has(device.id) &&
-      (hasAnyKeyword(device, ["distribution", "dist", "aggregation", "匯聚", "彙聚"]) || (graph.degree.get(device.id) ?? 0) >= 3),
-    ),
-    graph,
-  );
-  const distributionIds = new Set(distribution.map((device) => device.id));
-  const access = sortDevices(
-    devices.filter((device) =>
-      (device.type === "switch" && !coreIds.has(device.id) && !distributionIds.has(device.id)) ||
-      ["access-point", "mesh-node", "ssid"].includes(device.type),
-    ),
-    graph,
-  );
-  const endpoint = sortDevices(devices.filter((device) => ["server", "nas", "erp", "client", "printer", "camera", "pos", "iot"].includes(device.type)), graph);
-  const used = new Set([...source, ...edge, ...core, ...distribution, ...access, ...endpoint].map((device) => device.id));
-  const other = sortDevices(devices.filter((device) => !used.has(device.id)), graph);
-
-  return [source, edge, core, distribution, access, endpoint, other].filter((layer) => layer.length > 0);
-}
-
-function classifySpineLeaf(project: Project) {
-  const graph = buildDeviceGraph(project);
-  const switches = project.devices.filter((device) => device.type === "switch");
-  const namedSpines = switches.filter((device) => hasAnyKeyword(device, ["spine", "core", "backbone", "核心", "主幹"]));
-  const spines = namedSpines.length > 0
-    ? sortDevices(namedSpines, graph)
-    : sortDevices(switches.filter((device) => (graph.switchDegree.get(device.id) ?? 0) >= 2 && (graph.endpointDegree.get(device.id) ?? 0) === 0), graph);
-  const spineIds = new Set(spines.map((device) => device.id));
-  const leaves = sortDevices(
-    switches.filter((device) =>
-      !spineIds.has(device.id) &&
-      (hasAnyKeyword(device, ["leaf", "access", "tor", "接入"]) || (graph.endpointDegree.get(device.id) ?? 0) > 0 || (graph.switchDegree.get(device.id) ?? 0) > 0),
-    ),
-    graph,
-  );
-  const leafIds = new Set(leaves.map((device) => device.id));
-  const edge = sortDevices(project.devices.filter((device) => device.type === "modem" || device.type === "router" || device.type === "firewall"), graph);
-  const endpoints = sortDevices(project.devices.filter((device) => isEndpointDevice(device)), graph);
-  const endpointRows = Array.from({ length: Math.ceil(endpoints.length / 6) }, (_, index) =>
-    endpoints.slice(index * 6, index * 6 + 6),
-  );
-  const other = sortDevices(project.devices.filter((device) => !spineIds.has(device.id) && !leafIds.has(device.id) && !edge.includes(device) && !endpoints.includes(device)), graph);
-
-  return [edge, spines, leaves, ...endpointRows, other].filter((row) => row.length > 0);
-}
-
-async function layoutByMode(project: Project, mode: LayoutMode) {
-  const resolved = resolveLayoutMode(project, mode);
-  if (resolved === "three-tier") return applyColumnLayout(project, classifyThreeTier(project));
-  if (resolved === "spine-leaf") return applyRowLayout(project, classifySpineLeaf(project));
-  return layoutWithElk(project);
-}
-
-async function layoutWithElk(project: Project) {
-  const graph = {
-    id: "root",
-    layoutOptions: {
-      "elk.algorithm": "layered",
-      "elk.direction": "RIGHT",
-      "elk.spacing.nodeNode": "70",
-      "elk.layered.spacing.nodeNodeBetweenLayers": "90",
-      "elk.layered.nodePlacement.strategy": "NETWORK_SIMPLEX",
-      "elk.layered.crossingMinimization.strategy": "LAYER_SWEEP",
-    },
-    children: [...project.devices]
-      .sort((a, b) => DEVICE_ORDER.indexOf(a.type) - DEVICE_ORDER.indexOf(b.type))
-      .map((device) => ({ id: device.id, width: NODE_WIDTH, height: NODE_HEIGHT })),
-    edges: project.links.map((link) => ({ id: link.id, sources: [link.from], targets: [link.to] })),
-  };
-
-  const result = await elk.layout(graph);
-  const positions = new Map((result.children ?? []).map((child) => [child.id, { x: child.x ?? 0, y: child.y ?? 0 }]));
-
-  return {
-    ...project,
-    devices: project.devices.map((device) => {
-      const next = positions.get(device.id);
-      return next ? { ...device, x: next.x + 80, y: next.y + 90 } : device;
-    }),
-  };
 }
 
 async function restoreSession() {
@@ -924,8 +736,13 @@ function TopologyApp() {
     setNotice("正在整理拓樸...");
     const resolvedMode = resolveLayoutMode(project, layoutMode);
     const modeLabel = LAYOUT_LABELS[resolvedMode];
-    setProject(await layoutByMode(project, layoutMode));
-    setNotice(`${modeLabel} 整理完成。${LAYOUT_DESCRIPTIONS[resolvedMode]} 已分散共用端點與平行連線位置。`);
+    try {
+      const candidate = await runQuickLayout(project, activeTopologyId ?? "local-topology", layoutMode);
+      setProject(projectWithLayoutPositions(project, candidate.positions));
+      setNotice(`${modeLabel} 整理完成。${LAYOUT_DESCRIPTIONS[resolvedMode]} 已通過連線與設備避障檢查。`);
+    } catch {
+      setNotice("找不到符合安全規則的整理結果，原圖未變更。");
+    }
   }
 
   async function addCustomer(data: FormData) {
