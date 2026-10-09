@@ -35,5 +35,6 @@ test("DEV_UIX_004 gives the session profile a non-overlapping responsive topbar 
   assert.match(cssSource, /@media \(max-width: 1500px\)[\s\S]*grid-template-areas:\s*\n\s*"brand actions"\s*\n\s*"switcher switcher"/);
   assert.match(cssSource, /\.project-switcher \{ grid-area: switcher; \}/);
   assert.match(cssSource, /\.top-actions \{ grid-area: actions; justify-content: flex-end; \}/);
-  assert.match(cssSource, /\.workspace \{ height: calc\(100vh - 150px\); \}/);
+  assert.match(cssSource, /\.app-shell \{[^}]*display: flex[^}]*flex-direction: column/s);
+  assert.match(cssSource, /\.workspace \{[^}]*flex: 1 1 auto/s);
 });

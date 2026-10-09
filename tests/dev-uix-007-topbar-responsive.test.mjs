@@ -22,7 +22,8 @@ test("DEV_UIX_007 topbar and actions can shrink without horizontal overflow", ()
   assert.match(cssRule(".top-actions"), /flex-wrap:\s*wrap/);
   assert.match(cssRule(".project-switcher"), /min-width:\s*0/);
   assert.match(cssRule(".switcher-row"), /minmax\(0,\s*1fr\)/);
-  assert.match(cssRule(".workspace"), /height:\s*calc\(100vh - var\(--topbar-height\)\)/);
+  assert.match(cssRule(".workspace"), /height:\s*auto/);
+  assert.match(cssRule(".workspace"), /flex:\s*1 1 auto/);
 });
 
 test("DEV_UIX_007 keeps identity values accessible while visually compact", () => {

@@ -12,6 +12,7 @@ import {
   type NodeChange,
   type EdgeChange,
   type OnNodeDrag,
+  type ReactFlowInstance,
   applyNodeChanges,
   applyEdgeChanges,
   Position,
@@ -118,6 +119,7 @@ type RuntimeCapabilities = {
     pilotFullExport: boolean;
   };
 };
+type FlowViewportSize = { width: number; height: number };
 
 type DevIdentity = { email: string; label: string };
 
@@ -696,6 +698,10 @@ function TopologyApp() {
   const [groupCollapseOverrides, setGroupCollapseOverrides] = useState<Record<string, Record<string, boolean>>>({});
   const [notice, setNotice] = useState("資料儲存在這台裝置的 IndexedDB");
   const loadedRef = useRef(false);
+  const flowShellRef = useRef<HTMLDivElement>(null);
+  const [flowViewportSize, setFlowViewportSize] = useState<FlowViewportSize>({ width: 0, height: 0 });
+  const [flowInstance, setFlowInstance] = useState<ReactFlowInstance<Node, Edge>>();
+  const fittedTopologyRef = useRef<string | undefined>(undefined);
 
   useEffect(() => {
     queueMicrotask(() => {
@@ -733,6 +739,32 @@ function TopologyApp() {
     if (isSafePanelLayout(panelLayout)) localStorage.setItem(PANEL_LAYOUT_KEY, JSON.stringify(panelLayout));
     else localStorage.removeItem(PANEL_LAYOUT_KEY);
   }, [panelLayout, panelLayoutReady]);
+
+  useEffect(() => {
+    if (!panelLayoutReady || !ready) return;
+    const shell = flowShellRef.current;
+    if (!shell) return;
+
+    const syncFlowViewportSize = () => {
+      const rect = shell.getBoundingClientRect();
+      const width = Math.max(0, Math.round(rect.width));
+      const height = Math.max(0, Math.round(rect.height));
+      if (width === 0 || height === 0) return;
+      setFlowViewportSize((current) => current.width === width && current.height === height
+        ? current
+        : { width, height });
+    };
+
+    syncFlowViewportSize();
+    if (typeof ResizeObserver === "undefined") {
+      window.addEventListener("resize", syncFlowViewportSize);
+      return () => window.removeEventListener("resize", syncFlowViewportSize);
+    }
+
+    const observer = new ResizeObserver(syncFlowViewportSize);
+    observer.observe(shell);
+    return () => observer.disconnect();
+  }, [panelLayoutReady, ready]);
 
   const activeCustomer = customers.find((customer) => customer.id === activeCustomerId);
   const activeTopology = topologies.find((topology) => topology.id === activeTopologyId);
@@ -779,6 +811,48 @@ function TopologyApp() {
     latestNodePositionsRef.current = new Map(derivedNodes.map((node) => [node.id, node.position]));
     if (!draggingNodeRef.current) setFlowNodes(derivedNodes);
   }, [derivedNodes]);
+
+  const initialFitKey = activeTopologyId ?? "unscoped-topology";
+  const topologyNodeSetKey = useMemo(
+    () => JSON.stringify(canvasProject.devices.map((device) => device.id).sort()),
+    [canvasProject.devices],
+  );
+  const flowNodeSetKey = useMemo(
+    () => JSON.stringify(flowNodes.map((node) => node.id).sort()),
+    [flowNodes],
+  );
+  useEffect(() => {
+    if (!panelLayoutReady || !ready || !flowInstance || flowViewportSize.width === 0 || flowViewportSize.height === 0) return;
+    if (canvasProject.devices.length === 0) {
+      if (fittedTopologyRef.current === initialFitKey) fittedTopologyRef.current = undefined;
+      return;
+    }
+    if (fittedTopologyRef.current === initialFitKey || flowNodeSetKey !== topologyNodeSetKey) return;
+
+    let frame = 0;
+    let attempts = 0;
+    let cancelled = false;
+    const fitWhenMeasured = () => {
+      const measuredNodes = flowInstance.getNodes();
+      const measuredNodeSetKey = JSON.stringify(measuredNodes.map((node) => node.id).sort());
+      const nodesReady = measuredNodeSetKey === topologyNodeSetKey
+        && measuredNodes.every((node) => Boolean(node.measured?.width && node.measured?.height));
+      if ((!flowInstance.viewportInitialized || !nodesReady) && attempts < 12) {
+        attempts += 1;
+        frame = window.requestAnimationFrame(fitWhenMeasured);
+        return;
+      }
+      if (cancelled) return;
+      void flowInstance.fitView({ padding: 0.12, minZoom: 0.25, maxZoom: 1.2, duration: 0 });
+      fittedTopologyRef.current = initialFitKey;
+    };
+
+    frame = window.requestAnimationFrame(fitWhenMeasured);
+    return () => {
+      cancelled = true;
+      window.cancelAnimationFrame(frame);
+    };
+  }, [canvasProject.devices.length, flowInstance, flowNodeSetKey, flowViewportSize.height, flowViewportSize.width, initialFitKey, panelLayoutReady, ready, topologyNodeSetKey]);
 
   const edges = useMemo(
     () => canvasProject.links.map((link) => linkToEdge(link, selection?.kind === "link" && selection.id === link.id, canvasProject)),
@@ -1401,7 +1475,6 @@ function TopologyApp() {
           <span>正在載入拓樸工作區...</span>
         </div>
       ) : <PanelGroup
-        key={`${panelLayout.sidebar}-${panelLayout.canvas}-${panelLayout.inspector}`}
         className="workspace"
         defaultLayout={panelLayout}
         orientation="horizontal"
@@ -1496,10 +1569,13 @@ function TopologyApp() {
               <span className="status">{notice}</span>
               <span className="toolbar-hint">滑鼠滾輪縮放 · 拖曳空白處平移 · 拖曳設備調整位置</span>
             </div>
-            <div className="flow-shell">
+            <div className="flow-shell" ref={flowShellRef}>
               <ReactFlow
+                width={flowViewportSize.width || undefined}
+                height={flowViewportSize.height || undefined}
                 nodes={flowNodes}
                 edges={[]}
+                onInit={(instance) => setFlowInstance(instance)}
                 onNodesChange={onNodesChange}
                 onEdgesChange={onEdgesChange}
                 onNodeDragStart={() => {
@@ -1514,7 +1590,6 @@ function TopologyApp() {
                 }}
                 onEdgeClick={(_, edge) => setSelection({ kind: "link", id: edge.id })}
                 nodesDraggable={canWriteActiveTopology}
-                fitView
                 minZoom={0.25}
                 maxZoom={2}
               >
