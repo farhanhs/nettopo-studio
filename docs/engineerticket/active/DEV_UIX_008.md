@@ -5,11 +5,18 @@
 | Group | DEV |
 | Feature | UIX |
 | Priority | P1 |
-| Status | READY_FOR_QA |
+| Status | DONE |
 | Planned Order | 074 |
 | Change Type | CORRECT |
 | Owner | 開發組 |
 | QA | QA_UIX_004 |
+
+## Local Checkpoint — 2026-10-09
+
+- Commit: `cb485ea5f25106e1653762bbe391f57703249aab`.
+- Committed-tree cumulative focused tests: 16/16 PASS.
+- Final six product/test paths match the locked manifest and working tree after LF normalization.
+- Scope: local checkpoint only; no push, merge, integration, or deployment. Next owner is QA_PIL_006 for A09 committed-tree verification.
 
 ## Requirement Traceability
 

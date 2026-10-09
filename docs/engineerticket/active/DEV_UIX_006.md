@@ -5,11 +5,17 @@
 | Group | DEV |
 | Feature | UIX |
 | Priority | P1 |
-| Status | QA_PASSED |
+| Status | DONE |
 | Planned Order | 070 |
 | Change Type | CORRECT |
 | Owner | 開發組 |
 | QA | QA_UIX_002 |
+
+## Local Checkpoint — 2026-10-09
+
+- Commit: `5ee0e11b605979f39fc9e4aeba43ffffb798946c`.
+- Committed-tree focused tests: 3/3 PASS.
+- Scope: local checkpoint only; no push, merge, integration, or deployment.
 
 ## Requirement Traceability
 

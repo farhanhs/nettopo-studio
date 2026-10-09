@@ -19,7 +19,7 @@ Next owner開發組：先核對QA已結束／owned cleanup／release-for-repair�
 | Group | DEV |
 | Feature | UIX |
 | Priority | P1 |
-| Status | READY_FOR_QA |
+| Status | DONE |
 | Planned Order | 072 |
 | Change Type | CORRECT |
 | Owner | 開發組 |
@@ -27,6 +27,12 @@ Next owner開發組：先核對QA已結束／owned cleanup／release-for-repair�
 | Development Branch / Integration Target | codex/dev-rel-001-checkpoint / 同分支 checkpoint；無跨分支整合授權 |
 | Worktree | C:/Users/DUS/Desktop/project/nettopo-studio/.local/worktrees/dev-rel-001-checkpoint |
 | Recorded Base | 1b0b084518886cda347f175bfc959401fd1d18ed；開工另記 dirty candidate |
+
+## Local Checkpoint — 2026-10-09
+
+- Commit: `c481ab43a059e4d6eac782e01ba82c9b774928f1`.
+- Committed-tree cumulative focused tests: 8/8 PASS.
+- Scope: local checkpoint only; no push, merge, integration, or deployment.
 
 ## D42 A 開工核准 — 2026-10-05
 
