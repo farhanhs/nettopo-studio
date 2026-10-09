@@ -1557,8 +1557,8 @@ function TopologyApp() {
         <Panel id="inspector" className="workspace-panel inspector-panel" minSize={PANEL_LIMITS.inspector.minSize} maxSize={PANEL_LIMITS.inspector.maxSize}>
           <aside className="inspector">
             <h2>資訊欄位</h2>
-            {selectedDevice && <DeviceInspector device={selectedDevice} groups={project.groups} canEdit={canWriteActiveTopology} onSave={(data) => updateDevice(selectedDevice.id, data)} onDelete={removeSelected} />}
-            {selectedLink && <LinkInspector link={selectedLink} devices={project.devices} canEdit={canWriteActiveTopology} onSave={(data) => updateLink(selectedLink.id, data)} onDelete={removeSelected} />}
+            {selectedDevice && <DeviceInspector key={`device-${selectedDevice.id}`} device={selectedDevice} groups={project.groups} canEdit={canWriteActiveTopology} onSave={(data) => updateDevice(selectedDevice.id, data)} onDelete={removeSelected} />}
+            {selectedLink && <LinkInspector key={`link-${selectedLink.id}`} link={selectedLink} devices={project.devices} canEdit={canWriteActiveTopology} onSave={(data) => updateLink(selectedLink.id, data)} onDelete={removeSelected} />}
             {!selectedDevice && !selectedLink && <div className="inspect-empty">點選畫布、設備清單或連線清單，即可在這裡編輯資料。</div>}
           </aside>
         </Panel>
