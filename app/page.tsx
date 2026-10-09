@@ -1357,15 +1357,15 @@ function TopologyApp() {
                 <span className="session-avatar" aria-hidden="true">{currentUser.name.slice(0, 1)}</span>
                 <span>
                   <small>登入者</small>
-                  <strong>{currentUser.name}</strong>
-                  <em>{ROLE_LABELS[currentUser.role]} · {currentUser.email}</em>
+                  <strong title={currentUser.name}>{currentUser.name}</strong>
+                  <em title={`${ROLE_LABELS[currentUser.role]} · ${currentUser.email}`}>{ROLE_LABELS[currentUser.role]} · {currentUser.email}</em>
                 </span>
                 <button onClick={() => void logoutFromWorkspace()} type="button" aria-label={`登出 ${currentUser.name}`}>登出</button>
               </aside>
             )}
           </div>
         </div>
-        <div className="top-actions">
+        <div className="top-actions" aria-label="主要操作">
           {devIdentities.length > 0 && <label className="identity-picker">
             <span>測試身分</span>
             <select
