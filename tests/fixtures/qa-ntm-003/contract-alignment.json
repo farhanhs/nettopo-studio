@@ -1,0 +1,28 @@
+{
+  "addendumSha256": "e612bc77309a64b7b12326a5e11e82b2197462dc42fa1cd4403d6dc141ab5255",
+  "parentSha256": "0bb2145fb2b1844d576449e55c6f3e040ce9ae14175891c21716d963334dbf63",
+  "factory": "createTrustedChangePlanner",
+  "publicOperations": ["prepare", "resolve", "apply"],
+  "phase": {
+    "pureSnapshotOnly": true,
+    "persistenceReceipt": "not-performed",
+    "actorAdapterAvailable": false,
+    "actorBackedVerification": "NOT_RUN"
+  },
+  "supportedProposal": {
+    "entityType": "interface",
+    "operations": ["add", "replace"],
+    "fieldPaths": ["$record", "name", "kind", "aliases", "parentInterfaceId", "mac", "description", "adminLabel"]
+  },
+  "unsupported": ["remove", "link", "vlan", "subnet", "resiliency", "immutable-id", "immutable-deviceId"],
+  "resolutionActions": ["accept-unverified", "accept-and-verify", "keep-current", "exclude"],
+  "purePhaseActorTruth": {
+    "acceptAndVerifyError": "TRUSTED_ACTOR_REQUIRED",
+    "protectedChangeError": "TRUSTED_ACTOR_REQUIRED",
+    "keepWithoutActor": true,
+    "excludeWithoutActor": true,
+    "unprotectedAcceptUnverifiedWithoutActor": true
+  },
+  "errorPrecedence": ["invalid-structure", "scope-or-tamper", "stale", "decision-completeness", "blocking-or-warning", "actor", "dependency-or-result"],
+  "safeErrorFields": ["code", "safePath", "proposalId"]
+}

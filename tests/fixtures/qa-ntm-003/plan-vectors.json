@@ -1,0 +1,15 @@
+{
+  "ticket": "QA_NTM_003",
+  "phase": "PLAN-R1",
+  "formalResult": "NOT_RUN",
+  "vectors": [
+    { "id": "prepare-cancel-zero-effect", "covers": ["PLAN-01", "PLAN-07"], "action": "cancel", "expected": { "deterministicPlan": true, "inputMutation": false, "outputProject": false, "writes": 0 } },
+    { "id": "keep-protected-current", "covers": ["PLAN-02", "PLAN-04"], "current": { "verification": "verified", "value": "Gi0/1", "fingerprint": "current-fingerprint" }, "proposal": { "value": "Gi0/2", "fingerprint": "proposed-fingerprint" }, "decision": "keep-current", "expected": { "value": "Gi0/1", "fingerprint": "current-fingerprint", "verification": "verified", "writes": 0 } },
+    { "id": "exclude-dependent-closure", "covers": ["PLAN-02", "PLAN-06", "PLAN-07"], "decision": "exclude", "dependencyGraph": { "parent": "interface-parent", "children": ["interface-child"], "relations": ["link-child"] }, "expected": { "recalculate": true, "noOrphans": true, "noPartialResult": true } },
+    { "id": "accept-change-invalidates-old-trust", "covers": ["PLAN-04", "PLAN-05"], "current": { "verification": "verified", "fingerprint": "old-value-fingerprint" }, "decision": "accept-change", "expected": { "oldTrustRetained": false, "autoVerified": false, "explicitProtectedDecisionRequired": true } },
+    { "id": "accept-and-verify-needs-trusted-actor", "covers": ["PLAN-03", "PLAN-05"], "decision": "accept-and-verify", "untrustedInputMetadata": { "actorId": "client-claims-boss", "role": "boss" }, "trustedContext": null, "expected": { "typedReject": true, "clientMetadataIgnoredForAuthorization": true, "writes": 0 } },
+    { "id": "stale-tamper-wrong-scope", "covers": ["PLAN-03", "PLAN-07"], "negativeClasses": ["base-revision-stale", "current-fingerprint-stale", "plan-tampered", "wrong-project-scope", "unknown-decision", "duplicate-decision", "conflicting-decision"], "expected": { "typedReject": true, "allOrNone": true, "writes": 0 } },
+    { "id": "warning-and-blocking-gates", "covers": ["PLAN-02", "PLAN-06"], "negativeClasses": ["unresolved-blocking", "warning-not-acknowledged", "illegal-operation", "alias-collision-after-exclusion"], "expected": { "typedReject": true, "revalidateAfterDecision": true, "noPartialResult": true } },
+    { "id": "safe-error-and-no-persistence-claim", "covers": ["PLAN-07", "PLAN-08"], "expected": { "typedSafeError": true, "errorEcho": false, "pureSnapshotOnly": true, "databaseTransactionClaim": false } }
+  ]
+}

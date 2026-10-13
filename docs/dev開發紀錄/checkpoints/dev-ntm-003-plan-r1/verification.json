@@ -1,0 +1,70 @@
+{
+  "ticket": "DEV_NTM_003",
+  "candidate": "PLAN-R1",
+  "runs": {
+    "serial": {
+      "command": "node --test --test-concurrency=1 tests/dev-ntm-003-change-plan.test.mjs tests/dev-ntm-001-core.test.mjs tests/qa-ntm-001-core.test.mjs tests/dev-ntm-002-candidates.test.mjs tests/qa-ntm-002-formal.test.mjs tests/qa-ntm-002-preparation.test.mjs",
+      "chunk_id": "cc0df8",
+      "wall_time_seconds": 3.1821118999999998,
+      "exit_code": 0,
+      "original_token_count": 2458,
+      "output": "✔ CORE-R1 legacy upcast preserves legacy data and creates only explicit unverified endpoints (9.0292ms)\n✔ CORE-R1 legacy endpoint IDs are deterministic and quantity never creates devices or interfaces (1.6386ms)\n✔ CORE-R1 legacy round trip is lossless for the permitted provisional endpoint shape (2.9149ms)\n✔ CORE-R1 clone is deep and does not share nested trusted-network references (1.1492ms)\n✔ CORE-R1 rejects unknown project versions and unknown keys without echoing input (2.1688ms)\n✔ CORE-R1 validates interface owner, parent cycle, alias collision and link endpoint owner (3.6362ms)\n✔ CORE-R1 validates area cycles and area references (1.0032ms)\n✔ CORE-R1 validates VLAN, canonical CIDR, IP relation and resiliency references (1.5814ms)\n✔ CORE-R1 accepts structurally verified data but exposes no verification/apply authority (1.0881ms)\n✔ CORE-R1 rejects incomplete or forged trust records (1.2777ms)\n✔ CORE-R1 rejects unsafe evidence paths, sensitive values and raw-source keys (2.2773ms)\n✔ CORE-R1 refuses lossful downcast for independent trusted data (4.1854ms)\n✔ CORE-R2 raw legacy strings survive upcast, clone, validation and lossless downcast (2.3703ms)\n✔ CORE-R2 blank legacy ports stay intact without inventing interfaces (0.7486ms)\n✔ CORE-R2 normalized label matching preserves raw Unicode, case and aliases (2.6657ms)\n✔ CORE-R2 canonicalProjectV2 is public, deterministic, idempotent and preserves array order (1.7125ms)\n✔ CORE-R2 canonicalProjectV2 does not verify or change structurally verified records (1.0735ms)\n✔ CORE-R2 canonical rejects invalid schema, references, aliases and evidence without echo (11.1396ms)\n✔ CORE-R2 validation gates remain strict for raw legacy inputs (0.5246ms)\n✔ CORE-R2 canonical key ordering does not block a lossless downcast or allow data loss (2.1393ms)\n✔ GEN-01 deterministic IDs/order, immutable inputs and core-compatible additions (24.032ms)\n✔ GEN-02 exact normalized vendor/model and explicit missing-field fill priority (4.9832ms)\n✔ GEN-02 fuzzy/unknown/partial identity never becomes a trusted template match (3.3087ms)\n✔ GEN-02 multiple reviewed versions require an exact version/fingerprint selection (5.9839ms)\n✔ GEN-02 unversioned/unreviewed/malformed or inconsistent trusted records fail closed (4.1457ms)\n✔ GEN-03 finite manual formats preserve prefix/suffix and generate an explicit preview (2.4845ms)\n✔ GEN-03 quantity limit-1/limit, index edges and minimum are accepted (65.6583ms)\n✔ GEN-03 rejects noninteger/negative/oversized quantities and unsafe index arithmetic (6.6045ms)\n✔ GEN-03 rejects ambiguous formats, arbitrary expressions, regex and placeholder injection (4.3788ms)\n✔ GEN-03 never uses Device.quantity, model text, MAC or observed links as an interface count (2.9072ms)\n✔ GEN-04 all ranks preserve disagreements instead of silent priority overwrite (2.0791ms)\n✔ GEN-04 explicit same-name disagreements and alias collisions are blocking (1.9277ms)\n✔ GEN-04 NFC/case/trim collisions retain safe text in conflict proposals (2.6913ms)\n✔ GEN-04 current verified and unverified values remain untouched and are not auto-filled (3.5522ms)\n✔ GEN-04 template changes/removal report conflicts without rewriting current facts (3.28ms)\n✔ GEN-04 unknown provenance never invents template deletions (1.2673ms)\n✔ GEN-04 parents resolve names/aliases only within the requested device (3.1741ms)\n✔ GEN-04 cyclic and blocked parents cannot leak into safe candidates (3.0519ms)\n✔ GEN-05 every candidate and evidence reference is unverified, not a persisted trust transition (3.4153ms)\n✔ GEN-06 unknown fields, evidence misuse and unsafe strings fail without echo (4.6921ms)\n✔ GEN-06 strict row/template schemas reject metadata and raw payload containers (1.5564ms)\n✔ GEN-06 evidence ID conflicts and global generated ID collisions are not overwritten (2.9209ms)\n✔ GEN-06 resource bounds reject source/row/alias/name and aggregate excess (20.6097ms)\n✔ GEN-06 executable/accessor/cyclic inputs rejected without executing getters (0.8478ms)\n✔ GEN-07 repeated/duplicate rows and repeated generation after insertion are idempotent (2.5191ms)\n✔ GEN-07 IDs are scoped to device and row ordering does not change output (3.2105ms)\n✔ GEN-04 parent disagreements preserve both requested references for review (1.3573ms)\n✔ GEN-06 JSON arrays reject unknown properties instead of silently stripping them (0.5671ms)\n✔ GEN-06 current project accessors are rejected before invoking core validation (0.4887ms)\n✔ GEN-06 bounded source/row/name/alias/template maxima retain safe values (80.0713ms)\n✔ GEN-06 total selected rows limit-1/limit/limit+1 and registry budget (470.3096ms)\n✔ GEN-06 depth/text budgets fail closed and current sensitive IDs never escape (8.7575ms)\n✔ GEN-07 generation from already verified matching interfaces preserves trust and makes no proposals (4.234ms)\n✔ PLAN-01 deterministic prepare, frozen inputs, private evidence and unverified snapshot (30.5519ms)\n✔ PLAN-03 previews, cloned handles and cross-instance handles have no authority (4.95ms)\n✔ PLAN-01 cancel zero change, registry capacity and lifetime (21.8435ms)\n✔ PLAN-03 raw Unicode change is stale and failed apply consumes handle (3.3689ms)\n✔ PLAN-03 scope mismatch and premature apply never return a result (2.8914ms)\n✔ PLAN-02 incomplete/unknown/duplicate/unsupported decisions are correctable (2.0852ms)\n✔ PLAN-05 no action or body actor can grant verification (3.2959ms)\n✔ PLAN-04 verified changed field stays protected even when GEN says otherwise (5.338ms)\n✔ PLAN-04 stale verified fingerprints including legacy schemes are hard blocks (2.5966ms)\n✔ PLAN-06 omitted optional and default aliases never clear; aliases stable union (6.3307ms)\n✔ PLAN-02 warnings require acknowledgement; no-op template removal preserves all (2.728ms)\n✔ PLAN-02 deduped template/existing differences and alternatives cannot double-accept (5.3203ms)\n✔ PLAN-06 parent decisions cannot silently rewrite a child decision (5.0769ms)\n✔ PLAN-06 invalid parent/alias proposals can be explicitly excluded (4.6761ms)\n✔ PLAN-04 legacy rename requires visible coupled alias; links untouched (5.2494ms)\n✔ PLAN-07 changed unverified trust is replaced, retained fields untouched (2.9411ms)\n✔ PLAN-08 unsafe raw input/accessors/unknown operations fail safely without evaluation (2.7687ms)\n✔ PLAN-01 set-like evidence IDs canonicalize, raw values and alternative groups stay lossless (5.4933ms)\n✔ PLAN-03 prepare owns its source/evidence immediately, not after an async digest (3.4059ms)\n✔ PLAN-06 only accepted evidence is merged and conflicting evidence hard-blocks (4.6722ms)\n✔ PLAN-02 GEN severity table is explicit, with unknown codes failing closed (6.4914ms)\n✔ PLAN-06 resolved issue graph clears only after explicit safe decisions (3.1643ms)\n✔ PLAN-02 keep cannot fabricate an absent optional current value (1.7852ms)\n✔ PLAN-04 mixed protected/unverified differences keep their separate warning requirement (3.5785ms)\n✔ PLAN-06 genuine GEN parent/alias conflicts cannot be repaired implicitly (9.7982ms)\n✔ PLAN-07 result validation fails atomically and consumes handle without weakening CORE (3.8276ms)\n✔ PLAN-08 receipt never contains changed values, raw evidence, actor or Project (3.6542ms)\n✔ PLAN-07 cancellation after resolve, failed prepare and duplicate apply are bounded (7.0353ms)\n✔ PLAN-04 legacy coupled alias supports one selected rename alternative, not both (3.6746ms)\n✔ PLAN-06 existing parent edit cycles are blocked in preview, not persisted (3.3865ms)\n✔ PLAN-04 a protected coupled alias cannot be bypassed through a rename (3.3696ms)\n✔ QA_NTM_001 preparation fixtures are synthetic, deterministic, and secret-free (6.7604ms)\n✔ NTM-C01 legacy upcast is deterministic, lossless, and never fabricates or verifies ports (164.5427ms)\n✔ NTM-C02 strict V2 parse rejects versions, IDs, references, owners, aliases, and cycles (8.2045ms)\n✔ NTM-C03 validates VLAN/CIDR/logical/resiliency/trust invariants (5.052ms)\n✔ NTM-C04 clone and canonicalization are pure, deep, deterministic, and do not verify (3.2739ms)\n✔ NTM-C05 downcast succeeds only when lossless and never mutates V2 (5.6981ms)\n✔ NTM-C06 rejects secret/raw/unknown input with safe typed errors and exposes no verify operation (1.7462ms)\n✔ NTM-C07 core source has no product integration imports or persistence side effects (1.0897ms)\n✔ GEN-01/02 explicit priority is deterministic, preserves safe text, and templates only fill missing fields (23.9584ms)\n✔ GEN-02 exact trusted template selection rejects fuzzy and ambiguous matching (4.6275ms)\n✔ GEN-03 manual numbering observes exact finite syntax and all documented boundaries (10.5376ms)\n✔ GEN-04 collisions and parent errors are blocking and retain each source's original request (5.3259ms)\n✔ GEN-05/07 verified existing facts are unchanged and repeated generation is idempotent (4.0436ms)\n✔ GEN-06 strict secret/raw/unknown inputs reject safely with zero mutation or echo (1.5827ms)\n✔ GEN-07 safe additions validate under CORE-R2 and repeated insertion produces no duplicates (3.5733ms)\n✔ QA_NTM_002 preparation covers GEN-01 through GEN-07 without claiming product execution (6.0812ms)\n✔ QA_NTM_002 vectors preserve safe text and separate source from verification (1.0342ms)\n✔ QA_NTM_002 template and manual vectors require exact trust and finite non-eval numbering (1.5386ms)\n✔ QA_NTM_002 conflict vectors prohibit overwrite and protect verified records (2.1763ms)\n✔ QA_NTM_002 secret fixture is synthetic and fixes typed safe zero-side-effect expectations (0.9838ms)\nℹ tests 104\nℹ suites 0\nℹ pass 104\nℹ fail 0\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 2380.5189\n"
+    },
+    "typescript": {
+      "command": "node node_modules/typescript/bin/tsc --noEmit --pretty false --incremental false",
+      "chunk_id": "1ddea1",
+      "wall_time_seconds": 5.2710089,
+      "exit_code": 0,
+      "original_token_count": 0,
+      "output": ""
+    },
+    "scopedLint": {
+      "command": "node node_modules/eslint/bin/eslint.js app/lib/trusted-network-change-plan.ts tests/dev-ntm-003-change-plan.test.mjs --max-warnings 0",
+      "chunk_id": "033283",
+      "wall_time_seconds": 7.7173662,
+      "exit_code": 0,
+      "original_token_count": 0,
+      "output": ""
+    },
+    "diffCheck": {
+      "chunk_id": "a621fa",
+      "wall_time_seconds": 0.837163,
+      "exit_code": 0,
+      "original_token_count": 226,
+      "output": "warning: in the working copy of 'docs/engineerticket/ARCHITECTURE-MAP.md', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'docs/engineerticket/DECISION-LOG.md', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'docs/engineerticket/RULES.md', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'docs/engineerticket/TICKET-REGISTER.md', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'docs/engineerticket/TICKET-TEMPLATE.md', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'docs/engineerticket/active/QA_REL_001.md', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'tests/qa-pil-002-browser-flow.mjs', LF will be replaced by CRLF the next time Git touches it\n"
+    },
+    "newProductWhitespace": {
+      "chunk_id": "66e502",
+      "wall_time_seconds": 0.7527158,
+      "exit_code": 1,
+      "original_token_count": 33,
+      "output": "warning: in the working copy of 'app/lib/trusted-network-change-plan.ts', LF will be replaced by CRLF the next time Git touches it\n"
+    },
+    "newTestWhitespace": {
+      "chunk_id": "03d687",
+      "wall_time_seconds": 0.7307108,
+      "exit_code": 1,
+      "original_token_count": 33,
+      "output": "warning: in the working copy of 'tests/dev-ntm-003-change-plan.test.mjs', LF will be replaced by CRLF the next time Git touches it\n"
+    },
+    "index": {
+      "chunk_id": "0929fa",
+      "wall_time_seconds": 0.7277747,
+      "exit_code": 0,
+      "original_token_count": 0,
+      "output": ""
+    }
+  },
+  "history": [
+    "Initial test module load failed as expected before product file existed.",
+    "First product run: 16/17 PASS; coupled legacy alias was incorrectly checked against old name. Corrected joint proposal validation.",
+    "Expanded final DEV behavior suite: 31/31 PASS; preserved failure history, no QA assertion edits."
+  ],
+  "notRun": [
+    "Independent QA_NTM_003",
+    "authenticated actor verification",
+    "UI/Browser",
+    "DB/persistence",
+    "build/full repository suite (outside named scope)"
+  ]
+}

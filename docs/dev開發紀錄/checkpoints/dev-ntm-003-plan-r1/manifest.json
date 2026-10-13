@@ -1,0 +1,251 @@
+{
+  "schemaVersion": 1,
+  "ticket": "DEV_NTM_003",
+  "candidate": "PLAN-R1",
+  "contractRevision": "NTM-PLAN-R1.1",
+  "status": "READY_FOR_QA",
+  "branch": "codex/dev-rel-001-checkpoint",
+  "baseCommit": "a9abe637f0ad419aced6d31faf30a127ce5b81e6",
+  "worktree": "C:/Users/DUS/Desktop/project/nettopo-studio/.local/worktrees/dev-rel-001-checkpoint",
+  "capturedAt": "2026-10-09T16:32:40Z",
+  "authority": "PM conditional scope 2026-10-10 and DSG R1.1 five-point/PLAN-01-08 gate MATCH; no Git or durable integration",
+  "contracts": [
+    {
+      "path": "docs/engineerticket/contracts/TRUSTED-NETWORK-TOPOLOGY-V1-SECTION4-ADDENDUM.md",
+      "bytes": 26970,
+      "rawSha256": "e612bc77309a64b7b12326a5e11e82b2197462dc42fa1cd4403d6dc141ab5255",
+      "normalizedSha256": "e612bc77309a64b7b12326a5e11e82b2197462dc42fa1cd4403d6dc141ab5255"
+    },
+    {
+      "path": "docs/engineerticket/contracts/TRUSTED-NETWORK-TOPOLOGY-V1.md",
+      "bytes": 40642,
+      "rawSha256": "0bb2145fb2b1844d576449e55c6f3e040ce9ae14175891c21716d963334dbf63",
+      "normalizedSha256": "0bb2145fb2b1844d576449e55c6f3e040ce9ae14175891c21716d963334dbf63"
+    }
+  ],
+  "files": [
+    {
+      "path": "app/lib/trusted-network-change-plan.ts",
+      "bytes": 35694,
+      "rawSha256": "e403bd8be3a448870158353e2fa0cbb30e90af59c79ed85fd385b2a73933d6fb",
+      "normalizedSha256": "e403bd8be3a448870158353e2fa0cbb30e90af59c79ed85fd385b2a73933d6fb"
+    },
+    {
+      "path": "tests/dev-ntm-003-change-plan.test.mjs",
+      "bytes": 31512,
+      "rawSha256": "fa50fea0600ddf90b4ee40bcb3f3354daf47333100f344107cf224ee2f1290f7",
+      "normalizedSha256": "fa50fea0600ddf90b4ee40bcb3f3354daf47333100f344107cf224ee2f1290f7"
+    }
+  ],
+  "dependencies": [
+    {
+      "path": "app/lib/trusted-network-interface-candidates.ts",
+      "expectedSha256": "d53c2f462f59d0a87c7588c6e4240b37885be1bc5000e73a77588a5f93357701",
+      "actualSha256": "d53c2f462f59d0a87c7588c6e4240b37885be1bc5000e73a77588a5f93357701",
+      "matches": true
+    },
+    {
+      "path": "tests/dev-ntm-002-candidates.test.mjs",
+      "expectedSha256": "137e674aa2628be47df7b1982633a8622de3a5871748005bb5f977a660d4cbbf",
+      "actualSha256": "137e674aa2628be47df7b1982633a8622de3a5871748005bb5f977a660d4cbbf",
+      "matches": true
+    },
+    {
+      "path": "app/lib/trusted-network-model.ts",
+      "expectedSha256": "b0217c37e2ef34a8432a40a21b16305892d73e94c14b18b8ea52cc4cecaa16e7",
+      "actualSha256": "b0217c37e2ef34a8432a40a21b16305892d73e94c14b18b8ea52cc4cecaa16e7",
+      "matches": true
+    },
+    {
+      "path": "app/lib/trusted-network-types.ts",
+      "expectedSha256": "53ef00f4f668f151cc9e0a82c23550343428624399a8cd61d78d11d62e40997b",
+      "actualSha256": "53ef00f4f668f151cc9e0a82c23550343428624399a8cd61d78d11d62e40997b",
+      "matches": true
+    },
+    {
+      "path": "app/lib/topology-validation.ts",
+      "expectedSha256": "f3d727859e6c4aea86d8e8dcd9f50e6cbb24f248b12e2c1165375ecfdcf5df19",
+      "actualSha256": "f3d727859e6c4aea86d8e8dcd9f50e6cbb24f248b12e2c1165375ecfdcf5df19",
+      "matches": true
+    },
+    {
+      "path": "app/lib/topology-types.ts",
+      "expectedSha256": "474beaf4e2a044230e21971459da40ce50aef7df4f8884ebbf0a709a2f3fb1d4",
+      "actualSha256": "474beaf4e2a044230e21971459da40ce50aef7df4f8884ebbf0a709a2f3fb1d4",
+      "matches": true
+    },
+    {
+      "path": "package.json",
+      "expectedSha256": "af65067a2c5dc6ef36749e14a504365c954eab0b7e9ca8fbb566ce715aa8c0a9",
+      "actualSha256": "af65067a2c5dc6ef36749e14a504365c954eab0b7e9ca8fbb566ce715aa8c0a9",
+      "matches": true
+    },
+    {
+      "path": "package-lock.json",
+      "expectedSha256": "4d30e1dff901bcf26e1bd06071f34a12d6cc5bc28ee52d142d877749dccaa8b8",
+      "actualSha256": "4d30e1dff901bcf26e1bd06071f34a12d6cc5bc28ee52d142d877749dccaa8b8",
+      "matches": true
+    },
+    {
+      "path": "tests/dev-ntm-001-core.test.mjs",
+      "expectedSha256": "88e2ec23a5e51c60cae07a977304171c742ce48f24c77cc807159b616459df9a",
+      "actualSha256": "88e2ec23a5e51c60cae07a977304171c742ce48f24c77cc807159b616459df9a",
+      "matches": true
+    },
+    {
+      "path": "tests/qa-ntm-001-core.test.mjs",
+      "expectedSha256": "24cdf38a9a26e72eff12716ac4a087c3d87aee45b2001d9dac262158bce1f772",
+      "actualSha256": "24cdf38a9a26e72eff12716ac4a087c3d87aee45b2001d9dac262158bce1f772",
+      "matches": true
+    },
+    {
+      "path": "tests/fixtures/qa-ntm-001/legacy-project.json",
+      "expectedSha256": "f3e65292e489ef5472458cb7728c687ba086fa4bb4792265b0860e93c4d163b9",
+      "actualSha256": "f3e65292e489ef5472458cb7728c687ba086fa4bb4792265b0860e93c4d163b9",
+      "matches": true
+    },
+    {
+      "path": "tests/fixtures/qa-ntm-001/valid-project-v2.json",
+      "expectedSha256": "7a10bafef80ec3fb15cd722b117a4657994e37d3bc5abba7bc325355d0ce0ec7",
+      "actualSha256": "7a10bafef80ec3fb15cd722b117a4657994e37d3bc5abba7bc325355d0ce0ec7",
+      "matches": true
+    },
+    {
+      "path": "docs/dev開發紀錄/checkpoints/dev-ntm-001-core-r2/manifest.json",
+      "expectedSha256": "1e04689869d0e6581676113996525ba3368ed32f3e9969dee88584c35a829693",
+      "actualSha256": "1e04689869d0e6581676113996525ba3368ed32f3e9969dee88584c35a829693",
+      "matches": true
+    }
+  ],
+  "previousManifests": [
+    {
+      "path": "docs/dev開發紀錄/checkpoints/dev-ntm-001-core-r2/manifest.json",
+      "bytes": 6425,
+      "rawSha256": "1e04689869d0e6581676113996525ba3368ed32f3e9969dee88584c35a829693",
+      "normalizedSha256": "1e04689869d0e6581676113996525ba3368ed32f3e9969dee88584c35a829693"
+    },
+    {
+      "path": "docs/dev開發紀錄/checkpoints/dev-ntm-002-gen-r1/manifest.json",
+      "bytes": 44613,
+      "rawSha256": "b2ada6bd6e47c556cf12aee4d028d13e77e7a653287fd79048708eef80f7f698",
+      "normalizedSha256": "b2ada6bd6e47c556cf12aee4d028d13e77e7a653287fd79048708eef80f7f698"
+    }
+  ],
+  "toolConfig": [
+    {
+      "path": "tsconfig.json",
+      "bytes": 767,
+      "rawSha256": "3469e601b6856c4b10f89bdbf5679e22001b4ab5b876983b3780f776780ccd64",
+      "normalizedSha256": "e78faf2fdbc7ba3c0ae8bdc7c8af4dd3dd818f389dd133f0714c6280730a8e65"
+    },
+    {
+      "path": "eslint.config.mjs",
+      "bytes": 667,
+      "rawSha256": "0130b6081a3042165f5c0ea00eebc9b0a97d7ef2b58a35acd6373090270d89e1",
+      "normalizedSha256": "f1cec96e01ab4e0e6d6ed0641306adf915504236c347ade8724fa6dd0fbcb4b1"
+    },
+    {
+      "path": "node_modules/zod/package.json",
+      "bytes": 3796,
+      "rawSha256": "c630bd10b52dcf71c112a2bf78dbf2734b9db58d62de663b8d86c2ec2c8cda2e",
+      "normalizedSha256": "c630bd10b52dcf71c112a2bf78dbf2734b9db58d62de663b8d86c2ec2c8cda2e"
+    },
+    {
+      "path": "node_modules/typescript/package.json",
+      "bytes": 3620,
+      "rawSha256": "822ef7ca6452205657b6288b066481ecf508bfbf43455d715cf7d3ec457561e6",
+      "normalizedSha256": "822ef7ca6452205657b6288b066481ecf508bfbf43455d715cf7d3ec457561e6"
+    },
+    {
+      "path": "node_modules/eslint/package.json",
+      "bytes": 7225,
+      "rawSha256": "80a7caf2adf34963e47b32a1e75157de6d6814c3ae5a9d90358ddd9364833fe7",
+      "normalizedSha256": "80a7caf2adf34963e47b32a1e75157de6d6814c3ae5a9d90358ddd9364833fe7"
+    }
+  ],
+  "regressionTools": [
+    {
+      "path": "tests/qa-ntm-002-formal.test.mjs",
+      "sha256": "e19b5667d25e90872ee1f41ff2e2ae09ebb99ef6dc3039a5096ee746172c8940"
+    },
+    {
+      "path": "tests/qa-ntm-002-preparation.test.mjs",
+      "sha256": "9ec88971be2a3b7b87670049f52236bcaabf8156bd82f30b656ae65a762d1367"
+    },
+    {
+      "path": "tests/fixtures/qa-ntm-002/generation-vectors.json",
+      "sha256": "be8efff781ab758a7401ae458378aba923393cd5edd7b325ceec6a46a54361f1"
+    },
+    {
+      "path": "tests/fixtures/qa-ntm-002/secret-rejection.json",
+      "sha256": "afcf87133049a112e31e1fdbf80fbab4921fb90dd9cd36d7b7782145a11bd873"
+    }
+  ],
+  "runtime": {
+    "node": "v24.18.0",
+    "typescript": "5.9.3",
+    "zod": "4.4.3",
+    "eslint": "9.39.4"
+  },
+  "verification": {
+    "targeted": "31/31 PASS",
+    "coreAndGenRegression": "73/73 PASS, DEV rerun of existing tests, not independent PLAN QA",
+    "serialBatch": "104/104 PASS; 0 FAIL; 0 SKIP",
+    "typescript": "PASS",
+    "scopedEslint": "PASS; 0 warnings",
+    "trackedDiffCheck": "PASS; CRLF warnings only",
+    "newFileDiffCheck": "git no-index --check exit 1 for new-file differences; CRLF warning only, no whitespace diagnostic",
+    "evidence": "verification.json",
+    "independentPlanQA": "NOT RUN"
+  },
+  "boundaries": {
+    "productWriterStopped": true,
+    "registry": "same-instance object identity, max 32 live entries",
+    "persistence": "not-performed",
+    "actorInterface": false,
+    "protectedAndVerifyAcceptance": "always denied",
+    "coreGenModified": false,
+    "qaAssertionsModifiedByDev": false,
+    "uiStorageApiDbCsvIntegrated": false,
+    "envLoaded": false,
+    "dependenciesInstalled": false,
+    "browserDbDockerLiveStarted": false,
+    "gitStagedCommittedPushed": false,
+    "betaModified": false
+  },
+  "ownershipProof": {
+    "baselinePaths": 164,
+    "existingProductAndDependenciesUnchanged": true,
+    "qaOwnedConcurrentChanges": [
+      {
+        "path": "tests/qa-ntm-003-preparation.test.mjs",
+        "before": "87881de9086c56975d7045cfb79d9b6c7ecddd89dcd5ea01a3bba59ac125746d",
+        "after": "d218fe30cd05dadf1b80e08de2c91d5d73d42bced833b17da8a312b200414650"
+      }
+    ],
+    "addedByDev": [
+      "app/lib/trusted-network-change-plan.ts",
+      "tests/dev-ntm-003-change-plan.test.mjs"
+    ],
+    "addedByQa": [
+      {
+        "path": "tests/fixtures/qa-ntm-003/contract-alignment.json",
+        "sha256": "a82f13dc44a7711f4f0dae072d01b80055beaf49c65521bc177e8e60702f9758"
+      },
+      {
+        "path": "tests/fixtures/qa-ntm-003/r1-1-contract-vectors.json",
+        "sha256": "4a3491f64c37ae1e385cbc716b943debf34e4ae235f4e0f4d825064666fa9c72"
+      }
+    ],
+    "indexEmpty": true,
+    "evidence": "ownership.json"
+  },
+  "limitations": [
+    "Snapshot-only module; not wired to any product UI or durable write path.",
+    "Actor-backed verification, persistence transactions, Browser/DB/build/full suite NOT RUN (out of named pure scope).",
+    "GEN input must be bounded structured safe data, not a raw configuration sanitizer.",
+    "Legacy or stale verified fingerprints conservatively hard-block; no automatic trust repair.",
+    "Working candidate is not HEAD, committed, deployed, or independently QA_PASSED."
+  ],
+  "nextOwner": "QA_NTM_003 after explicit dispatch authorization and independent hash lock; PRE-COMMIT stop"
+}

@@ -1,0 +1,87 @@
+{
+  "authority": "NTM-PLAN-R1.1",
+  "addendumSha256": "e612bc77309a64b7b12326a5e11e82b2197462dc42fa1cd4403d6dc141ab5255",
+  "parentSha256": "0bb2145fb2b1844d576449e55c6f3e040ce9ae14175891c21716d963334dbf63",
+  "contractStatus": "FIXED_FOR_DEV_IMPLEMENTATION",
+  "formalResult": "NOT_RUN",
+  "vectors": [
+    {
+      "id": "same-instance-private-plan-lifecycle",
+      "requiredTruth": {
+        "sameInstanceObjectIdentityRequired": true,
+        "publicPreviewIsExecutable": false,
+        "cloneRejected": "TRUSTED_PLAN_HANDLE_INVALID",
+        "jsonRoundTripRejected": "TRUSTED_PLAN_HANDLE_INVALID",
+        "crossInstanceRejected": "TRUSTED_PLAN_HANDLE_INVALID",
+        "cancelConsumesHandle": true,
+        "privateEvidenceClosure": true,
+        "maximumLiveEntries": 32
+      }
+    },
+    {
+      "id": "raw-nfc-nfd-change-is-stale",
+      "currentRaw": "Café",
+      "changedRaw": "Café",
+      "requiredTruth": {
+        "unicodeNormalizedEqual": true,
+        "rawBytesEqual": false,
+        "staleError": "TRUSTED_PLAN_STALE",
+        "rewriteRawText": false
+      }
+    },
+    {
+      "id": "field-presence-never-implies-clear",
+      "requiredTruth": {
+        "aliasesDefaultEmptyPreservesCurrent": true,
+        "absentOptionalPreservesCurrent": true,
+        "nonEmptyAliasesUseStableUnion": true,
+        "ambiguousClearError": "TRUSTED_FIELD_INTENT_AMBIGUOUS"
+      }
+    },
+    {
+      "id": "stale-verified-trust-hard-block",
+      "requiredTruth": {
+        "error": "TRUSTED_TRUST_FINGERPRINT_STALE",
+        "severity": "blocking",
+        "disposition": "hard-block",
+        "downgradeToUnprotected": false,
+        "receiptLeaksActorOrValue": false
+      }
+    },
+    {
+      "id": "interface-rename-revalidates-legacy-ports",
+      "fixture": {
+        "interfaceName": "Gi0/1",
+        "proposedName": "uplink-primary",
+        "legacyReferences": ["fromPort:Gi0/1", "toPort:Gi0/1"]
+      },
+      "requiredTruth": {
+        "visibleCoupledAliasProposal": "Gi0/1",
+        "renameAndAliasAreMutualDependencies": true,
+        "silentLinkMutation": false,
+        "incompatibleError": "TRUSTED_LEGACY_PORT_INCOMPATIBLE"
+      }
+    },
+    {
+      "id": "gen-severity-and-parent-child-decision",
+      "requiredTruth": {
+        "everyIssueHasSeverityAndDisposition": true,
+        "excludedIssuesRecomputedFromPrivateGraph": true,
+        "parentExcludedChildAcceptedError": "TRUSTED_DECISION_DEPENDENCY_CONFLICT",
+        "parentExcludedRequiresExplicitChildExclude": true,
+        "silentDecisionOverride": false
+      }
+    },
+    {
+      "id": "safe-snapshot-result-boundary",
+      "requiredTruth": {
+        "receiptPersistence": "not-performed",
+        "actorBackedVerification": "NOT_RUN",
+        "durablePersistence": "NOT_RUN",
+        "browser": "NOT_RUN",
+        "database": "NOT_RUN",
+        "safeErrorFields": ["code", "safePath", "proposalId"]
+      }
+    }
+  ]
+}
