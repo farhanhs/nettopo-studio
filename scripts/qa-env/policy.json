@@ -1,0 +1,14 @@
+{
+  "revision": "OPS_ENV_001-R1",
+  "referenceNode": "24.18.0",
+  "postgresVersion": "17.10",
+  "nativePostgresRelativePath": ".local/postgresql-17.10/pgsql/bin/postgres.exe",
+  "fixtureRoot": ".local/qa-auth-001-fixtures",
+  "nativeCases": {
+    "auth-schema": "tests/qa-auth-003-phase-a-real-postgres.test.mjs",
+    "auth-concurrency": "tests/qa-auth-003-phase-b-concurrency-matrix.test.mjs",
+    "auth-sensitive-read": "tests/qa-auth-003-phase-b-sensitive-read-race.test.mjs",
+    "auth-read-orders": "tests/qa-auth-003-phase-b-sensitive-read-orders.test.mjs",
+    "auth-contract-boundaries": "tests/qa-auth-003-contract-boundaries.test.mjs"
+  }
+}

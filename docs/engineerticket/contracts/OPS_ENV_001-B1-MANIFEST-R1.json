@@ -1,0 +1,39 @@
+{
+  "ticket": "OPS_ENV_001",
+  "candidate": "B1-native-lifecycle-R2",
+  "branch": "dustool",
+  "worktree": "C:/Users/DUS/Desktop/project/nettopo-studio",
+  "head": "72783636a8b22f353e8c25fe68b859ad62e3c237",
+  "dirtyBaselinePaths": 295,
+  "capturedAt": "2026-10-12T17:00:33+08:00",
+  "writer": "OPS",
+  "writerStopped": true,
+  "allowedPaths": [
+    "scripts/qa-env/cli.mjs",
+    "scripts/qa-env/native-lifecycle.mjs",
+    "scripts/qa-env/environment.mjs",
+    "scripts/qa-env/policy.json",
+    "tests/ops-env-001-guardrails.test.mjs",
+    "tests/ops-env-001-native-lifecycle.test.mjs"
+  ],
+  "containment": { "root": "C:/Users/DUS/Desktop/project/nettopo-studio", "allListedRealpathsWithinRoot": true, "reparsePointsObserved": false },
+  "doctorObservation": { "scopedFingerprint": "7f8993acbb22fa77e4a7936a3d7c2d21f5d8f6f11883a6f81a892d57ef6d9024", "meaning": "doctor source observation; not a substitute for this manifest" },
+  "files": [
+    { "path": "scripts/qa-env/cli.mjs", "realpath": "C:/Users/DUS/Desktop/project/nettopo-studio/scripts/qa-env/cli.mjs", "bytes": 1312, "sha256": "f6ce4ed34ea9a0f25f57981dd7e14858682807666cbdccc9607f48769b195efd" },
+    { "path": "scripts/qa-env/native-lifecycle.mjs", "realpath": "C:/Users/DUS/Desktop/project/nettopo-studio/scripts/qa-env/native-lifecycle.mjs", "bytes": 6168, "sha256": "8f01b2f56effa90dcaf801a5842f756d54763b47c5aaa22995dfaad9beb57ed2" },
+    { "path": "scripts/qa-env/environment.mjs", "realpath": "C:/Users/DUS/Desktop/project/nettopo-studio/scripts/qa-env/environment.mjs", "bytes": 7496, "sha256": "da5b60b4c264da766f8ce97d4546d492977a975ecf58fa16e055fc1e53199c43" },
+    { "path": "scripts/qa-env/policy.json", "realpath": "C:/Users/DUS/Desktop/project/nettopo-studio/scripts/qa-env/policy.json", "bytes": 651, "sha256": "8d7967bccfa9e6aab40f1a0bf96de223dfd4bffaf8887102b9202e9132ea080b" },
+    { "path": "tests/ops-env-001-guardrails.test.mjs", "realpath": "C:/Users/DUS/Desktop/project/nettopo-studio/tests/ops-env-001-guardrails.test.mjs", "bytes": 2002, "sha256": "3831c2235296645163dde3440a65bb68187dd97141c595cc37a1297b693ed94a" },
+    { "path": "tests/ops-env-001-native-lifecycle.test.mjs", "realpath": "C:/Users/DUS/Desktop/project/nettopo-studio/tests/ops-env-001-native-lifecycle.test.mjs", "bytes": 689, "sha256": "8f49c17cb65a9bb553977dce1ed15e1f8b5ac4da58b1f6369a56f98e8e7d1353" },
+    { "path": "package.json", "realpath": "C:/Users/DUS/Desktop/project/nettopo-studio/package.json", "bytes": 4062, "sha256": "af65067a2c5dc6ef36749e14a504365c954eab0b7e9ca8fbb566ce715aa8c0a9" },
+    { "path": "package-lock.json", "realpath": "C:/Users/DUS/Desktop/project/nettopo-studio/package-lock.json", "bytes": 406445, "sha256": "4d30e1dff901bcf26e1bd06071f34a12d6cc5bc28ee52d142d877749dccaa8b8" },
+    { "path": ".local/postgresql-17.10/pgsql/bin/initdb.exe", "realpath": "C:/Users/DUS/Desktop/project/nettopo-studio/.local/postgresql-17.10/pgsql/bin/initdb.exe", "bytes": 244736, "version": "initdb (PostgreSQL) 17.10", "sha256": "f775e03d6dc6c67f115d7e688c6933573fff7ac7285f6b1f5809354223cfb9e1" },
+    { "path": ".local/postgresql-17.10/pgsql/bin/postgres.exe", "realpath": "C:/Users/DUS/Desktop/project/nettopo-studio/.local/postgresql-17.10/pgsql/bin/postgres.exe", "bytes": 9918464, "version": "postgres (PostgreSQL) 17.10", "sha256": "db14ddb0efc10b72b57dc29dbce5a719e2755dcd0ae54297d0ea4bbfc75f79a0" },
+    { "path": ".local/postgresql-17.10/pgsql/bin/pg_ctl.exe", "realpath": "C:/Users/DUS/Desktop/project/nettopo-studio/.local/postgresql-17.10/pgsql/bin/pg_ctl.exe", "bytes": 132096, "version": "pg_ctl (PostgreSQL) 17.10", "sha256": "9e1c3375f47116eef8d04c1f67cc79f03c7c3cca99172511c4464cb9c6b8116f" }
+  ],
+  "runtimeDependencies": { "node": "v24.18.0", "directDependencyParity": "MATCH", "thirdPartyImportsInOPSRunner": "none", "packageLockModified": false },
+  "preFixtureDirectories": 0,
+  "qaOwnedFilesExcluded": true,
+  "supersedes": { "nativeLifecycleSha256": "37ffedd7075d764952e2d780d601822cfdadb6cd65ec2bf5640fb3ef4bd3c6b7", "reason": "removed unused catch binding in timeout branch; behavior unchanged; ESLint cleanup at 2026-10-12T08:55:38Z" },
+  "manifestSha256": null
+}
