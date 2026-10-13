@@ -1,0 +1,70 @@
+{
+  "ticket": "DEV_NTM_002",
+  "phase": "GEN-R1",
+  "capturedAt": "2026-10-09T10:22:04.2467475Z",
+  "history": [
+    {
+      "phase": "initial",
+      "targeted": "26/26 PASS"
+    },
+    {
+      "phase": "additional guard regression red",
+      "targeted": "3/3 FAIL before correction",
+      "details": [
+        "Retain both parentName alternatives in conflicts.",
+        "Reject extra array properties/sparse arrays.",
+        "Guard current-project getters before core validation."
+      ]
+    },
+    {
+      "phase": "final targeted",
+      "targeted": "33/33 PASS"
+    }
+  ],
+  "finalCommands": [
+    {
+      "command": "node --test --test-concurrency=1 tests/dev-ntm-002-candidates.test.mjs tests/dev-ntm-001-core.test.mjs tests/qa-ntm-001-core.test.mjs",
+      "chunk_id": "c9f84d",
+      "wall_time_seconds": 2.2855295,
+      "exit_code": 0,
+      "original_token_count": 1454,
+      "output": "✔ CORE-R1 legacy upcast preserves legacy data and creates only explicit unverified endpoints (9.6197ms)\n✔ CORE-R1 legacy endpoint IDs are deterministic and quantity never creates devices or interfaces (1.5138ms)\n✔ CORE-R1 legacy round trip is lossless for the permitted provisional endpoint shape (2.3272ms)\n✔ CORE-R1 clone is deep and does not share nested trusted-network references (0.7863ms)\n✔ CORE-R1 rejects unknown project versions and unknown keys without echoing input (1.7886ms)\n✔ CORE-R1 validates interface owner, parent cycle, alias collision and link endpoint owner (3.164ms)\n✔ CORE-R1 validates area cycles and area references (0.8236ms)\n✔ CORE-R1 validates VLAN, canonical CIDR, IP relation and resiliency references (1.5394ms)\n✔ CORE-R1 accepts structurally verified data but exposes no verification/apply authority (1.2277ms)\n✔ CORE-R1 rejects incomplete or forged trust records (1.3321ms)\n✔ CORE-R1 rejects unsafe evidence paths, sensitive values and raw-source keys (2.0545ms)\n✔ CORE-R1 refuses lossful downcast for independent trusted data (3.527ms)\n✔ CORE-R2 raw legacy strings survive upcast, clone, validation and lossless downcast (1.8214ms)\n✔ CORE-R2 blank legacy ports stay intact without inventing interfaces (0.7446ms)\n✔ CORE-R2 normalized label matching preserves raw Unicode, case and aliases (1.8049ms)\n✔ CORE-R2 canonicalProjectV2 is public, deterministic, idempotent and preserves array order (1.4974ms)\n✔ CORE-R2 canonicalProjectV2 does not verify or change structurally verified records (0.9725ms)\n✔ CORE-R2 canonical rejects invalid schema, references, aliases and evidence without echo (10.7953ms)\n✔ CORE-R2 validation gates remain strict for raw legacy inputs (0.5422ms)\n✔ CORE-R2 canonical key ordering does not block a lossless downcast or allow data loss (1.748ms)\n✔ GEN-01 deterministic IDs/order, immutable inputs and core-compatible additions (23.2657ms)\n✔ GEN-02 exact normalized vendor/model and explicit missing-field fill priority (5.1859ms)\n✔ GEN-02 fuzzy/unknown/partial identity never becomes a trusted template match (2.8315ms)\n✔ GEN-02 multiple reviewed versions require an exact version/fingerprint selection (5.7641ms)\n✔ GEN-02 unversioned/unreviewed/malformed or inconsistent trusted records fail closed (3.3008ms)\n✔ GEN-03 finite manual formats preserve prefix/suffix and generate an explicit preview (3.0183ms)\n✔ GEN-03 quantity limit-1/limit, index edges and minimum are accepted (65.4312ms)\n✔ GEN-03 rejects noninteger/negative/oversized quantities and unsafe index arithmetic (7.2516ms)\n✔ GEN-03 rejects ambiguous formats, arbitrary expressions, regex and placeholder injection (4.0283ms)\n✔ GEN-03 never uses Device.quantity, model text, MAC or observed links as an interface count (2.9406ms)\n✔ GEN-04 all ranks preserve disagreements instead of silent priority overwrite (1.9108ms)\n✔ GEN-04 explicit same-name disagreements and alias collisions are blocking (2.5242ms)\n✔ GEN-04 NFC/case/trim collisions retain safe text in conflict proposals (3.3358ms)\n✔ GEN-04 current verified and unverified values remain untouched and are not auto-filled (3.6824ms)\n✔ GEN-04 template changes/removal report conflicts without rewriting current facts (3.4913ms)\n✔ GEN-04 unknown provenance never invents template deletions (1.4849ms)\n✔ GEN-04 parents resolve names/aliases only within the requested device (3.012ms)\n✔ GEN-04 cyclic and blocked parents cannot leak into safe candidates (3.6702ms)\n✔ GEN-05 every candidate and evidence reference is unverified, not a persisted trust transition (2.796ms)\n✔ GEN-06 unknown fields, evidence misuse and unsafe strings fail without echo (4.265ms)\n✔ GEN-06 strict row/template schemas reject metadata and raw payload containers (1.288ms)\n✔ GEN-06 evidence ID conflicts and global generated ID collisions are not overwritten (3.0358ms)\n✔ GEN-06 resource bounds reject source/row/alias/name and aggregate excess (22.876ms)\n✔ GEN-06 executable/accessor/cyclic inputs rejected without executing getters (0.9415ms)\n✔ GEN-07 repeated/duplicate rows and repeated generation after insertion are idempotent (2.087ms)\n✔ GEN-07 IDs are scoped to device and row ordering does not change output (2.5107ms)\n✔ GEN-04 parent disagreements preserve both requested references for review (1.2323ms)\n✔ GEN-06 JSON arrays reject unknown properties instead of silently stripping them (0.6566ms)\n✔ GEN-06 current project accessors are rejected before invoking core validation (0.4119ms)\n✔ GEN-06 bounded source/row/name/alias/template maxima retain safe values (80.3922ms)\n✔ GEN-06 total selected rows limit-1/limit/limit+1 and registry budget (457.7518ms)\n✔ GEN-06 depth/text budgets fail closed and current sensitive IDs never escape (7.5123ms)\n✔ GEN-07 generation from already verified matching interfaces preserves trust and makes no proposals (3.3211ms)\n✔ QA_NTM_001 preparation fixtures are synthetic, deterministic, and secret-free (5.7437ms)\n✔ NTM-C01 legacy upcast is deterministic, lossless, and never fabricates or verifies ports (150.6808ms)\n✔ NTM-C02 strict V2 parse rejects versions, IDs, references, owners, aliases, and cycles (7.751ms)\n✔ NTM-C03 validates VLAN/CIDR/logical/resiliency/trust invariants (4.8109ms)\n✔ NTM-C04 clone and canonicalization are pure, deep, deterministic, and do not verify (3.9757ms)\n✔ NTM-C05 downcast succeeds only when lossless and never mutates V2 (5.3869ms)\n✔ NTM-C06 rejects secret/raw/unknown input with safe typed errors and exposes no verify operation (1.7712ms)\n✔ NTM-C07 core source has no product integration imports or persistence side effects (1.444ms)\nℹ tests 61\nℹ suites 0\nℹ pass 61\nℹ fail 0\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 1509.7062\n"
+    },
+    {
+      "command": "node node_modules/typescript/bin/tsc --noEmit --pretty false --incremental false",
+      "chunk_id": "d01da7",
+      "wall_time_seconds": 5.0933072,
+      "exit_code": 0,
+      "original_token_count": 0,
+      "output": ""
+    },
+    {
+      "command": "node node_modules/eslint/bin/eslint.js app/lib/trusted-network-interface-candidates.ts tests/dev-ntm-002-candidates.test.mjs --max-warnings 0",
+      "chunk_id": "e8d244",
+      "wall_time_seconds": 8.2067645,
+      "exit_code": 0,
+      "original_token_count": 0,
+      "output": ""
+    }
+  ],
+  "diffCheck": {
+    "tracked": "exit 0; register; CRLF advisory only",
+    "newFiles": "git diff --no-index --check /dev/null: exit 1 (new content differs); CRLF advisory only; no whitespace errors"
+  },
+  "formalQA": "NOT RUN; QA_NTM_002 next owner",
+  "notRun": [
+    "whole repository Node suite",
+    "build",
+    "full lint",
+    "Browser",
+    "DB",
+    "Docker",
+    "live",
+    "UI/storage integration"
+  ],
+  "cleanup": {
+    "ownedExternalResources": 0,
+    "temporaryResources": 0,
+    "removedResources": 0
+  }
+}

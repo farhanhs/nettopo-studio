@@ -1,0 +1,991 @@
+{
+  "schemaVersion": 1,
+  "ticket": "DEV_NTM_002",
+  "phase": "GEN-R1",
+  "status": "READY_FOR_QA",
+  "branch": "codex/dev-rel-001-checkpoint",
+  "baseCommit": "a9abe637f0ad419aced6d31faf30a127ce5b81e6",
+  "worktree": "C:/Users/DUS/Desktop/project/nettopo-studio/.local/worktrees/dev-rel-001-checkpoint",
+  "capturedAt": "2026-10-09T10:22:04.2467475Z",
+  "authorization": "2026-10-09 PM GEN-R1 named scope; user authorized direct QA handoff",
+  "changeType": "EXTEND",
+  "contract": {
+    "path": "docs/engineerticket/contracts/TRUSTED-NETWORK-TOPOLOGY-V1.md",
+    "rawSha256": "0bb2145fb2b1844d576449e55c6f3e040ce9ae14175891c21716d963334dbf63",
+    "approvedSections": [
+      "2.4",
+      "2.8",
+      "3.1",
+      "3.2",
+      "3.3"
+    ],
+    "apiDetails": "docs/engineerticket/active/DEV_NTM_002.md#dev-start--api-contract--2026-10-09",
+    "wholeContractApproved": false
+  },
+  "hashMode": {
+    "raw": "sha256-bytes",
+    "normalized": "sha256-utf8-lf-normalized"
+  },
+  "files": [
+    {
+      "path": "app/lib/trusted-network-interface-candidates.ts",
+      "bytes": 20783,
+      "rawSha256": "d53c2f462f59d0a87c7588c6e4240b37885be1bc5000e73a77588a5f93357701",
+      "normalizedSha256": "d53c2f462f59d0a87c7588c6e4240b37885be1bc5000e73a77588a5f93357701"
+    },
+    {
+      "path": "tests/dev-ntm-002-candidates.test.mjs",
+      "bytes": 27778,
+      "rawSha256": "137e674aa2628be47df7b1982633a8622de3a5871748005bb5f977a660d4cbbf",
+      "normalizedSha256": "137e674aa2628be47df7b1982633a8622de3a5871748005bb5f977a660d4cbbf"
+    }
+  ],
+  "dependencies": [
+    {
+      "path": "app/lib/trusted-network-model.ts",
+      "bytes": 26026,
+      "rawSha256": "b0217c37e2ef34a8432a40a21b16305892d73e94c14b18b8ea52cc4cecaa16e7",
+      "normalizedSha256": "b0217c37e2ef34a8432a40a21b16305892d73e94c14b18b8ea52cc4cecaa16e7"
+    },
+    {
+      "path": "app/lib/trusted-network-types.ts",
+      "bytes": 3347,
+      "rawSha256": "53ef00f4f668f151cc9e0a82c23550343428624399a8cd61d78d11d62e40997b",
+      "normalizedSha256": "53ef00f4f668f151cc9e0a82c23550343428624399a8cd61d78d11d62e40997b"
+    },
+    {
+      "path": "app/lib/topology-validation.ts",
+      "bytes": 4814,
+      "rawSha256": "f3d727859e6c4aea86d8e8dcd9f50e6cbb24f248b12e2c1165375ecfdcf5df19",
+      "normalizedSha256": "f3d727859e6c4aea86d8e8dcd9f50e6cbb24f248b12e2c1165375ecfdcf5df19"
+    },
+    {
+      "path": "app/lib/topology-types.ts",
+      "bytes": 4051,
+      "rawSha256": "474beaf4e2a044230e21971459da40ce50aef7df4f8884ebbf0a709a2f3fb1d4",
+      "normalizedSha256": "474beaf4e2a044230e21971459da40ce50aef7df4f8884ebbf0a709a2f3fb1d4"
+    },
+    {
+      "path": "package.json",
+      "bytes": 4062,
+      "rawSha256": "af65067a2c5dc6ef36749e14a504365c954eab0b7e9ca8fbb566ce715aa8c0a9",
+      "normalizedSha256": "f9e221a3c32e28ea5d118c3fd51a6e9a942905451645be540e6b9f29f2822861"
+    },
+    {
+      "path": "package-lock.json",
+      "bytes": 406445,
+      "rawSha256": "4d30e1dff901bcf26e1bd06071f34a12d6cc5bc28ee52d142d877749dccaa8b8",
+      "normalizedSha256": "7dc0769e5c6e5b0165417b17a7426805e1859710112c5f5510dccfec6a675ffb"
+    }
+  ],
+  "regressionTools": [
+    {
+      "path": "tests/dev-ntm-001-core.test.mjs",
+      "bytes": 17355,
+      "rawSha256": "88e2ec23a5e51c60cae07a977304171c742ce48f24c77cc807159b616459df9a",
+      "normalizedSha256": "88e2ec23a5e51c60cae07a977304171c742ce48f24c77cc807159b616459df9a"
+    },
+    {
+      "path": "tests/qa-ntm-001-core.test.mjs",
+      "bytes": 8906,
+      "rawSha256": "24cdf38a9a26e72eff12716ac4a087c3d87aee45b2001d9dac262158bce1f772",
+      "normalizedSha256": "24cdf38a9a26e72eff12716ac4a087c3d87aee45b2001d9dac262158bce1f772"
+    },
+    {
+      "path": "tests/fixtures/qa-ntm-001/legacy-project.json",
+      "bytes": 741,
+      "rawSha256": "f3e65292e489ef5472458cb7728c687ba086fa4bb4792265b0860e93c4d163b9",
+      "normalizedSha256": "f3e65292e489ef5472458cb7728c687ba086fa4bb4792265b0860e93c4d163b9"
+    },
+    {
+      "path": "tests/fixtures/qa-ntm-001/valid-project-v2.json",
+      "bytes": 2988,
+      "rawSha256": "7a10bafef80ec3fb15cd722b117a4657994e37d3bc5abba7bc325355d0ce0ec7",
+      "normalizedSha256": "7a10bafef80ec3fb15cd722b117a4657994e37d3bc5abba7bc325355d0ce0ec7"
+    }
+  ],
+  "previousCoreManifest": {
+    "path": "docs/dev開發紀錄/checkpoints/dev-ntm-001-core-r2/manifest.json",
+    "bytes": 6425,
+    "rawSha256": "1e04689869d0e6581676113996525ba3368ed32f3e9969dee88584c35a829693",
+    "normalizedSha256": "1e04689869d0e6581676113996525ba3368ed32f3e9969dee88584c35a829693"
+  },
+  "runtime": {
+    "typescript": "5.9.3",
+    "zod": "4.4.3",
+    "eslint": "9.39.4",
+    "node": "v24.18.0"
+  },
+  "toolConfig": [
+    {
+      "path": "tsconfig.json",
+      "rawSha256": "3469e601b6856c4b10f89bdbf5679e22001b4ab5b876983b3780f776780ccd64"
+    },
+    {
+      "path": "eslint.config.mjs",
+      "rawSha256": "0130b6081a3042165f5c0ea00eebc9b0a97d7ef2b58a35acd6373090270d89e1"
+    },
+    {
+      "path": "node_modules/zod/package.json",
+      "rawSha256": "c630bd10b52dcf71c112a2bf78dbf2734b9db58d62de663b8d86c2ec2c8cda2e"
+    },
+    {
+      "path": "node_modules/typescript/package.json",
+      "rawSha256": "822ef7ca6452205657b6288b066481ecf508bfbf43455d715cf7d3ec457561e6"
+    },
+    {
+      "path": "node_modules/eslint/package.json",
+      "rawSha256": "80a7caf2adf34963e47b32a1e75157de6d6814c3ae5a9d90358ddd9364833fe7"
+    }
+  ],
+  "verification": {
+    "targeted": "33/33 PASS",
+    "coreDevRegression": "20/20 PASS",
+    "existingCoreQAAsDevRegression": "8/8 PASS; supplementary DEV execution, not independent GEN QA",
+    "serialTotal": "61/61 PASS / 0 FAIL / 0 SKIP",
+    "typescript": "PASS",
+    "scopedEslint": "PASS / 0 warnings",
+    "evidence": "verification.json",
+    "independentGENQA": "NOT RUN"
+  },
+  "ownershipProof": {
+    "observedExistingPaths": 135,
+    "changedExistingPaths": [],
+    "addedPaths": [
+      "app/lib/trusted-network-interface-candidates.ts",
+      "tests/dev-ntm-002-candidates.test.mjs"
+    ],
+    "indexEmpty": true,
+    "protectedFiles": [
+      {
+        "path": "app/chatgpt-auth.ts",
+        "beforeSha256": "1407f614cc83d7049fdb08cd713d2516866ba58e24e820f7f4fd9d718b9d3007",
+        "afterSha256": "1407f614cc83d7049fdb08cd713d2516866ba58e24e820f7f4fd9d718b9d3007",
+        "unchanged": true
+      },
+      {
+        "path": "app/globals.css",
+        "beforeSha256": "1b94242fa83a0744cd75538f9de5ab5c8a2e69a0b92adf3a0e9c6533da7aa5b6",
+        "afterSha256": "1b94242fa83a0744cd75538f9de5ab5c8a2e69a0b92adf3a0e9c6533da7aa5b6",
+        "unchanged": true
+      },
+      {
+        "path": "app/layout.tsx",
+        "beforeSha256": "d6c7b08fd059705f3a5ef58d5209f01745419036b91d311efbadd8b3d5404d8e",
+        "afterSha256": "d6c7b08fd059705f3a5ef58d5209f01745419036b91d311efbadd8b3d5404d8e",
+        "unchanged": true
+      },
+      {
+        "path": "app/page.tsx",
+        "beforeSha256": "bfdbdc45a3295dcc2adbdfbc241c4ca83f83d32e99f12e2e8a3cb9d71382f5d1",
+        "afterSha256": "bfdbdc45a3295dcc2adbdfbc241c4ca83f83d32e99f12e2e8a3cb9d71382f5d1",
+        "unchanged": true
+      },
+      {
+        "path": "app/api/audit-logs/route.ts",
+        "beforeSha256": "b2e5a04e0c1032457c3fd7a899fe6bedacd4f4afb8f898edbc5a1fd8a4fa4174",
+        "afterSha256": "b2e5a04e0c1032457c3fd7a899fe6bedacd4f4afb8f898edbc5a1fd8a4fa4174",
+        "unchanged": true
+      },
+      {
+        "path": "app/api/credentials/route.ts",
+        "beforeSha256": "31c78d157a6422721bc526447e22e300233507fbb823a51ec118b2c05563a365",
+        "afterSha256": "31c78d157a6422721bc526447e22e300233507fbb823a51ec118b2c05563a365",
+        "unchanged": true
+      },
+      {
+        "path": "app/api/dev/identities/route.ts",
+        "beforeSha256": "84d2e3d62b889f6791dd094601a9fcd5c45cb0dd9827a2486c162a63e2f97bd4",
+        "afterSha256": "84d2e3d62b889f6791dd094601a9fcd5c45cb0dd9827a2486c162a63e2f97bd4",
+        "unchanged": true
+      },
+      {
+        "path": "app/api/dev/session/route.ts",
+        "beforeSha256": "812938726729dccce2b26ed194e6959adc9f7547cc8a6eca6280bf7972ae3954",
+        "afterSha256": "812938726729dccce2b26ed194e6959adc9f7547cc8a6eca6280bf7972ae3954",
+        "unchanged": true
+      },
+      {
+        "path": "app/api/health/schema/route.ts",
+        "beforeSha256": "0a5685d5f06c2e04eb74aba29c2d8d71a00c85cf828ea5d5369f6b4009efe38f",
+        "afterSha256": "0a5685d5f06c2e04eb74aba29c2d8d71a00c85cf828ea5d5369f6b4009efe38f",
+        "unchanged": true
+      },
+      {
+        "path": "app/api/pilot/session/route.ts",
+        "beforeSha256": "78c7f8de3852d242c873becceb8813c8ea5b844fddc1d825814ff3e3ebddd0ac",
+        "afterSha256": "78c7f8de3852d242c873becceb8813c8ea5b844fddc1d825814ff3e3ebddd0ac",
+        "unchanged": true
+      },
+      {
+        "path": "app/api/runtime-capabilities/route.ts",
+        "beforeSha256": "e7e34729a822c0ec754404b233896e52be8f099833396fd86b2fe162dee8782a",
+        "afterSha256": "e7e34729a822c0ec754404b233896e52be8f099833396fd86b2fe162dee8782a",
+        "unchanged": true
+      },
+      {
+        "path": "app/api/session/route.ts",
+        "beforeSha256": "5a22e38bc292495e038e43afeafb06727135b0a668793c508dcaffff11497607",
+        "afterSha256": "5a22e38bc292495e038e43afeafb06727135b0a668793c508dcaffff11497607",
+        "unchanged": true
+      },
+      {
+        "path": "app/api/topology/route.ts",
+        "beforeSha256": "0cdfc2569957896eca286668736d99727dd3cd4c32ea91af600b816ec2944295",
+        "afterSha256": "0cdfc2569957896eca286668736d99727dd3cd4c32ea91af600b816ec2944295",
+        "unchanged": true
+      },
+      {
+        "path": "app/components/import/FileDropZone.tsx",
+        "beforeSha256": "0ecbd0e09d2922e176d5a0f8f54642214cd5a4feebc5ded4aa363d0de169f221",
+        "afterSha256": "0ecbd0e09d2922e176d5a0f8f54642214cd5a4feebc5ded4aa363d0de169f221",
+        "unchanged": true
+      },
+      {
+        "path": "app/components/import/ImportIssueList.tsx",
+        "beforeSha256": "063bd7002e984af041475886b26895482d5d5e637bb4d3cbfad009bed6e0d487",
+        "afterSha256": "063bd7002e984af041475886b26895482d5d5e637bb4d3cbfad009bed6e0d487",
+        "unchanged": true
+      },
+      {
+        "path": "app/components/import/ImportPreviewModal.tsx",
+        "beforeSha256": "081f789051f11b36bd6406e772981cda7f6e9b0bd5b4a3a8a0664a1371523b05",
+        "afterSha256": "081f789051f11b36bd6406e772981cda7f6e9b0bd5b4a3a8a0664a1371523b05",
+        "unchanged": true
+      },
+      {
+        "path": "app/components/import/ImportSummary.tsx",
+        "beforeSha256": "b4299d4db94c33cf83d7940723bd5b709ba951a56b40e4efd789ab67d365aef9",
+        "afterSha256": "b4299d4db94c33cf83d7940723bd5b709ba951a56b40e4efd789ab67d365aef9",
+        "unchanged": true
+      },
+      {
+        "path": "app/components/import/MaskedCredentialPreview.tsx",
+        "beforeSha256": "d3d2d732d370be961f14e0b63099072fd0e20669f2f9ae410c6d88780bbe5194",
+        "afterSha256": "d3d2d732d370be961f14e0b63099072fd0e20669f2f9ae410c6d88780bbe5194",
+        "unchanged": true
+      },
+      {
+        "path": "app/components/import/MissingInfoChecklist.tsx",
+        "beforeSha256": "6f3cb385608783ee5880f1060c2f6c07581dbf30a13bcbf0994b7762c336330f",
+        "afterSha256": "6f3cb385608783ee5880f1060c2f6c07581dbf30a13bcbf0994b7762c336330f",
+        "unchanged": true
+      },
+      {
+        "path": "app/lib/credential-masking.ts",
+        "beforeSha256": "685f6222ddded6188d8315c6aee339857c7ab482769abe82c79d1b7752b89b02",
+        "afterSha256": "685f6222ddded6188d8315c6aee339857c7ab482769abe82c79d1b7752b89b02",
+        "unchanged": true
+      },
+      {
+        "path": "app/lib/demo-topologies.ts",
+        "beforeSha256": "79885027b81d407a5738a1c465656e85e26b82ea6f90ce432dddc98d99ca1664",
+        "afterSha256": "79885027b81d407a5738a1c465656e85e26b82ea6f90ce432dddc98d99ca1664",
+        "unchanged": true
+      },
+      {
+        "path": "app/lib/login-auth.ts",
+        "beforeSha256": "ac8fbceec8367bb6f466d69b9bf7c859174c4c9a00de8ee3c96ca18db5b81d1d",
+        "afterSha256": "ac8fbceec8367bb6f466d69b9bf7c859174c4c9a00de8ee3c96ca18db5b81d1d",
+        "unchanged": true
+      },
+      {
+        "path": "app/lib/topology-db.ts",
+        "beforeSha256": "08c17bcac2c72a8aad14f76268ca1b2f8dcd0edd07522574e514a4a5e7b43efb",
+        "afterSha256": "08c17bcac2c72a8aad14f76268ca1b2f8dcd0edd07522574e514a4a5e7b43efb",
+        "unchanged": true
+      },
+      {
+        "path": "app/lib/topology-document-parser.ts",
+        "beforeSha256": "f657c7804c3812eff694ccb4e75eec069373e2e7219b753a0573df3cb83e8eff",
+        "afterSha256": "f657c7804c3812eff694ccb4e75eec069373e2e7219b753a0573df3cb83e8eff",
+        "unchanged": true
+      },
+      {
+        "path": "app/lib/topology-layout.ts",
+        "beforeSha256": "7f898931072e2ae6ff193060c47715d3f739d1755f187f99bc0c9d36564e4a10",
+        "afterSha256": "7f898931072e2ae6ff193060c47715d3f739d1755f187f99bc0c9d36564e4a10",
+        "unchanged": true
+      },
+      {
+        "path": "app/lib/topology-missing-info.ts",
+        "beforeSha256": "1037517f4c1c66f0a7e0e8824966be308f670b309d93e2b87e36706394e53220",
+        "afterSha256": "1037517f4c1c66f0a7e0e8824966be308f670b309d93e2b87e36706394e53220",
+        "unchanged": true
+      },
+      {
+        "path": "app/lib/topology-routing.ts",
+        "beforeSha256": "3b57e6913f28eddec6052e132f70ecce9f78f61c21be19600d1b67cabc7b1bc8",
+        "afterSha256": "3b57e6913f28eddec6052e132f70ecce9f78f61c21be19600d1b67cabc7b1bc8",
+        "unchanged": true
+      },
+      {
+        "path": "app/lib/topology-store.ts",
+        "beforeSha256": "8a5d2b7bca304683ae484e7f5d05165afd2acf64541c4c477a8b133f755a0003",
+        "afterSha256": "8a5d2b7bca304683ae484e7f5d05165afd2acf64541c4c477a8b133f755a0003",
+        "unchanged": true
+      },
+      {
+        "path": "app/lib/topology-transfer.ts",
+        "beforeSha256": "d3e77f1aeda7a6f76e0d70962502f44891c69c819e04d533fab35a59144fb780",
+        "afterSha256": "d3e77f1aeda7a6f76e0d70962502f44891c69c819e04d533fab35a59144fb780",
+        "unchanged": true
+      },
+      {
+        "path": "app/lib/topology-types.ts",
+        "beforeSha256": "474beaf4e2a044230e21971459da40ce50aef7df4f8884ebbf0a709a2f3fb1d4",
+        "afterSha256": "474beaf4e2a044230e21971459da40ce50aef7df4f8884ebbf0a709a2f3fb1d4",
+        "unchanged": true
+      },
+      {
+        "path": "app/lib/topology-validation.ts",
+        "beforeSha256": "f3d727859e6c4aea86d8e8dcd9f50e6cbb24f248b12e2c1165375ecfdcf5df19",
+        "afterSha256": "f3d727859e6c4aea86d8e8dcd9f50e6cbb24f248b12e2c1165375ecfdcf5df19",
+        "unchanged": true
+      },
+      {
+        "path": "app/lib/topology-visibility.ts",
+        "beforeSha256": "be42cde72ee900d32607a18d536b54fe33b37f601f2e802da9e9eff647aa16e8",
+        "afterSha256": "be42cde72ee900d32607a18d536b54fe33b37f601f2e802da9e9eff647aa16e8",
+        "unchanged": true
+      },
+      {
+        "path": "app/lib/trusted-network-model.ts",
+        "beforeSha256": "b0217c37e2ef34a8432a40a21b16305892d73e94c14b18b8ea52cc4cecaa16e7",
+        "afterSha256": "b0217c37e2ef34a8432a40a21b16305892d73e94c14b18b8ea52cc4cecaa16e7",
+        "unchanged": true
+      },
+      {
+        "path": "app/lib/trusted-network-types.ts",
+        "beforeSha256": "53ef00f4f668f151cc9e0a82c23550343428624399a8cd61d78d11d62e40997b",
+        "afterSha256": "53ef00f4f668f151cc9e0a82c23550343428624399a8cd61d78d11d62e40997b",
+        "unchanged": true
+      },
+      {
+        "path": "app/lib/server/http-security.ts",
+        "beforeSha256": "6ab9e604baefc01a7b70b0c2a991c953076a5207d2acaea6b452d8740eec70a4",
+        "afterSha256": "6ab9e604baefc01a7b70b0c2a991c953076a5207d2acaea6b452d8740eec70a4",
+        "unchanged": true
+      },
+      {
+        "path": "app/lib/server/pilot-policy.ts",
+        "beforeSha256": "baf423c749ed5b73424d73526faf1bbe120041752e146055664acf7a99e83643",
+        "afterSha256": "baf423c749ed5b73424d73526faf1bbe120041752e146055664acf7a99e83643",
+        "unchanged": true
+      },
+      {
+        "path": "app/lib/server/pilot-request.ts",
+        "beforeSha256": "50d5ea181a598d8d48ca3070adcec1bd6acdbf01122069bbf0a779a709dd6a87",
+        "afterSha256": "50d5ea181a598d8d48ca3070adcec1bd6acdbf01122069bbf0a779a709dd6a87",
+        "unchanged": true
+      },
+      {
+        "path": "app/lib/server/pilot-session.ts",
+        "beforeSha256": "6317136f092e14d7154b15293bf022ff9aa507d0894b8e050aedef7b047f94c7",
+        "afterSha256": "6317136f092e14d7154b15293bf022ff9aa507d0894b8e050aedef7b047f94c7",
+        "unchanged": true
+      },
+      {
+        "path": "app/lib/server/rbac-policy.ts",
+        "beforeSha256": "47b633113b440b47afde8eb4bda03872ca3fe7ee3fe63efe769638172adfa0e8",
+        "afterSha256": "47b633113b440b47afde8eb4bda03872ca3fe7ee3fe63efe769638172adfa0e8",
+        "unchanged": true
+      },
+      {
+        "path": "app/lib/server/request-identity.ts",
+        "beforeSha256": "9852cab2d0b4a46f43cb9c5c48a2abccd3513ead682238d94a4491ae2dc7935d",
+        "afterSha256": "9852cab2d0b4a46f43cb9c5c48a2abccd3513ead682238d94a4491ae2dc7935d",
+        "unchanged": true
+      },
+      {
+        "path": "app/lib/server/runtime-policy.ts",
+        "beforeSha256": "e596dda891150d001864058bcd3857eb7f992093925c5a8144b6f1e3717c6673",
+        "afterSha256": "e596dda891150d001864058bcd3857eb7f992093925c5a8144b6f1e3717c6673",
+        "unchanged": true
+      },
+      {
+        "path": "db/credential-crypto.ts",
+        "beforeSha256": "3da84fec7f3e7e3a41783c4891a283b5125fa50b2412d06ee4c860ecc866adf3",
+        "afterSha256": "3da84fec7f3e7e3a41783c4891a283b5125fa50b2412d06ee4c860ecc866adf3",
+        "unchanged": true
+      },
+      {
+        "path": "db/data-dictionary.ts",
+        "beforeSha256": "148a805123568ec9751d0b85c90ec4ec668617d80fcbeed30ea47b59094b4501",
+        "afterSha256": "148a805123568ec9751d0b85c90ec4ec668617d80fcbeed30ea47b59094b4501",
+        "unchanged": true
+      },
+      {
+        "path": "db/postgres-connection.ts",
+        "beforeSha256": "8331671583905259f88276e34439ff78f6b6ad640c30da954c271d4d4be5a7fd",
+        "afterSha256": "8331671583905259f88276e34439ff78f6b6ad640c30da954c271d4d4be5a7fd",
+        "unchanged": true
+      },
+      {
+        "path": "db/postgres-migrations.js",
+        "beforeSha256": "f10858e772ef53c60802d9d77a7d74fb6dad50ccba195213fa8a617838e25369",
+        "afterSha256": "f10858e772ef53c60802d9d77a7d74fb6dad50ccba195213fa8a617838e25369",
+        "unchanged": true
+      },
+      {
+        "path": "db/postgres-schema-check.ts",
+        "beforeSha256": "22a894df703dcd7c7266aa7ebbc298f0995a88fa44f4cd847ef19860a4603dd9",
+        "afterSha256": "22a894df703dcd7c7266aa7ebbc298f0995a88fa44f4cd847ef19860a4603dd9",
+        "unchanged": true
+      },
+      {
+        "path": "db/postgres-schema-version.ts",
+        "beforeSha256": "6c142aba7a962e425c39122c2b1faf7c9ebef6cd7e1836db12a9c59a7a633481",
+        "afterSha256": "6c142aba7a962e425c39122c2b1faf7c9ebef6cd7e1836db12a9c59a7a633481",
+        "unchanged": true
+      },
+      {
+        "path": "db/schema.ts",
+        "beforeSha256": "0aecb02d5c157c6891c9688e3d5d41817e46622e708a9a100187b5bcc7e6281d",
+        "afterSha256": "0aecb02d5c157c6891c9688e3d5d41817e46622e708a9a100187b5bcc7e6281d",
+        "unchanged": true
+      },
+      {
+        "path": "db/topology-postgres.ts",
+        "beforeSha256": "528495d31dca9a118c9e32fb6a323cc9a420e607ba38cf4d57e506a22b4d9c80",
+        "afterSha256": "528495d31dca9a118c9e32fb6a323cc9a420e607ba38cf4d57e506a22b4d9c80",
+        "unchanged": true
+      },
+      {
+        "path": "db/topology-scope.ts",
+        "beforeSha256": "cc4e3c53ea493d58a0cc42b7e83c44fafad8a2ecd6e40fafb41ab4d77e5afb55",
+        "afterSha256": "cc4e3c53ea493d58a0cc42b7e83c44fafad8a2ecd6e40fafb41ab4d77e5afb55",
+        "unchanged": true
+      },
+      {
+        "path": "db/virtual-test-data.ts",
+        "beforeSha256": "bea38b371b92f0f6ceba9d489bd2768cfd71911083c15100ccf5d70c84c76392",
+        "afterSha256": "bea38b371b92f0f6ceba9d489bd2768cfd71911083c15100ccf5d70c84c76392",
+        "unchanged": true
+      },
+      {
+        "path": "db/migrations/0001_formal_topology_schema.sql",
+        "beforeSha256": "6bc0195c84be1413d69aa6f048d9fd548236c521d1472c6f9d80fab03df34256",
+        "afterSha256": "6bc0195c84be1413d69aa6f048d9fd548236c521d1472c6f9d80fab03df34256",
+        "unchanged": true
+      },
+      {
+        "path": "db/migrations/0002_dictionary_constraints.sql",
+        "beforeSha256": "a48749253d7cba4dcce4397592ec1ee6945543b82d96d3ffe1747f1369a55742",
+        "afterSha256": "a48749253d7cba4dcce4397592ec1ee6945543b82d96d3ffe1747f1369a55742",
+        "unchanged": true
+      },
+      {
+        "path": "db/migrations/0003_project_device_credentials.sql",
+        "beforeSha256": "ba95378fb6855b8da02614106dae7440c3a00cd0a62e7b9c5e98bfa80b4edefd",
+        "afterSha256": "ba95378fb6855b8da02614106dae7440c3a00cd0a62e7b9c5e98bfa80b4edefd",
+        "unchanged": true
+      },
+      {
+        "path": "db/migrations/0004_topology_quantity_and_collapse.sql",
+        "beforeSha256": "4f2d818af4753841526616bf4f311376c9a5b57dd8f81acc9abe4f5c02204083",
+        "afterSha256": "4f2d818af4753841526616bf4f311376c9a5b57dd8f81acc9abe4f5c02204083",
+        "unchanged": true
+      },
+      {
+        "path": "tests/api-auth-order.test.mjs",
+        "beforeSha256": "e0c9b5faa0da9260b976d9c99eaaa4c45acdb90a33e59bc2f33dcf5db58751a5",
+        "afterSha256": "e0c9b5faa0da9260b976d9c99eaaa4c45acdb90a33e59bc2f33dcf5db58751a5",
+        "unchanged": true
+      },
+      {
+        "path": "tests/audit-api-handler.test.mjs",
+        "beforeSha256": "2bd72e0db9f598297d5c74f0d9b20d9f4b1962e92323d8bcf625c6004e510f88",
+        "afterSha256": "2bd72e0db9f598297d5c74f0d9b20d9f4b1962e92323d8bcf625c6004e510f88",
+        "unchanged": true
+      },
+      {
+        "path": "tests/credential-crypto.test.mjs",
+        "beforeSha256": "1446b44fb974107cdc7c5f208abbf758973c46bdeb5dde8d9f573802432de11e",
+        "afterSha256": "1446b44fb974107cdc7c5f208abbf758973c46bdeb5dde8d9f573802432de11e",
+        "unchanged": true
+      },
+      {
+        "path": "tests/database-dictionary.test.mjs",
+        "beforeSha256": "6a3d167de60d6fea56c876c0193a51fa1ebf1435524b4502bd8989d8d5565bed",
+        "afterSha256": "6a3d167de60d6fea56c876c0193a51fa1ebf1435524b4502bd8989d8d5565bed",
+        "unchanged": true
+      },
+      {
+        "path": "tests/db-seed-boundary.test.mjs",
+        "beforeSha256": "caee54b1ca835b8361e8e1ea92aaed33fb377637666a85cef51f1d24d0abfd20",
+        "afterSha256": "caee54b1ca835b8361e8e1ea92aaed33fb377637666a85cef51f1d24d0abfd20",
+        "unchanged": true
+      },
+      {
+        "path": "tests/demo-gate.test.mjs",
+        "beforeSha256": "48037746c707b157a21f5af7ae957a2b4e34f8c3791937a7a310a38d1a77559e",
+        "afterSha256": "48037746c707b157a21f5af7ae957a2b4e34f8c3791937a7a310a38d1a77559e",
+        "unchanged": true
+      },
+      {
+        "path": "tests/demo-topology-seed.test.mjs",
+        "beforeSha256": "f5f124193bfe61778e7df7657bb47fffceb6058554f76a6a8704b317e1318dc7",
+        "afterSha256": "f5f124193bfe61778e7df7657bb47fffceb6058554f76a6a8704b317e1318dc7",
+        "unchanged": true
+      },
+      {
+        "path": "tests/dev-exp-002-export-contract.test.mjs",
+        "beforeSha256": "880ff2907a28be1f7a040be56f9b20a1883903fb519a8d6167eb0c4255b9729f",
+        "afterSha256": "880ff2907a28be1f7a040be56f9b20a1883903fb519a8d6167eb0c4255b9729f",
+        "unchanged": true
+      },
+      {
+        "path": "tests/dev-imp-002-preview-ownership.test.mjs",
+        "beforeSha256": "4d8152351bb7ca1b815923421350e1eb156aaffe185cd1700adfdffb8ea3e813",
+        "afterSha256": "4d8152351bb7ca1b815923421350e1eb156aaffe185cd1700adfdffb8ea3e813",
+        "unchanged": true
+      },
+      {
+        "path": "tests/dev-imp-002-transfer-contract.test.mjs",
+        "beforeSha256": "02a0f5b00662b7e825e8f2e3d602f97bba10702691ac740ae8b9308dcdeb61f9",
+        "afterSha256": "02a0f5b00662b7e825e8f2e3d602f97bba10702691ac740ae8b9308dcdeb61f9",
+        "unchanged": true
+      },
+      {
+        "path": "tests/dev-ntm-001-core.test.mjs",
+        "beforeSha256": "88e2ec23a5e51c60cae07a977304171c742ce48f24c77cc807159b616459df9a",
+        "afterSha256": "88e2ec23a5e51c60cae07a977304171c742ce48f24c77cc807159b616459df9a",
+        "unchanged": true
+      },
+      {
+        "path": "tests/dev-pil-002-topology-site.test.mjs",
+        "beforeSha256": "12749fde72c5b341050dc38f2af590b50a0535c52b6662904e875431a093b035",
+        "afterSha256": "12749fde72c5b341050dc38f2af590b50a0535c52b6662904e875431a093b035",
+        "unchanged": true
+      },
+      {
+        "path": "tests/dev-pil-003-profile-logout.test.mjs",
+        "beforeSha256": "9aae7abc095854ea278843e2c9a8c22694f5ae58759a392ebcd33bbe81f99480",
+        "afterSha256": "9aae7abc095854ea278843e2c9a8c22694f5ae58759a392ebcd33bbe81f99480",
+        "unchanged": true
+      },
+      {
+        "path": "tests/dev-sec-002-secret-boundary.test.mjs",
+        "beforeSha256": "95609c94258ee77296e15afc05d63f63ab27294c96cf36b45f29462c35d38c9a",
+        "afterSha256": "95609c94258ee77296e15afc05d63f63ab27294c96cf36b45f29462c35d38c9a",
+        "unchanged": true
+      },
+      {
+        "path": "tests/dev-uix-004-session-profile-layout.test.mjs",
+        "beforeSha256": "89ffe4976b6b1906f20c96b96e84270c57f1c9391a6dd1661fc2379a37088d9f",
+        "afterSha256": "89ffe4976b6b1906f20c96b96e84270c57f1c9391a6dd1661fc2379a37088d9f",
+        "unchanged": true
+      },
+      {
+        "path": "tests/dev-uix-005-drag-persistence.test.mjs",
+        "beforeSha256": "bfb47bdc9117be7ec71bce2b86f2a5ae63738d046039ff170fd699a73e750538",
+        "afterSha256": "bfb47bdc9117be7ec71bce2b86f2a5ae63738d046039ff170fd699a73e750538",
+        "unchanged": true
+      },
+      {
+        "path": "tests/dev-uix-006-inspector-remount.test.mjs",
+        "beforeSha256": "deab0fcac5f13accc7ca4a1db2397cd7ecb58ab86406cf3b865a9d934a797c8c",
+        "afterSha256": "deab0fcac5f13accc7ca4a1db2397cd7ecb58ab86406cf3b865a9d934a797c8c",
+        "unchanged": true
+      },
+      {
+        "path": "tests/dev-uix-007-topbar-responsive.test.mjs",
+        "beforeSha256": "c625ee57cbb4fd9145cfc4a18e69bade64a4f3586beb863f6e661e6f7e3fa2f2",
+        "afterSha256": "c625ee57cbb4fd9145cfc4a18e69bade64a4f3586beb863f6e661e6f7e3fa2f2",
+        "unchanged": true
+      },
+      {
+        "path": "tests/dev-uix-008-canvas-resize.test.mjs",
+        "beforeSha256": "fa7b472b1aa390533b873b9616fb081cd325f416d0bba833e71edfdeadd94dad",
+        "afterSha256": "fa7b472b1aa390533b873b9616fb081cd325f416d0bba833e71edfdeadd94dad",
+        "unchanged": true
+      },
+      {
+        "path": "tests/login-auth.test.mjs",
+        "beforeSha256": "e775a31758ed9a360c87c2741c668aeb288d95427caa9e2f5526254cfa7c8035",
+        "afterSha256": "e775a31758ed9a360c87c2741c668aeb288d95427caa9e2f5526254cfa7c8035",
+        "unchanged": true
+      },
+      {
+        "path": "tests/migration-boundary.e2e.test.mjs",
+        "beforeSha256": "44ea3e54148b400434252682d74b2e6a10de1fa3774a5416a91aadf17425683f",
+        "afterSha256": "44ea3e54148b400434252682d74b2e6a10de1fa3774a5416a91aadf17425683f",
+        "unchanged": true
+      },
+      {
+        "path": "tests/migration-boundary.test.mjs",
+        "beforeSha256": "5cb8dac16a568e27f389e2a7049dcb9ae8e5ba414afa7c937e4adee6d0a12e17",
+        "afterSha256": "5cb8dac16a568e27f389e2a7049dcb9ae8e5ba414afa7c937e4adee6d0a12e17",
+        "unchanged": true
+      },
+      {
+        "path": "tests/pilot-checkpoint.test.mjs",
+        "beforeSha256": "7de8daea098729f344b3dee8615ce187d27bb218041afac4bb0e5a67d0ac2672",
+        "afterSha256": "7de8daea098729f344b3dee8615ce187d27bb218041afac4bb0e5a67d0ac2672",
+        "unchanged": true
+      },
+      {
+        "path": "tests/pilot-internal-boundary.test.mjs",
+        "beforeSha256": "db3c57376796947212f6b6235802fa31a01a758890beff754abee0f0b940fb14",
+        "afterSha256": "db3c57376796947212f6b6235802fa31a01a758890beff754abee0f0b940fb14",
+        "unchanged": true
+      },
+      {
+        "path": "tests/pilot-repository-scope.test.mjs",
+        "beforeSha256": "0555ced29e1d7dac6ca1d5bc21a272a4e1347382cbddd4bdb3c99df1b2aac2a6",
+        "afterSha256": "0555ced29e1d7dac6ca1d5bc21a272a4e1347382cbddd4bdb3c99df1b2aac2a6",
+        "unchanged": true
+      },
+      {
+        "path": "tests/pilot-request-boundary.test.mjs",
+        "beforeSha256": "b78b2ab6d22e618cca3380cb8389eeedfca2b9c5f111abfae89a694446fccda2",
+        "afterSha256": "b78b2ab6d22e618cca3380cb8389eeedfca2b9c5f111abfae89a694446fccda2",
+        "unchanged": true
+      },
+      {
+        "path": "tests/pilot-session-handler.test.mjs",
+        "beforeSha256": "24dc08ab4b74b5634e40dd19e31e2262b650734839a2ed77b69489e95c8ef91d",
+        "afterSha256": "24dc08ab4b74b5634e40dd19e31e2262b650734839a2ed77b69489e95c8ef91d",
+        "unchanged": true
+      },
+      {
+        "path": "tests/postgres-migrations.test.mjs",
+        "beforeSha256": "fd969776e7892227c3d9100775b6a2ccfb0d0b068f3136f47d2bc5e1c8760c31",
+        "afterSha256": "fd969776e7892227c3d9100775b6a2ccfb0d0b068f3136f47d2bc5e1c8760c31",
+        "unchanged": true
+      },
+      {
+        "path": "tests/postgres-schema-check.test.mjs",
+        "beforeSha256": "220d6aea5a5f0e75072cbb479a03a94bd6c4261b69bce3567c0df7da55484868",
+        "afterSha256": "220d6aea5a5f0e75072cbb479a03a94bd6c4261b69bce3567c0df7da55484868",
+        "unchanged": true
+      },
+      {
+        "path": "tests/postgres-schema-status-fixtures.test.mjs",
+        "beforeSha256": "755114d35f2229ceb0aca57a4bc69d04a39e8043d43456177d6696306509260a",
+        "afterSha256": "755114d35f2229ceb0aca57a4bc69d04a39e8043d43456177d6696306509260a",
+        "unchanged": true
+      },
+      {
+        "path": "tests/postgres-security.test.mjs",
+        "beforeSha256": "030a6c67756f25d5ca8def3253e3017615d87aa4e33d9da92b8a429c822d56d9",
+        "afterSha256": "030a6c67756f25d5ca8def3253e3017615d87aa4e33d9da92b8a429c822d56d9",
+        "unchanged": true
+      },
+      {
+        "path": "tests/qa-dbm-001-real-postgres.test.mjs",
+        "beforeSha256": "b055d01ba0d0ee7607786b380f4bcdf0850b663e0d3035d796a78035e4541f1f",
+        "afterSha256": "b055d01ba0d0ee7607786b380f4bcdf0850b663e0d3035d796a78035e4541f1f",
+        "unchanged": true
+      },
+      {
+        "path": "tests/qa-imp-001-browser-retest.mjs",
+        "beforeSha256": "7a4ca1c6466a141bf48546a1c4ec5effeac5c4cf61708b2a5c8e65060311fd4b",
+        "afterSha256": "7a4ca1c6466a141bf48546a1c4ec5effeac5c4cf61708b2a5c8e65060311fd4b",
+        "unchanged": true
+      },
+      {
+        "path": "tests/qa-imp-001-transfer-contract.test.mjs",
+        "beforeSha256": "bae2219fae681abb6ab2c0d5d590d73416e720bd2ebc684f87ebad66e7c570c3",
+        "afterSha256": "bae2219fae681abb6ab2c0d5d590d73416e720bd2ebc684f87ebad66e7c570c3",
+        "unchanged": true
+      },
+      {
+        "path": "tests/qa-ntm-001-core.test.mjs",
+        "beforeSha256": "24cdf38a9a26e72eff12716ac4a087c3d87aee45b2001d9dac262158bce1f772",
+        "afterSha256": "24cdf38a9a26e72eff12716ac4a087c3d87aee45b2001d9dac262158bce1f772",
+        "unchanged": true
+      },
+      {
+        "path": "tests/qa-ntm-002-preparation.test.mjs",
+        "beforeSha256": "9ec88971be2a3b7b87670049f52236bcaabf8156bd82f30b656ae65a762d1367",
+        "afterSha256": "9ec88971be2a3b7b87670049f52236bcaabf8156bd82f30b656ae65a762d1367",
+        "unchanged": true
+      },
+      {
+        "path": "tests/qa-pil-001-real-postgres.test.mjs",
+        "beforeSha256": "fb5d4a85fdfd743b07abeb3bb658bc6575dbd0ea853961e069b9943a8a2eaf0e",
+        "afterSha256": "fb5d4a85fdfd743b07abeb3bb658bc6575dbd0ea853961e069b9943a8a2eaf0e",
+        "unchanged": true
+      },
+      {
+        "path": "tests/qa-pil-002-browser-flow.mjs",
+        "beforeSha256": "b4b2969fa4a5007186d84ee656d5827f85269d02de9c53de597c5b901a3dbe38",
+        "afterSha256": "b4b2969fa4a5007186d84ee656d5827f85269d02de9c53de597c5b901a3dbe38",
+        "unchanged": true
+      },
+      {
+        "path": "tests/qa-pil-003-engineer-uat.mjs",
+        "beforeSha256": "1247f841708c3bada79efaa47e6acf1711ad7cc3acead4e659e760731ff25551",
+        "afterSha256": "1247f841708c3bada79efaa47e6acf1711ad7cc3acead4e659e760731ff25551",
+        "unchanged": true
+      },
+      {
+        "path": "tests/qa-pil-004-topology-site-uat.mjs",
+        "beforeSha256": "197d27578d2a8a16a93b917cf89a796879fc73cfdf176fec2390f1da9f80965a",
+        "afterSha256": "197d27578d2a8a16a93b917cf89a796879fc73cfdf176fec2390f1da9f80965a",
+        "unchanged": true
+      },
+      {
+        "path": "tests/qa-pil-006-a09-committed-tree.mjs",
+        "beforeSha256": "fb939634001c5c46b07a57fec08693b24745f7b40c9410639f8bd1c37cc11bb3",
+        "afterSha256": "fb939634001c5c46b07a57fec08693b24745f7b40c9410639f8bd1c37cc11bb3",
+        "unchanged": true
+      },
+      {
+        "path": "tests/qa-pil-006-acceptance.json",
+        "beforeSha256": "30daee9bb687e1e2969d237eae8e99bda9eb9129574971916009b7ff6307b65a",
+        "afterSha256": "30daee9bb687e1e2969d237eae8e99bda9eb9129574971916009b7ff6307b65a",
+        "unchanged": true
+      },
+      {
+        "path": "tests/qa-pil-006-browser-flow.mjs",
+        "beforeSha256": "f0fb58c2ede2e69f83fd2f2c9a4145181ccb0905f78c767a79cb217d47b3d0fa",
+        "afterSha256": "f0fb58c2ede2e69f83fd2f2c9a4145181ccb0905f78c767a79cb217d47b3d0fa",
+        "unchanged": true
+      },
+      {
+        "path": "tests/qa-pil-006-fixture-spec.mjs",
+        "beforeSha256": "7e0d7a49fab19446d9872ae7d665a98974ad40adefa030dd4a3379a8e1e68217",
+        "afterSha256": "7e0d7a49fab19446d9872ae7d665a98974ad40adefa030dd4a3379a8e1e68217",
+        "unchanged": true
+      },
+      {
+        "path": "tests/qa-pil-006-intermediate-stages.mjs",
+        "beforeSha256": "5a90bd216c8d94aaf0d7a9ced78d5fcdf7dfe67c1d4ae7b15dda55cbe8ee0d7b",
+        "afterSha256": "5a90bd216c8d94aaf0d7a9ced78d5fcdf7dfe67c1d4ae7b15dda55cbe8ee0d7b",
+        "unchanged": true
+      },
+      {
+        "path": "tests/qa-pil-006-local-flow.mjs",
+        "beforeSha256": "75a0fa07e96a8c7d6b0917a9c7437e8dab86e10d90e24f2603e6810ce1af15d8",
+        "afterSha256": "75a0fa07e96a8c7d6b0917a9c7437e8dab86e10d90e24f2603e6810ce1af15d8",
+        "unchanged": true
+      },
+      {
+        "path": "tests/qa-pil-006-manifest.mjs",
+        "beforeSha256": "d2af4e54b0a41552ce623023415e980e82d0bb99d4b5f4446cafda36946dc54d",
+        "afterSha256": "d2af4e54b0a41552ce623023415e980e82d0bb99d4b5f4446cafda36946dc54d",
+        "unchanged": true
+      },
+      {
+        "path": "tests/qa-pil-006-phase-plan.mjs",
+        "beforeSha256": "759289d8782501708189d9fd00575ef3f3601043cf5d05e05eb22674b3c363ee",
+        "afterSha256": "759289d8782501708189d9fd00575ef3f3601043cf5d05e05eb22674b3c363ee",
+        "unchanged": true
+      },
+      {
+        "path": "tests/qa-pil-006-postgres-fixture.mjs",
+        "beforeSha256": "72a2a98c5e9d132c5b6ad342cb32578e63ec794705ea953f769383932eb2ac68",
+        "afterSha256": "72a2a98c5e9d132c5b6ad342cb32578e63ec794705ea953f769383932eb2ac68",
+        "unchanged": true
+      },
+      {
+        "path": "tests/qa-pil-006-postgres-lifecycle.test.mjs",
+        "beforeSha256": "0637c9be1b6afca92676d4f47f2df6b6b0cc8a08abc43c8513a9b14197578f04",
+        "afterSha256": "0637c9be1b6afca92676d4f47f2df6b6b0cc8a08abc43c8513a9b14197578f04",
+        "unchanged": true
+      },
+      {
+        "path": "tests/qa-pil-006-preparation.test.mjs",
+        "beforeSha256": "4dab2f546ef31ff55c9da52ffe11a8b2f1312541b9fe590ff4f548115218066a",
+        "afterSha256": "4dab2f546ef31ff55c9da52ffe11a8b2f1312541b9fe590ff4f548115218066a",
+        "unchanged": true
+      },
+      {
+        "path": "tests/qa-pil-006-server-flow.mjs",
+        "beforeSha256": "541c766b7dd41a7eeda45cd36598a5e0135a7bab1e79e3a49c47d2aa06f8b2b0",
+        "afterSha256": "541c766b7dd41a7eeda45cd36598a5e0135a7bab1e79e3a49c47d2aa06f8b2b0",
+        "unchanged": true
+      },
+      {
+        "path": "tests/qa-uix-002-inspector-uat.mjs",
+        "beforeSha256": "66acb575dbd15e419f814b3824d9b228f472dfab6e1a2dd9ba5a539db47192d6",
+        "afterSha256": "66acb575dbd15e419f814b3824d9b228f472dfab6e1a2dd9ba5a539db47192d6",
+        "unchanged": true
+      },
+      {
+        "path": "tests/qa-uix-002-readonly-uat.mjs",
+        "beforeSha256": "e29bd4f52994e1cadc2420307ba897984d418b4110e284a67b395fa80faecc11",
+        "afterSha256": "e29bd4f52994e1cadc2420307ba897984d418b4110e284a67b395fa80faecc11",
+        "unchanged": true
+      },
+      {
+        "path": "tests/qa-uix-003-topbar-responsive-uat.mjs",
+        "beforeSha256": "195c40879ef132fb6301f189e628d153a50e20a6ad6a0a745711da71d2a2eef7",
+        "afterSha256": "195c40879ef132fb6301f189e628d153a50e20a6ad6a0a745711da71d2a2eef7",
+        "unchanged": true
+      },
+      {
+        "path": "tests/qa-uix-004-canvas-resize-uat.mjs",
+        "beforeSha256": "65ca801bcb117809940f524635aea270f60d0fc350839266d0c33d491040d35d",
+        "afterSha256": "65ca801bcb117809940f524635aea270f60d0fc350839266d0c33d491040d35d",
+        "unchanged": true
+      },
+      {
+        "path": "tests/qa-uix-checkpoint-preparation.test.mjs",
+        "beforeSha256": "e46a82ea39eb376c1f789d3e98333870cb9919f6ec80185365bf804b62e595cd",
+        "afterSha256": "e46a82ea39eb376c1f789d3e98333870cb9919f6ec80185365bf804b62e595cd",
+        "unchanged": true
+      },
+      {
+        "path": "tests/rbac-multi-user-fixtures.test.mjs",
+        "beforeSha256": "12220bdca1bd99cc668c4009a230fd224131d8b9923f6af9128b15eeb496056e",
+        "afterSha256": "12220bdca1bd99cc668c4009a230fd224131d8b9923f6af9128b15eeb496056e",
+        "unchanged": true
+      },
+      {
+        "path": "tests/rbac-precedence.integration.test.mjs",
+        "beforeSha256": "0deb4425af0c502a31487cb727020109865778c2754926133ce9c7cd5830c9f9",
+        "afterSha256": "0deb4425af0c502a31487cb727020109865778c2754926133ce9c7cd5830c9f9",
+        "unchanged": true
+      },
+      {
+        "path": "tests/rbac-repository.integration.test.mjs",
+        "beforeSha256": "0026f7b69a3ada835b57334b26d76adc156c3ebf1da5a544bb41edc739d6ae9d",
+        "afterSha256": "0026f7b69a3ada835b57334b26d76adc156c3ebf1da5a544bb41edc739d6ae9d",
+        "unchanged": true
+      },
+      {
+        "path": "tests/rbac-transaction-guards.test.mjs",
+        "beforeSha256": "cba24cafcc30b03c8bced51eaab9a30bdb440758406e45ce79de71a0aa5e2874",
+        "afterSha256": "cba24cafcc30b03c8bced51eaab9a30bdb440758406e45ce79de71a0aa5e2874",
+        "unchanged": true
+      },
+      {
+        "path": "tests/rendered-html.test.mjs",
+        "beforeSha256": "156ef2b21b1617eede49f8c4484d2a9845739e45728f45b4c6702b4a3198e994",
+        "afterSha256": "156ef2b21b1617eede49f8c4484d2a9845739e45728f45b4c6702b4a3198e994",
+        "unchanged": true
+      },
+      {
+        "path": "tests/request-identity.test.mjs",
+        "beforeSha256": "58ca923aafd91ab75dfe1df438516d7a976136da438f236c31ecf15f7f84108a",
+        "afterSha256": "58ca923aafd91ab75dfe1df438516d7a976136da438f236c31ecf15f7f84108a",
+        "unchanged": true
+      },
+      {
+        "path": "tests/runtime-policy.test.mjs",
+        "beforeSha256": "f8f4af133d86dca4e1278d310509e25c7840dc762c1b80589288a7489f5367ff",
+        "afterSha256": "f8f4af133d86dca4e1278d310509e25c7840dc762c1b80589288a7489f5367ff",
+        "unchanged": true
+      },
+      {
+        "path": "tests/topology-layout.test.mjs",
+        "beforeSha256": "d5a537801701d69139a1b9bcc2a6d970159b364d09fa15e244e96fcdf00235bc",
+        "afterSha256": "d5a537801701d69139a1b9bcc2a6d970159b364d09fa15e244e96fcdf00235bc",
+        "unchanged": true
+      },
+      {
+        "path": "tests/topology-routing-qa-uix.test.mjs",
+        "beforeSha256": "d355000f6fbe379f4ca1c1d863d3594dfce23a1d7d2f9d54b5abf3660b531704",
+        "afterSha256": "d355000f6fbe379f4ca1c1d863d3594dfce23a1d7d2f9d54b5abf3660b531704",
+        "unchanged": true
+      },
+      {
+        "path": "tests/topology-routing.test.mjs",
+        "beforeSha256": "0b30dcbc244e3aa0892e69bb5f72dee0943f1a66cf4d1bcf1591aec4320fe781",
+        "afterSha256": "0b30dcbc244e3aa0892e69bb5f72dee0943f1a66cf4d1bcf1591aec4320fe781",
+        "unchanged": true
+      },
+      {
+        "path": "tests/topology-transfer.test.mjs",
+        "beforeSha256": "a3b81bda36a433c09721742c1b5fb22a6b40370bb898aff03bf0ade7491f504e",
+        "afterSha256": "a3b81bda36a433c09721742c1b5fb22a6b40370bb898aff03bf0ade7491f504e",
+        "unchanged": true
+      },
+      {
+        "path": "tests/topology-types.test.mjs",
+        "beforeSha256": "f7f10bc594f1b6e4692a779bc753d30463a22e8ac323558ec41b3164a1ec5db5",
+        "afterSha256": "f7f10bc594f1b6e4692a779bc753d30463a22e8ac323558ec41b3164a1ec5db5",
+        "unchanged": true
+      },
+      {
+        "path": "tests/topology-validation.test.mjs",
+        "beforeSha256": "08cc6ea95738be965dedaeedc36ca11fde24814944a6eb6de9ec60b201731742",
+        "afterSha256": "08cc6ea95738be965dedaeedc36ca11fde24814944a6eb6de9ec60b201731742",
+        "unchanged": true
+      },
+      {
+        "path": "tests/topology-visibility.test.mjs",
+        "beforeSha256": "47a00ebb551b73f16142e031eca67043cf683deb60384216fb394bb007169f1f",
+        "afterSha256": "47a00ebb551b73f16142e031eca67043cf683deb60384216fb394bb007169f1f",
+        "unchanged": true
+      },
+      {
+        "path": "tests/e2e/uix-routing.spec.ts",
+        "beforeSha256": "65c26a435330aabd4673299bb8809234553abd07e3cf10c324a8dc02748b84a0",
+        "afterSha256": "65c26a435330aabd4673299bb8809234553abd07e3cf10c324a8dc02748b84a0",
+        "unchanged": true
+      },
+      {
+        "path": "tests/fixtures/qa-ntm-001/legacy-project.json",
+        "beforeSha256": "f3e65292e489ef5472458cb7728c687ba086fa4bb4792265b0860e93c4d163b9",
+        "afterSha256": "f3e65292e489ef5472458cb7728c687ba086fa4bb4792265b0860e93c4d163b9",
+        "unchanged": true
+      },
+      {
+        "path": "tests/fixtures/qa-ntm-001/valid-project-v2.json",
+        "beforeSha256": "7a10bafef80ec3fb15cd722b117a4657994e37d3bc5abba7bc325355d0ce0ec7",
+        "afterSha256": "7a10bafef80ec3fb15cd722b117a4657994e37d3bc5abba7bc325355d0ce0ec7",
+        "unchanged": true
+      },
+      {
+        "path": "tests/fixtures/qa-ntm-002/generation-vectors.json",
+        "beforeSha256": "be8efff781ab758a7401ae458378aba923393cd5edd7b325ceec6a46a54361f1",
+        "afterSha256": "be8efff781ab758a7401ae458378aba923393cd5edd7b325ceec6a46a54361f1",
+        "unchanged": true
+      },
+      {
+        "path": "tests/fixtures/qa-ntm-002/secret-rejection.json",
+        "beforeSha256": "afcf87133049a112e31e1fdbf80fbab4921fb90dd9cd36d7b7782145a11bd873",
+        "afterSha256": "afcf87133049a112e31e1fdbf80fbab4921fb90dd9cd36d7b7782145a11bd873",
+        "unchanged": true
+      },
+      {
+        "path": "tests/fixtures/qa-uix-checkpoint/acceptance-matrix.json",
+        "beforeSha256": "d0c9a43048127d8edcc5cd967a599c2e1aaf8f1cc91abd3c2b853afc432dd8f1",
+        "afterSha256": "d0c9a43048127d8edcc5cd967a599c2e1aaf8f1cc91abd3c2b853afc432dd8f1",
+        "unchanged": true
+      },
+      {
+        "path": "package.json",
+        "beforeSha256": "af65067a2c5dc6ef36749e14a504365c954eab0b7e9ca8fbb566ce715aa8c0a9",
+        "afterSha256": "af65067a2c5dc6ef36749e14a504365c954eab0b7e9ca8fbb566ce715aa8c0a9",
+        "unchanged": true
+      },
+      {
+        "path": "package-lock.json",
+        "beforeSha256": "4d30e1dff901bcf26e1bd06071f34a12d6cc5bc28ee52d142d877749dccaa8b8",
+        "afterSha256": "4d30e1dff901bcf26e1bd06071f34a12d6cc5bc28ee52d142d877749dccaa8b8",
+        "unchanged": true
+      },
+      {
+        "path": "docs/dev開發紀錄/checkpoints/dev-ntm-001-core-r2/manifest.json",
+        "beforeSha256": "1e04689869d0e6581676113996525ba3368ed32f3e9969dee88584c35a829693",
+        "afterSha256": "1e04689869d0e6581676113996525ba3368ed32f3e9969dee88584c35a829693",
+        "unchanged": true
+      }
+    ]
+  },
+  "boundaries": {
+    "productWriterStopped": true,
+    "coreR2Modified": false,
+    "qaAssertionsModified": false,
+    "uiStorageApiDbTransferIntegrated": false,
+    "envLoaded": false,
+    "dependenciesInstalled": false,
+    "browserDbDockerLiveStarted": false,
+    "gitStagedCommittedPushed": false,
+    "betaProductModified": false
+  },
+  "limitations": [
+    "Pure structured-data preview engine, no UI or apply/persistence.",
+    "Only explicit trusted synthetic templates; no signature verification or vendor completeness claim.",
+    "Input safety is not a raw configuration sanitizer.",
+    "All new candidates unverified; existing verification unchanged.",
+    "Resource limits are engine bounds, not approved product scale."
+  ],
+  "nextOwner": "QA_NTM_002 independent GEN-01-07; PRE-COMMIT stop"
+}

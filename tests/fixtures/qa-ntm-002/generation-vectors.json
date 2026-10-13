@@ -1,0 +1,62 @@
+{
+  "ticket": "QA_NTM_002",
+  "phase": "GEN-R1",
+  "formalResult": "NOT_RUN",
+  "sourcePriority": ["explicit", "trusted-template", "manual"],
+  "vectors": [
+    {
+      "id": "explicit-preserves-safe-text",
+      "covers": ["GEN-01", "GEN-02", "GEN-04", "GEN-05", "GEN-07"],
+      "deviceId": "qa-device-explicit",
+      "explicit": [
+        { "name": " Gi0/1 ", "kind": "physical", "aliases": [" UPLINK-A "] },
+        { "name": "Gi0/2", "kind": "physical", "aliases": [] }
+      ],
+      "expected": { "source": "explicit", "count": 2, "verification": "unverified", "preserveSafeText": true, "stableIds": true }
+    },
+    {
+      "id": "trusted-template-exact-match-only",
+      "covers": ["GEN-01", "GEN-02", "GEN-04", "GEN-05"],
+      "deviceId": "qa-device-template",
+      "device": { "vendor": "QA Vendor", "model": "QA-24", "revision": "R1" },
+      "templates": [
+        {
+          "templateId": "qa-template-24-r1",
+          "version": "1.0.0",
+          "fingerprint": "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
+          "match": { "vendor": "QA Vendor", "model": "QA-24", "revision": "R1" },
+          "interfaces": [{ "name": "Gi0/1", "kind": "physical", "aliases": [] }]
+        }
+      ],
+      "expected": { "source": "trusted-template", "count": 1, "verification": "unverified", "exactMatchRequired": true }
+    },
+    {
+      "id": "manual-finite-numbering",
+      "covers": ["GEN-01", "GEN-03", "GEN-05", "GEN-07"],
+      "deviceId": "qa-device-manual",
+      "manual": { "quantity": 4, "start": 1, "pattern": "decimal", "prefix": "Gi0/", "suffix": "" },
+      "expected": { "source": "manual", "names": ["Gi0/1", "Gi0/2", "Gi0/3", "Gi0/4"], "verification": "unverified", "stableIds": true }
+    },
+    {
+      "id": "cross-source-collision",
+      "covers": ["GEN-02", "GEN-04", "GEN-05", "GEN-07"],
+      "deviceId": "qa-device-collision",
+      "explicit": [{ "name": "Gi0/1", "kind": "physical", "aliases": ["UPLINK"] }],
+      "manual": { "quantity": 1, "start": 1, "pattern": "decimal", "prefix": " gi0/", "suffix": " " },
+      "expected": { "conflict": true, "silentOverwrite": false, "normalizationForComparisonOnly": true }
+    },
+    {
+      "id": "verified-existing-protected",
+      "covers": ["GEN-04", "GEN-05", "GEN-07"],
+      "deviceId": "qa-device-verified",
+      "existing": [{ "id": "if-existing", "name": "Gi0/1", "kind": "physical", "aliases": [], "verification": "verified" }],
+      "manual": { "quantity": 1, "start": 1, "pattern": "decimal", "prefix": "Gi0/", "suffix": "" },
+      "expected": { "conflict": true, "existingUnchanged": true, "noDowngrade": true }
+    }
+  ],
+  "invalidClasses": [
+    "manual-non-integer", "manual-negative", "manual-overflow", "manual-over-resource-limit",
+    "manual-ambiguous-pattern", "template-unknown", "template-ambiguous", "template-untrusted",
+    "unknown-field", "raw-config", "secret-bearing-metadata", "cross-device-reference"
+  ]
+}
