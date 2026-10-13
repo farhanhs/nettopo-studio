@@ -45,3 +45,11 @@ NTM沒有UI／durable persistence／Browser／DB整合；QA_ENV_001整票仍BLOC
 三路皆通過PID停止／port關閉／dataDir移除斷言，測後fixture dirs=0。工具raw仍`8f01b2f56effa90dcaf801a5842f756d54763b47c5aaa22995dfaad9beb57ed2`、QA runner raw仍`01901cf2560b7b36b62da1fc32c531bbede37ca5acc70430d869197189ec1cf8`；7個已提交工具／測試檔與working tree normalized bytes全一致。未修改程式、現用env／DB或測試斷言。
 
 判讀：同候選在不同執行權限context結果不同，受限環境相容性仍是限制；這不是精確Windows root cause定論。整體QA_ENV_001仍BLOCKED於其餘phase，不能擴張成全環境完成。
+
+## 最終推送核收
+
+PM已fresh read-back核對 `origin/codex/dev-rel-001-checkpoint=590339395ec8cf5af5591d3be4379bd3ab4ebc6b`，與該工作樹HEAD相同。三筆：CORE `545ab726cf8d7ecd329b8af0411c7b04054637cf`、GEN `dbdbc915399bfe65190879b0bdcc16c77a7f7a52`、PLAN `590339395ec8cf5af5591d3be4379bd3ab4ebc6b`；各提交後乾淨tree分別28/28、73/73、122/122，tsc／scoped ESLint均PASS。PM另讀最終plan-committed測試log確認122/122、0 fail/skip及静態檢查exit0，並核對47個新增NTM／交付檔案範圍、index空。相關檔案：[NTM checkpoint](https://github.com/farhanhs/nettopo-studio/blob/590339395ec8cf5af5591d3be4379bd3ab4ebc6b/docs/dev%E9%96%8B%E7%99%BC%E7%B4%80%E9%8C%84/2026-10-13-ntm-checkpoint.md)。
+
+root已推：`ed23a1e` Native工具、`8bda303` 獨立QA runner、`e8088a9` 治理、`9944319` 執行context補證；PM核remote dustool與9944319一致，再以本文件的獨立docs commit保存最終核收。所有推送為同名branch正常fast-forward，沒有改寫歷史／整合／部署；Beta保留a9abe63。
+
+根目錄Auth產品與其他混合dirty、checkpoint的舊UIX／Pilot測試及混合治理仍未提交，未宣稱工作樹全乾淨。工作到本次commit／push完成為止，不自動開下一票。CORE原核准文件的Markdown whitespace提示有保留，產品／測試檔diff-check通過；未將文件提示或Native受限context失敗隱藏成全綠。
