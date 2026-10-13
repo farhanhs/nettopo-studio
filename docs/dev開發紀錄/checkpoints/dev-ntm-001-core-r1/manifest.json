@@ -1,0 +1,49 @@
+{
+  "schemaVersion": 1,
+  "ticket": "DEV_NTM_001",
+  "phase": "CORE-R1",
+  "status": "READY_FOR_QA",
+  "branch": "codex/dev-rel-001-checkpoint",
+  "baseCommit": "a9abe637f0ad419aced6d31faf30a127ce5b81e6",
+  "authorization": "PM Scope Review R1 / PM_GOV_001-D44",
+  "hashMode": {
+    "raw": "sha256-bytes",
+    "normalized": "sha256-utf8-lf-normalized"
+  },
+  "files": [
+    {
+      "path": "app/lib/trusted-network-types.ts",
+      "bytes": 3347,
+      "rawSha256": "53ef00f4f668f151cc9e0a82c23550343428624399a8cd61d78d11d62e40997b",
+      "normalizedSha256": "53ef00f4f668f151cc9e0a82c23550343428624399a8cd61d78d11d62e40997b"
+    },
+    {
+      "path": "app/lib/trusted-network-model.ts",
+      "bytes": 25243,
+      "rawSha256": "2050a8b74b28bdc1b5bbb46049f4974958dea78b881117bb08e7bb294bddd0f3",
+      "normalizedSha256": "2050a8b74b28bdc1b5bbb46049f4974958dea78b881117bb08e7bb294bddd0f3"
+    },
+    {
+      "path": "tests/dev-ntm-001-core.test.mjs",
+      "bytes": 9719,
+      "rawSha256": "b69c30544b5d149944284f58650bf23dd3641e680842ddc0df4ae3bc2d7bd154",
+      "normalizedSha256": "b69c30544b5d149944284f58650bf23dd3641e680842ddc0df4ae3bc2d7bd154"
+    }
+  ],
+  "verification": {
+    "targetedNode": "12/12 PASS",
+    "typescript": "PASS",
+    "scopedEslint": "PASS (0 warnings)",
+    "browser": "NOT RUN",
+    "database": "NOT RUN",
+    "build": "NOT RUN",
+    "formalQa": "NOT RUN"
+  },
+  "boundaries": {
+    "existingPipelineModified": false,
+    "storageIntegrated": false,
+    "transferV3Implemented": false,
+    "verificationAuthorityImplemented": false,
+    "gitStagedOrCommitted": false
+  }
+}

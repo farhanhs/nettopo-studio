@@ -1,0 +1,162 @@
+{
+  "schemaVersion": 1,
+  "ticket": "DEV_NTM_001",
+  "phase": "CORE-R2",
+  "status": "READY_FOR_QA",
+  "branch": "codex/dev-rel-001-checkpoint",
+  "baseCommit": "a9abe637f0ad419aced6d31faf30a127ce5b81e6",
+  "capturedAt": "2026-10-09T08:50:29.263Z",
+  "timezone": "Asia/Taipei",
+  "authorization": "PM Scope Review R1 / D44 / QA release for repair 2026-10-09 / PM CORE-R2 correction",
+  "changeType": "CORRECT",
+  "previousManifest": "docs/dev開發紀錄/checkpoints/dev-ntm-001-core-r1/manifest.json",
+  "defects": [
+    "NTM-CORE-01 legacy-port-loss",
+    "NTM-CORE-02 canonical-public-seam"
+  ],
+  "hashMode": {
+    "raw": "sha256-bytes",
+    "normalized": "sha256-utf8-lf-normalized"
+  },
+  "files": [
+    {
+      "path": "app/lib/trusted-network-types.ts",
+      "bytes": 3347,
+      "rawSha256": "53ef00f4f668f151cc9e0a82c23550343428624399a8cd61d78d11d62e40997b",
+      "normalizedSha256": "53ef00f4f668f151cc9e0a82c23550343428624399a8cd61d78d11d62e40997b"
+    },
+    {
+      "path": "app/lib/trusted-network-model.ts",
+      "bytes": 26026,
+      "rawSha256": "b0217c37e2ef34a8432a40a21b16305892d73e94c14b18b8ea52cc4cecaa16e7",
+      "normalizedSha256": "b0217c37e2ef34a8432a40a21b16305892d73e94c14b18b8ea52cc4cecaa16e7"
+    },
+    {
+      "path": "tests/dev-ntm-001-core.test.mjs",
+      "bytes": 17355,
+      "rawSha256": "88e2ec23a5e51c60cae07a977304171c742ce48f24c77cc807159b616459df9a",
+      "normalizedSha256": "88e2ec23a5e51c60cae07a977304171c742ce48f24c77cc807159b616459df9a"
+    }
+  ],
+  "dependencies": [
+    {
+      "path": "app/lib/topology-types.ts",
+      "bytes": 4051,
+      "rawSha256": "474beaf4e2a044230e21971459da40ce50aef7df4f8884ebbf0a709a2f3fb1d4",
+      "normalizedSha256": "474beaf4e2a044230e21971459da40ce50aef7df4f8884ebbf0a709a2f3fb1d4"
+    },
+    {
+      "path": "app/lib/topology-validation.ts",
+      "bytes": 4814,
+      "rawSha256": "f3d727859e6c4aea86d8e8dcd9f50e6cbb24f248b12e2c1165375ecfdcf5df19",
+      "normalizedSha256": "f3d727859e6c4aea86d8e8dcd9f50e6cbb24f248b12e2c1165375ecfdcf5df19"
+    },
+    {
+      "path": "package.json",
+      "bytes": 4062,
+      "rawSha256": "af65067a2c5dc6ef36749e14a504365c954eab0b7e9ca8fbb566ce715aa8c0a9",
+      "normalizedSha256": "f9e221a3c32e28ea5d118c3fd51a6e9a942905451645be540e6b9f29f2822861"
+    },
+    {
+      "path": "package-lock.json",
+      "bytes": 406445,
+      "rawSha256": "4d30e1dff901bcf26e1bd06071f34a12d6cc5bc28ee52d142d877749dccaa8b8",
+      "normalizedSha256": "7dc0769e5c6e5b0165417b17a7426805e1859710112c5f5510dccfec6a675ffb"
+    }
+  ],
+  "runtime": {
+    "node": "v24.18.0",
+    "zod": "4.4.3",
+    "typescript": "5.9.3",
+    "eslint": "9.39.4"
+  },
+  "diffFromCoreR1": {
+    "changedPaths": [
+      "app/lib/trusted-network-model.ts",
+      "tests/dev-ntm-001-core.test.mjs"
+    ],
+    "unchangedCandidatePaths": [
+      "app/lib/trusted-network-types.ts"
+    ],
+    "details": [
+      "Keep legacy validation conditions but retain validated raw strings through upcast, clone and downcast.",
+      "Normalize provisional identity/alias matching only; preserve interface display text and fingerprint the stored name.",
+      "Export canonicalProjectV2: strict validation, deep copy, deterministic object-key order; no array/string/trust normalization.",
+      "Compare downcast using canonical object keys; retain typed rejection of any lost trusted data.",
+      "Add eight DEV regression cases; correct two DEV color assertions to raw legacy equality. Independent QA tests unchanged."
+    ]
+  },
+  "verification": {
+    "minimalReproBefore": "2 FAIL (expected red)",
+    "devRegressionRed": "19 total / 11 PASS / 8 FAIL (before product correction)",
+    "targetedNode": "20/20 PASS / 0 FAIL / 0 SKIP",
+    "minimalReproAfter": "2/2 PASS",
+    "typescript": "PASS --noEmit --pretty false --incremental false",
+    "scopedEslint": "PASS --max-warnings 0",
+    "fullSuite": "NOT RUN (outside pure-module phase)",
+    "browser": "NOT RUN",
+    "database": "NOT RUN",
+    "docker": "NOT RUN",
+    "build": "NOT RUN",
+    "formalQa": "NOT RUN for CORE-R2; CORE-R1 QA_FAILED retained"
+  },
+  "ownershipProof": {
+    "scope": "recursive app/db/tests plus package files and previous manifest, captured before writes and after verification",
+    "observedPaths": 132,
+    "unchangedPaths": 130,
+    "changedPaths": [
+      "app/lib/trusted-network-model.ts",
+      "tests/dev-ntm-001-core.test.mjs"
+    ],
+    "protectedFiles": [
+      {
+        "path": "app/lib/trusted-network-types.ts",
+        "beforeSha256": "53ef00f4f668f151cc9e0a82c23550343428624399a8cd61d78d11d62e40997b",
+        "afterSha256": "53ef00f4f668f151cc9e0a82c23550343428624399a8cd61d78d11d62e40997b",
+        "unchanged": true
+      },
+      {
+        "path": "tests/qa-ntm-001-core.test.mjs",
+        "beforeSha256": "24cdf38a9a26e72eff12716ac4a087c3d87aee45b2001d9dac262158bce1f772",
+        "afterSha256": "24cdf38a9a26e72eff12716ac4a087c3d87aee45b2001d9dac262158bce1f772",
+        "unchanged": true
+      },
+      {
+        "path": "tests/fixtures/qa-ntm-001/legacy-project.json",
+        "beforeSha256": "f3e65292e489ef5472458cb7728c687ba086fa4bb4792265b0860e93c4d163b9",
+        "afterSha256": "f3e65292e489ef5472458cb7728c687ba086fa4bb4792265b0860e93c4d163b9",
+        "unchanged": true
+      },
+      {
+        "path": "tests/fixtures/qa-ntm-001/valid-project-v2.json",
+        "beforeSha256": "7a10bafef80ec3fb15cd722b117a4657994e37d3bc5abba7bc325355d0ce0ec7",
+        "afterSha256": "7a10bafef80ec3fb15cd722b117a4657994e37d3bc5abba7bc325355d0ce0ec7",
+        "unchanged": true
+      },
+      {
+        "path": "docs/dev開發紀錄/checkpoints/dev-ntm-001-core-r1/manifest.json",
+        "beforeSha256": "da2606744a6a8e54e9a014fc58ad79d1c681d2ede6e8cd8c0c281b447bb52670",
+        "afterSha256": "da2606744a6a8e54e9a014fc58ad79d1c681d2ede6e8cd8c0c281b447bb52670",
+        "unchanged": true
+      }
+    ],
+    "indexEmpty": true
+  },
+  "boundaries": {
+    "productWriterStopped": true,
+    "existingPipelineModified": false,
+    "storageIntegrated": false,
+    "transferV3Implemented": false,
+    "verificationAuthorityImplemented": false,
+    "envLoaded": false,
+    "externalResourcesCreated": false,
+    "gitStagedOrCommitted": false
+  },
+  "nextOwner": "PM: receive fixed candidate and arrange independent QA_NTM_001 re-test; DEV PRE-COMMIT stop",
+  "requiredRetest": [
+    "NTM-C01",
+    "NTM-C04",
+    "NTM-C05",
+    "full NTM-C01-C07"
+  ]
+}

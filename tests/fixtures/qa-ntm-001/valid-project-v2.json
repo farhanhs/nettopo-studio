@@ -1,0 +1,49 @@
+{
+  "projectSchemaVersion": 2,
+  "devices": [
+    { "id": "dev-router", "name": "Router", "type": "router", "quantity": 1, "x": 80, "y": 120, "networkAreaId": "area-site" },
+    { "id": "dev-switch", "name": "Switch", "type": "switch", "quantity": 1, "x": 420, "y": 120, "networkAreaId": "area-site" }
+  ],
+  "links": [
+    { "id": "link-primary", "from": "dev-router", "to": "dev-switch", "kind": "wired", "fromPort": "Gi0/1", "toPort": "Gi0/24", "fromInterfaceId": "if-router-1", "toInterfaceId": "if-switch-24", "speed": "1 Gbps" },
+    { "id": "link-backup", "from": "dev-router", "to": "dev-switch", "kind": "wired", "fromPort": "Gi0/2", "toPort": "Gi0/23", "fromInterfaceId": "if-router-2", "toInterfaceId": "if-switch-23", "speed": "1 Gbps" }
+  ],
+  "groups": [
+    { "id": "group-site", "name": "Site", "kind": "site", "color": "#526cf5", "collapsed": false }
+  ],
+  "trustedNetwork": {
+    "modelVersion": 1,
+    "areas": [
+      { "id": "area-region", "kind": "region", "name": "North" },
+      { "id": "area-site", "kind": "site", "name": "North Site", "parentAreaId": "area-region", "groupId": "group-site" }
+    ],
+    "interfaces": [
+      { "id": "if-router-1", "deviceId": "dev-router", "name": "Gi0/1", "kind": "physical", "aliases": ["WAN-A"] },
+      { "id": "if-router-2", "deviceId": "dev-router", "name": "Gi0/2", "kind": "physical", "aliases": ["WAN-B"] },
+      { "id": "if-switch-24", "deviceId": "dev-switch", "name": "Gi0/24", "kind": "physical", "aliases": ["UPLINK-A"] },
+      { "id": "if-switch-23", "deviceId": "dev-switch", "name": "Gi0/23", "kind": "physical", "aliases": ["UPLINK-B"] },
+      { "id": "if-switch-vlan10", "deviceId": "dev-switch", "name": "Vlan10", "kind": "logical", "parentInterfaceId": "if-switch-24", "aliases": [] }
+    ],
+    "vlans": [
+      { "id": "vlan-10", "vlanNumber": 10, "name": "Users", "areaId": "area-site" }
+    ],
+    "subnets": [
+      { "id": "subnet-users", "cidr": "10.10.0.0/24", "name": "Users", "areaId": "area-site", "vlanId": "vlan-10" }
+    ],
+    "interfaceVlans": [
+      { "id": "ivr-users", "interfaceId": "if-switch-vlan10", "vlanId": "vlan-10", "mode": "tagged" }
+    ],
+    "interfaceSubnets": [
+      { "id": "isr-users", "interfaceId": "if-switch-vlan10", "subnetId": "subnet-users", "address": "10.10.0.1", "role": "gateway" }
+    ],
+    "resiliencyRelations": [
+      { "id": "rr-uplinks", "kind": "primary-backup", "memberLinkIds": ["link-primary", "link-backup"], "primaryLinkId": "link-primary", "name": "Uplinks" }
+    ],
+    "evidence": [
+      { "id": "ev-manual", "method": "human", "sourceKind": "manual", "displayName": "QA synthetic fixture", "safeSummary": "Synthetic topology evidence" }
+    ],
+    "fieldTrust": [
+      { "id": "trust-interface", "entityType": "interface", "entityId": "if-router-1", "fieldPath": "name", "valueFingerprint": "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef", "evidenceIds": ["ev-manual"], "verification": "unverified" }
+    ]
+  }
+}

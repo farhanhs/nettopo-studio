@@ -1,0 +1,13 @@
+{
+  "devices": [
+    { "id": "dev-router", "name": "Legacy Router", "type": "router", "quantity": 2, "model": "ISR-Legacy", "x": 80, "y": 120, "groupId": "group-site" },
+    { "id": "dev-switch", "name": "Legacy Switch", "type": "switch", "quantity": 1, "x": 420, "y": 120, "groupId": "group-site" }
+  ],
+  "links": [
+    { "id": "link-labelled", "from": "dev-router", "to": "dev-switch", "kind": "wired", "fromPort": " Gi0/1 ", "toPort": "Gi0/24", "vlan": "VLAN 010 legacy", "speed": "1 Gbps" },
+    { "id": "link-missing-port", "from": "dev-router", "to": "dev-switch", "kind": "wired", "speed": "100 Mbps" }
+  ],
+  "groups": [
+    { "id": "group-site", "name": "Legacy Site", "kind": "site", "color": "#526cf5", "collapsed": true }
+  ]
+}
