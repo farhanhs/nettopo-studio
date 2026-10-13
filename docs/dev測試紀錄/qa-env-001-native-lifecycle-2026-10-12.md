@@ -57,3 +57,14 @@ Every port was loopback and not 5432. QA independently rechecked each reported P
 No `.env` file, existing DSN, current/shared database, Browser, Docker container, remote daemon, company API or live system was used. No package was installed and package/lock were unchanged. Owned native fixtures were disposable and cleaned.
 
 The native B1 candidate is released from QA with phase `QA_PASSED`. Overall `QA_ENV_001` remains `BLOCKED`: Docker cold-start ×2, container B3, Browser and CI/rulesets are `BLOCKED/NOT RUN` and are not signed by this evidence. Next owner is PM/OPS for the remaining explicitly scoped environment phases; no stage, commit, push, merge or deploy is authorized.
+
+## 2026-10-13 post-commit bounded rerun supplied by PM
+
+This is supplemental evidence for the same Native B1 candidate, not a new QA phase or a replacement independent QA signature. Candidate HEAD was `e8088a989dfbde0b4f4451dc3dd9ee77fc2f4df4`; `scripts/qa-env/native-lifecycle.mjs` remained raw `8f01b2f56effa90dcaf801a5842f756d54763b47c5aaa22995dfaad9beb57ed2`, and the QA runner remained raw `01901cf2560b7b36b62da1fc32c531bbede37ca5acc70430d869197189ec1cf8`. PM reported the exact serial command `node --test --test-concurrency=1 tests/ops-env-001-guardrails.test.mjs tests/qa-env-001-native-lifecycle.test.mjs` passed 9/9 with 0 fail/skip under a platform-approved elevated execution context; no program, environment file or security setting was changed.
+
+- Normal run `ops-env-001-1791877823162-c13f5509`: loopback port 62950, PID 48400, PASS.
+- Controlled-failure run `ops-env-001-1791877841175-1ab1ba2f`: loopback port 62484, PID 53184, expected `CONTROLLED_INIT_FAILURE`.
+- Readiness-timeout run `ops-env-001-1791877858782-d6490bf6`: loopback port 59922, PID 51456, expected `READINESS_TIMEOUT`.
+- All three runs reported cleanup complete, port closed, directory removed and owned PID stopped; final fixture directory count was 0.
+
+The earlier managed-sandbox failure is retained: `initdb` failed before producing an owned PID and emitted restricted-token error code 87 plus a safe directory-creation error; cleanup still left fixture directories at 0. Raw committed bytes and working-tree bytes had already been checked equal, so line-ending or commit conversion is not supported as the cause. The elevated rerun shows an execution-permission/context difference, but it does not by itself establish the exact Windows root cause. Therefore the same Native B1 phase remains `QA_PASSED` with an explicit execution-context limitation, while the overall ticket remains `BLOCKED` for the unchanged Docker cold-start, B3, Browser and CI/rulesets scope.

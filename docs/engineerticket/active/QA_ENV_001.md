@@ -20,6 +20,12 @@ QA加強斷言時曾有一次4/5：錯誤要求timeout一定有`failureMessage`�
 
 Native B1 phase為 `QA_PASSED` 並release候選鎖；整票仍 `BLOCKED`，Docker cold-start×2、container B3、Browser、CI/rulesets維持 `BLOCKED/NOT RUN`。未讀env／現用DB，未用Docker／Browser／live，無安裝或Git寫入。完整證據：[qa-env-001-native-lifecycle-2026-10-12.md](../../dev測試紀錄/qa-env-001-native-lifecycle-2026-10-12.md)。
 
+### 2026-10-13 提交後同候選補證（非新 phase）
+
+PM 在平台具名核准的 elevated execution context 原封不動重跑 guardrails＋QA runner，候選 `e8088a989dfbde0b4f4451dc3dd9ee77fc2f4df4`、native raw `8f01b2...`、QA runner raw `01901c...` 均未變；結果 9/9 PASS、0 fail/skip。normal／controlled failure／timeout 三路分別得到 PASS、`CONTROLLED_INIT_FAILURE`、`READINESS_TIMEOUT`，全部 owned PID stopped、port closed、directory removed，fixture dirs=0。此為 PM 提供的提交後補驗證據，不取代上方 QA 獨立簽核，也不開新 phase。
+
+受限 managed sandbox 內的既有失敗仍保留：`initdb` 在 PID 建立前遇到 restricted-token error code 87；精確 committed/working-tree raw bytes 與 EOL 等價已排除 commit conversion。elevated rerun 支持「執行權限 context 差異」，但不足以斷言精確 Windows root cause。Native B1 仍為 `QA_PASSED` 並帶此執行環境限制；整票仍 `BLOCKED`，Docker cold-start×2、container B3、Browser、CI/rulesets狀態不變。詳細補證見同一份 [QA 日誌](../../dev測試紀錄/qa-env-001-native-lifecycle-2026-10-12.md)。
+
 ## 2026-10-09 Docker 隔離入口 DEV 重驗可用，整票仍 BLOCKED
 
 使用者本日明確要求確認 Docker 容器隔離測試，僅就此有界自測解除下方歷史停止操作限制，不擴成 cold-start、独立 QA 或部署授權。DEV 於 13:24（Asia/Taipei）使用既有 PostgreSQL fixture 完成 6/6：正常 migration/verify、角色/DML/DDL 邊界、受控初始化失敗清理、SQL timeout/interrupt 取消、兩組並行隔離。schema `0006` ready，測前後候選 hash 不變；每組自建容器/網路/資料卷均零殘留，port 關閉，原有資源保留。

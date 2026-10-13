@@ -31,3 +31,17 @@ NTM沒有UI／durable persistence／Browser／DB整合；QA_ENV_001整票仍BLOC
 - OPS提交後重驗：guardrails4/4 PASS；三條native lifecycle在initdb、beforePID失敗（Windows目錄建立錯誤），owned cleanup complete。QA已同票独立重現normal失敗，初步排除committed bytes／EOL改動；環境因素仍待診斷，昨日Native B1 QA_PASSED歷史保留，**當前重現能力不能宣稱PASS**。
 - 2026-10-13 fresh remote baseline：`codex/public-beta-0.1=a9abe637f0ad419aced6d31faf30a127ce5b81e6`、`codex/dev-rel-001-checkpoint=1b0b084518886cda347f175bfc959401fd1d18ed`。NTM所需4筆UIX祖先已在核准的公開Beta基底可達，本次正常推送checkpoint分支可包含其必要歷史，不授權新增UIX變更或改寫歷史。
 - root governance僅文件存檔，不把本次native FAIL以規則或文件改成PASS；Auth及其他混合dirty保留。最終各分支remote SHA及NTM提交結果依完成後實際核對另記。
+
+## Native B1 同候選提交後補验
+
+在 `e8088a989dfbde0b4f4451dc3dd9ee77fc2f4df4`（已與遠端dustool相同）上，PM取得平台針對既有一次性fixture測試的 `require_escalated` 核准，原封不動執行 `node --test --test-concurrency=1 tests/ops-env-001-guardrails.test.mjs tests/qa-env-001-native-lifecycle.test.mjs`，**9/9 PASS、0 fail/skip**。此是PM提交後補驗，不代稱新QA獨立簽核；受限執行context的FAIL歷史保留，不更改全域sandbox設定。
+
+| Scenario | Run ID | Port／PID | Result／cleanup |
+|---|---|---|---|
+| normal | ops-env-001-1791877823162-c13f5509 | 62950／48400 | PASS；complete |
+| controlled failure | ops-env-001-1791877841175-1ab1ba2f | 62484／53184 | 預期 CONTROLLED_INIT_FAILURE；complete |
+| timeout | ops-env-001-1791877858782-d6490bf6 | 59922／51456 | 預期 READINESS_TIMEOUT；complete |
+
+三路皆通過PID停止／port關閉／dataDir移除斷言，測後fixture dirs=0。工具raw仍`8f01b2f56effa90dcaf801a5842f756d54763b47c5aaa22995dfaad9beb57ed2`、QA runner raw仍`01901cf2560b7b36b62da1fc32c531bbede37ca5acc70430d869197189ec1cf8`；7個已提交工具／測試檔與working tree normalized bytes全一致。未修改程式、現用env／DB或測試斷言。
+
+判讀：同候選在不同執行權限context結果不同，受限環境相容性仍是限制；這不是精確Windows root cause定論。整體QA_ENV_001仍BLOCKED於其餘phase，不能擴張成全環境完成。
