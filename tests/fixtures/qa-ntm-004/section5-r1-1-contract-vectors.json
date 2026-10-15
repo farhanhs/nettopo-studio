@@ -1,0 +1,92 @@
+{
+  "ticket": "QA_NTM_004",
+  "classification": "synthetic-qa-only",
+  "formalProductResult": "NOT_RUN",
+  "contract": {
+    "revision": "SECTION5-R1.1",
+    "sha256": "d87640d787533de697b405f433843c132da38294bcea69d656778c0fc4b6bb34",
+    "status": "FIXED_FOR_RUNNER_PREPARATION"
+  },
+  "digestVectors": [
+    {
+      "id": "scalar-raw-string",
+      "canonicalUtf8Hex": "224769302f3122",
+      "sha256": "cfdd96521d026cf6979b5f835ae5dbc3aa3df27fff54f6f9c248269a7d71aa81"
+    },
+    {
+      "id": "interface-record-optional-present",
+      "canonicalUtf8Hex": "7b22616c6961736573223a5b2275706c696e6b225d2c226465736372697074696f6e223a2265646765222c226465766963654964223a226465762d61222c226964223a2269662d61222c226b696e64223a22706879736963616c222c226e616d65223a224769302f31227d",
+      "sha256": "9811b9c7355a48785594712334c3309a7d9cf6592feeb54e2d09f301db9cafcd"
+    },
+    {
+      "id": "interface-record-optional-removed",
+      "canonicalUtf8Hex": "7b22616c6961736573223a5b2275706c696e6b225d2c226465766963654964223a226465762d61222c226964223a2269662d61222c226b696e64223a22706879736963616c222c226e616d65223a224769302f31227d",
+      "sha256": "775f3199f6409a7a448b7fd584b29f5ddeee052c5aad3198a9a0755bd2faa31c"
+    }
+  ],
+  "fixedTruths": {
+    "sharedPlanDigest": {
+      "algorithm": "SHA-256",
+      "input": "PLAN canonical raw value UTF-8 bytes",
+      "preserveRawStrings": true,
+      "preserveArrayOrder": true,
+      "sortObjectKeysRecursively": true,
+      "omitUndefined": true,
+      "dualAlgorithmAcceptance": false
+    },
+    "legacy": {
+      "rewriteExistingFingerprint": false,
+      "unverifiedShortCircuitsDigest": true,
+      "blankPortInventsInterface": false,
+      "blankPortAllModeEndpoint": "device",
+      "blankPortVerifiedOnlyVisible": false,
+      "linkVlanCreatesLogicalEntity": false
+    },
+    "recordTrust": {
+      "key": "$record",
+      "value": "complete current schema record",
+      "aggregateLeafFields": false,
+      "optionalAddedRemovedOrChangedIsStale": true,
+      "arrayOrderMeaningful": true,
+      "fieldVerificationUpgradesRecord": false,
+      "recordVerificationUpgradesFields": false
+    },
+    "selection": {
+      "unknownRequestedRefCopied": false,
+      "unknownRequestedIdEchoed": false,
+      "unknownIssue": "SELECTION_NOT_VISIBLE",
+      "authorizedFilteredRefMayBeRetained": true,
+      "fallbackUsesFixedRankAndStableId": true
+    }
+  },
+  "formalRunnerCases": [
+    "shared-digest-byte-equivalence",
+    "plan-id-revision-field-fingerprint-unchanged",
+    "legacy-unverified-fingerprint-byte-preserved",
+    "verified-authoritative-digest-current-versus-stale",
+    "record-complete-optional-field-stale",
+    "record-and-field-no-automatic-upgrade",
+    "blank-port-and-legacy-vlan-mapping",
+    "unknown-selection-no-echo",
+    "nfc-equivalent-raw-id-tie-break-permutations"
+  ],
+  "orderingVectors": [
+    {
+      "id": "nfc-equivalent-raw-id-tie-break",
+      "permutations": [
+        ["if-caf\u00e9", "if-cafe\u0301"],
+        ["if-cafe\u0301", "if-caf\u00e9"]
+      ],
+      "normalizedEqual": true,
+      "expectedRawCodePointOrder": ["if-cafe\u0301", "if-caf\u00e9"],
+      "rewriteEntityIds": false
+    }
+  ],
+  "validatorCorrection": {
+    "v1ValidatorRejectsUnknownTopLevelFields": true,
+    "specificTopLevelCleanerMayRebuildOnlyDevicesLinksGroups": true,
+    "nestedUnknownsMayStillReject": true,
+    "relaxesProjectionSafety": false,
+    "v2MayEnterExistingWriter": false
+  }
+}

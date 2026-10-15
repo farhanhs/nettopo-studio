@@ -10,7 +10,7 @@
 | Base Commit | a9abe637f0ad419aced6d31faf30a127ce5b81e6 |
 | Integration Target | codex/dev-rel-001-checkpoint；未授權整合 |
 | Governance / Checkpoint | root R3／PM_GOV_001-D43／WAITING_APPROVAL |
-| Created / Updated | 2026-10-09 / 2026-10-10 |
+| Created / Updated | 2026-10-09 / 2026-10-14 |
 | Engineering commit / push / deploy / live | none |
 
 ## Objective / Authority
@@ -100,3 +100,15 @@ Legacy Project/CSV v1/v2 走明確 upcast；只有顯式 legacy port 字串能�
 初版R1補充固定GEN→field proposals、prepare/resolve/apply深模組interface、owner/scope/fingerprint、tamper/stale、取消零副作用、protected決策、值變更trust失效、相依排除、actor來源/no-auth fail closed、typed errors及PLAN-01–08真值；當時仍待PM scope review。R1.1以下述紀錄取代其衝突細節。
 
 2026-10-10 R1.1：依PM scope review補同instance opaque handle/private evidence registry、CORE raw-string revision、GEN欄位presence/no-clear、stale verified/legacy link保護及唯一issue/decision結果表。DEV記錄final hash並逐項核對五組要求後，可在具名兩產品路徑開始PLAN-R1.1，不需再等一般PM輪次；有矛盾只升該項。原parent contract不變，無Git或其他scope放行。
+
+## §5 Focused Addendum — 2026-10-14
+
+使用者要求依現行流程接續開發後，PM 建立 `DEV_NTM_004`／`QA_NTM_004`，要求只補雙視圖接入缺口，不重開父契約。父契約與 §4 addendum 均未修改。
+
+- Addendum: [TRUSTED-NETWORK-TOPOLOGY-V1-SECTION5-ADDENDUM.md](../contracts/TRUSTED-NETWORK-TOPOLOGY-V1-SECTION5-ADDENDUM.md)
+- Log: [2026-10-14-dsg-ntm-001-section5.md](../../dev開發紀錄/2026-10-14-dsg-ntm-001-section5.md)
+- Focused status: `WAITING_PM_SCOPE_REVIEW`; parent ticket remains `WAITING_APPROVAL` for its unresolved CSV v3/scale/anonymous-case/actor decisions.
+
+SECTION5-R1.1（取代R1衝突細節）fixes a pure async read projector and safe result union, PLAN-compatible shared SHA-256 digest, explicit `$record` semantics without field aggregation, fixed type rank, exact all/verified-only membership and blank-port mapping, deterministic selection/fallback with untrusted-ID suppression, auth-before-projection/no-hidden-rehydrate, safe evidence display and mandatory keyboard/touch/list fallback. It records the actual boundary that app/store/API/storage are still V1: NTM004 may in-memory upcast the already-authorized active V1 Project, but must not pass V2 to an existing writer or claim synthetic V2 module fixtures prove persisted logical Browser data.
+
+2026-10-14：PM 指出 `$record`、CORE/PLAN digest 差異、safe error、固定排序、視圖 membership/blank-port 與不可信 selection 回顯缺口；同票補為 SECTION5-R1.1。未修改產品、測試、package、DB/env、Git index 或歷史候選。next owner：PM 核對 DEV preflight 的精確產品 paths/hunks 是否符合本局部契約；核對後 DEV_NTM_004 才進產品寫入。

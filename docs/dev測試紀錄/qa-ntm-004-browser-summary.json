@@ -1,0 +1,114 @@
+{
+  "ticket": "QA_NTM_004",
+  "runId": "qa-ntm-004-1943407f-1af9-433f-b716-68def6726937",
+  "candidateManifestSha256": "ba766b4e68c1dd621a9e6ea2322eb67cd80a2021492221b638f2dcb02ee86c31",
+  "result": "QA_PASSED",
+  "phase": "PROJ-R1 V1 Browser",
+  "isolation": {
+    "sanitizedMirror": true,
+    "dotenvCopied": false,
+    "dotenvReadGuard": true,
+    "environmentAllowlist": true,
+    "bind": "127.0.0.1",
+    "freshBrowserContext": true,
+    "database": "NOT_STARTED",
+    "docker": "NOT_STARTED"
+  },
+  "gates": {
+    "v1SeedStrictSchemaAndRecordPreflight": "PASS",
+    "ownedFontClassifierPreflight": "PASS",
+    "sanitizedBuild": "PASS",
+    "ownedLoopbackPreview": "PASS",
+    "entryInventorySourceTrust": "PASS",
+    "physicalLogicalSwitch": "PASS",
+    "verifiedOnlyEmptyAndReset": "PASS",
+    "searchListSelectionRootBreadcrumb": "PASS",
+    "simulatedTouchViewFilterList": "PASS",
+    "keyboardNavigation": "PASS",
+    "responsiveAccessibility": "PASS",
+    "zeroWrite": "PASS",
+    "secretConsoleNetworkStorage": "PASS",
+    "returnEditorCanvasInteraction": "PASS",
+    "exitAndTopologySwitchIsolation": "PASS",
+    "sessionRevocationRemovesProjection": "PASS"
+  },
+  "viewports": [
+    {
+      "width": 1280,
+      "height": 900,
+      "horizontalOverflow": false,
+      "touchTargetsAtLeast44": true,
+      "inspectorReachable": true
+    },
+    {
+      "width": 1024,
+      "height": 700,
+      "horizontalOverflow": false,
+      "touchTargetsAtLeast44": true,
+      "inspectorReachable": true
+    },
+    {
+      "width": 768,
+      "height": 900,
+      "horizontalOverflow": false,
+      "touchTargetsAtLeast44": true,
+      "inspectorReachable": true
+    },
+    {
+      "width": 360,
+      "height": 640,
+      "horizontalOverflow": false,
+      "touchTargetsAtLeast44": true,
+      "inspectorReachable": true
+    },
+    {
+      "width": 700,
+      "height": 520,
+      "horizontalOverflow": false,
+      "touchTargetsAtLeast44": true,
+      "inspectorReachable": true
+    }
+  ],
+  "screenshots": [
+    "docs/dev測試紀錄/screenshots/qa-ntm-004-reader-360x640.png"
+  ],
+  "observations": [
+    {
+      "id": "VINEXT_LOCAL_FONT_URL",
+      "blocking": false,
+      "count": 11,
+      "detail": "Sanitized preview emitted local .vinext font URL errors; no product data or secret was present."
+    },
+    {
+      "id": "VINEXT_LOCAL_FONT_REQUEST_FAILURE",
+      "blocking": false,
+      "count": 11,
+      "detail": "Only the matching sanitized preview font requests failed."
+    }
+  ],
+  "cleanup": {
+    "browserContextClosed": true,
+    "browserProcessClosed": true,
+    "previewStopped": true,
+    "portReleased": true,
+    "downloadsRetained": 0,
+    "sanitizedMirrorRemoved": true
+  },
+  "limitations": [
+    "V2 persistence and area/focus breadcrumb Browser NOT RUN",
+    "real DB/RBAC Browser NOT RUN",
+    "anonymous UAT NOT RUN"
+  ],
+  "toolDiagnostics": {
+    "dotenv-probe.log": "[WORKTREE]\\.local\\qa-ntm-004-1943407f-1af9-433f-b716-68def6726937\\deny-dotenv.cjs:2\r\nfunction deny(p){if(p instanceof URL)p=fileURLToPath(p);if(typeof p==='string'&&/^\\.env(?:\\.|$)/i.test(path.basename(p)))throw new Error('QA_NTM_004_DOTENV_READ_DENIED');}\r\n                                                                                                                         ^\r\n\r\nError: QA_NTM_004_DOTENV_READ_DENIED\r\n    at deny ([WORKTREE]\\.local\\qa-ntm-004-1943407f-1af9-433f-b716-68def6726937\\deny-dotenv.cjs:2:128)\r\n    at fs.<computed> [as readFileSync] ([WORKTREE]\\.local\\qa-ntm-004-1943407f-1af9-433f-b716-68def6726937\\deny-dotenv.cjs:3:119)\r\n    at [eval]:1:20\r\n    at runScriptInThisContext (node:internal/vm:219:10)\r\n    at node:internal/process/execution:451:12\r\n    at [eval]-wrapper:6:24\r\n    at runScriptInContext (node:internal/process/execution:449:60)\r\n    at evalFunction (node:internal/process/execution:283:30)\r\n    at evalTypeScript (node:internal/process/execution:295:3)\r\n    at node:internal/main/eval_string:71:3\r\n\r\nNode.js v24.18.0\r\n"
+  },
+  "resources": {
+    "previewPid": 11812,
+    "port": 55221,
+    "previewExit": {
+      "exitCode": null,
+      "signalCode": "SIGTERM"
+    }
+  },
+  "candidateUnchanged": true
+}

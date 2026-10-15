@@ -1,0 +1,116 @@
+{
+  "ticket": "QA_NTM_004",
+  "classification": "synthetic-qa-only",
+  "formalResult": "NOT_RUN",
+  "contractStatus": "PENDING_DSG_SECTION_5",
+  "sourceProject": "tests/fixtures/qa-ntm-001/valid-project-v2.json",
+  "sentinels": ["QA_NTM_004_SAFE_SENTINEL", "qa_ntm_004_hidden_site"],
+  "vectors": [
+    {
+      "id": "same-snapshot-dual-projection",
+      "covers": ["PROJ-01"],
+      "expected": {
+        "deterministicPhysical": true,
+        "deterministicLogical": true,
+        "sourceMutation": false,
+        "durableGraphCopies": 0,
+        "writes": 0
+      }
+    },
+    {
+      "id": "stable-id-and-legacy-unknown-endpoint",
+      "covers": ["PROJ-02"],
+      "legacy": {
+        "deviceId": "legacy-device-a",
+        "linkId": "legacy-link-a",
+        "fromPort": null
+      },
+      "expected": {
+        "stableEntityIds": true,
+        "missingInterfaceState": "unknown",
+        "canvasAnchorIsInterface": false,
+        "inventedInterfaceCount": 0
+      }
+    },
+    {
+      "id": "verified-only-closure-and-reason",
+      "covers": ["PROJ-03"],
+      "classes": ["verified-complete", "unverified-endpoint", "stale-trust", "filtered-dependency", "missing-identity"],
+      "expected": {
+        "verifiedRequiresRelationAndEndpointClosure": true,
+        "staleTrustAccepted": false,
+        "filteredItemHasSafeReason": true,
+        "claimsDisconnected": false,
+        "claimsHealthy": false
+      }
+    },
+    {
+      "id": "navigation-selection-fallback",
+      "covers": ["PROJ-04"],
+      "path": ["area-region", "area-site", "dev-switch", "if-switch-vlan10"],
+      "invalidSelections": ["missing-id", "hidden-id", "filtered-id"],
+      "expected": {
+        "stableSelectionById": true,
+        "fallbackIsExplicit": true,
+        "collapseMutatesPhysicalLinks": false,
+        "breadcrumbUsesVisibleAncestorsOnly": true
+      }
+    },
+    {
+      "id": "authorization-and-hidden-data-boundary",
+      "covers": ["PROJ-05"],
+      "visibleIds": ["area-site", "dev-switch"],
+      "hiddenIds": ["qa_ntm_004_hidden_site", "qa_ntm_004_hidden_device"],
+      "unsafeInputs": ["QA_NTM_004_PASSWORD_SENTINEL", "postgresql://qa_ntm_004_invalid_dsn"],
+      "expected": {
+        "authorizationBeforeProjection": true,
+        "hiddenIdsLoadedByClient": false,
+        "clientAreaGrantsAccess": false,
+        "safeErrorEcho": false,
+        "safeSummaryContainsRawSource": false
+      }
+    },
+    {
+      "id": "browser-interaction-and-responsive-a11y",
+      "covers": ["PROJ-06"],
+      "viewports": [
+        { "width": 360, "height": 640 },
+        { "width": 768, "height": 900 },
+        { "width": 1024, "height": 700 },
+        { "width": 1280, "height": 900 },
+        { "width": 700, "height": 450 }
+      ],
+      "expected": {
+        "switchSearchSourceReason": true,
+        "nonColorTrustCue": true,
+        "keyboardReachable": true,
+        "touchTargetObservable": true,
+        "criticalControlsVisible": true,
+        "pageHorizontalOverflow": false
+      }
+    },
+    {
+      "id": "synthetic-performance-observation",
+      "covers": ["PROJ-07"],
+      "syntheticScale": { "areas": 3, "devices": 60, "interfaces": 240, "links": 120, "relations": 360 },
+      "expected": {
+        "recordMachine": true,
+        "recordElapsed": true,
+        "newProductThresholdClaim": false,
+        "anonymousRealCaseClaim": false
+      }
+    },
+    {
+      "id": "regression-and-evidence-separation",
+      "covers": ["PROJ-08"],
+      "expected": {
+        "coreGenPlanTargeted": true,
+        "affectedLegacyUiTargeted": true,
+        "moduleBrowserPersistenceDbSeparated": true,
+        "dependencyClosureHasRawHashes": true,
+        "prePostHashesCompared": true,
+        "ownedCleanupRequired": true
+      }
+    }
+  ]
+}

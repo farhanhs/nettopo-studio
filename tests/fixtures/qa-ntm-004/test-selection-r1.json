@@ -1,0 +1,81 @@
+{
+  "ticket": "QA_NTM_004",
+  "classification": "qa-only-positive-allowlist",
+  "formalProductResult": "NOT_RUN",
+  "wildcardsAllowed": false,
+  "moduleAllowlist": [
+    "tests/dev-ntm-001-core.test.mjs",
+    "tests/dev-ntm-002-candidates.test.mjs",
+    "tests/dev-ntm-003-change-plan.test.mjs",
+    "tests/dev-ntm-004-digest.test.mjs",
+    "tests/dev-ntm-004-trust.test.mjs",
+    "tests/dev-ntm-004-projection.test.mjs",
+    "tests/qa-ntm-001-core.test.mjs",
+    "tests/qa-ntm-002-formal.test.mjs",
+    "tests/qa-ntm-003-formal.test.mjs",
+    "tests/qa-ntm-004-formal.test.mjs",
+    "tests/qa-ntm-004-preparation.test.mjs",
+    "tests/qa-ntm-004-contract-preparation.test.mjs",
+    "tests/topology-routing.test.mjs",
+    "tests/topology-routing-qa-uix.test.mjs",
+    "tests/topology-layout.test.mjs",
+    "tests/topology-visibility.test.mjs",
+    "tests/dev-uix-005-drag-persistence.test.mjs",
+    "tests/dev-uix-006-inspector-remount.test.mjs",
+    "tests/dev-uix-007-topbar-responsive.test.mjs",
+    "tests/dev-uix-008-canvas-resize.test.mjs"
+  ],
+  "browserAllowlist": [
+    "tests/qa-ntm-004-browser.mjs"
+  ],
+  "envReadExceptions": [
+    {
+      "path": "tests/qa-ntm-001-core.test.mjs",
+      "reason": "reads only QA_NTM_PREP_ONLY; formal invocation must use the explicit sanitized environment"
+    }
+  ],
+  "blockedClasses": [
+    {
+      "id": "real-db-or-db-fixture",
+      "status": "BLOCKED_NO_AUTHORIZATION",
+      "examples": [
+        "tests/qa-pil-006-postgres-lifecycle.test.mjs",
+        "tests/qa-pil-006-postgres-fixture.mjs",
+        "tests/qa-pil-001-real-postgres.test.mjs",
+        "tests/qa-dbm-001-real-postgres.test.mjs",
+        "tests/rbac-repository.integration.test.mjs",
+        "tests/rbac-precedence.integration.test.mjs"
+      ]
+    },
+    {
+      "id": "browser-child-process",
+      "status": "SEPARATE_OWNED_BROWSER_GATE",
+      "examples": ["tests/qa-ntm-004-browser.mjs"]
+    },
+    {
+      "id": "unknown-unclassified-test",
+      "status": "BLOCKED_UNTIL_CLASSIFIED",
+      "examples": ["any test not present in an explicit allowlist"]
+    },
+    {
+      "id": "full-glob",
+      "status": "PROHIBITED_FOR_QA_NTM_004",
+      "examples": ["tests/*.test.mjs", "node --test tests"]
+    }
+  ],
+  "requiredBeforeFormalModule": [
+    "dev-ready-for-qa",
+    "writer-stopped",
+    "candidate-manifest-and-full-import-closure-fixed",
+    "allowlist-files-exist-and-hashes-recorded",
+    "source-closure-guard-pass",
+    "explicit-sanitized-process-environment"
+  ],
+  "requiredBeforeFormalBrowser": [
+    "all-formal-module-prerequisites",
+    "sanitized-project-mirror-created-without-dotenv",
+    "owned-loopback-port-and-pid-recorded",
+    "temporary-profile-storage-download-paths-recorded",
+    "cleanup-recovery-plan-recorded"
+  ]
+}

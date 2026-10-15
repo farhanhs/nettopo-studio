@@ -1,0 +1,263 @@
+{
+  "ticket": "QA_NTM_004",
+  "historyNote": "Runs before the cleanup-verification correction are retained as QA harness history and are not sufficient final PASS evidence.",
+  "runs": [
+    {
+      "runId": "qa-ntm-004-e9dd684d-3c7e-488b-ba1b-68670d95ea2e",
+      "result": "HARNESS_FAILED",
+      "failure": "Windows denied dependency junction creation before the original try/finally boundary.",
+      "gates": {},
+      "cleanup": {
+        "browserNeverStarted": true,
+        "previewNeverStarted": true,
+        "manualSanitizedMirrorRemoved": true
+      },
+      "candidateUnchanged": true
+    },
+    {
+      "runId": "qa-ntm-004-41dfad3a-88bc-4991-81d4-9fa26f7ba9ae",
+      "result": "HARNESS_FAILED",
+      "failure": "Sanitized mirror build omitted a required allowlisted example resource.",
+      "gates": {},
+      "cleanup": {
+        "legacyEvidence": "INSUFFICIENT",
+        "sanitizedMirrorRemoved": true
+      },
+      "candidateUnchanged": true
+    },
+    {
+      "runId": "qa-ntm-004-6ee9c50d-64c7-4633-85d6-4955a8bb7553",
+      "result": "HARNESS_FAILED",
+      "failure": "V2 fixture was incorrectly seeded into the V1 durable store; workspace did not become ready.",
+      "gates": {
+        "sanitizedBuild": "PASS",
+        "ownedLoopbackPreview": "PASS"
+      },
+      "cleanup": {
+        "legacyEvidence": "INSUFFICIENT",
+        "sanitizedMirrorRemoved": true
+      },
+      "candidateUnchanged": true
+    },
+    {
+      "runId": "qa-ntm-004-41e3769f-de57-4e20-8ae9-2e567708b3b3",
+      "result": "HARNESS_FAILED",
+      "failure": "The V2-to-V1 fixture conversion retained a strict-schema-incompatible device field.",
+      "gates": {
+        "sanitizedBuild": "PASS",
+        "ownedLoopbackPreview": "PASS"
+      },
+      "cleanup": {
+        "legacyEvidence": "INSUFFICIENT",
+        "sanitizedMirrorRemoved": true
+      },
+      "candidateUnchanged": true
+    },
+    {
+      "runId": "qa-ntm-004-4555fab1-ae0c-4bf2-bb5e-d7b133b1ff06",
+      "result": "HARNESS_FAILED",
+      "failure": "QA expected five legacy interfaces although four explicit ports correctly upcast to four interfaces.",
+      "gates": {
+        "sanitizedBuild": "PASS",
+        "ownedLoopbackPreview": "PASS"
+      },
+      "cleanup": {
+        "legacyEvidence": "INSUFFICIENT",
+        "sanitizedMirrorRemoved": true
+      },
+      "candidateUnchanged": true
+    },
+    {
+      "runId": "qa-ntm-004-9c5ac8c7-9307-4a98-8826-7499ada473dc",
+      "result": "HARNESS_FAILED",
+      "failure": "QA expected V2 evidence text instead of the contract-required legacy unverified source.",
+      "gates": {
+        "sanitizedBuild": "PASS",
+        "ownedLoopbackPreview": "PASS"
+      },
+      "cleanup": {
+        "legacyEvidence": "INSUFFICIENT",
+        "sanitizedMirrorRemoved": true
+      },
+      "candidateUnchanged": true
+    },
+    {
+      "runId": "qa-ntm-004-94d0dad7-f1e9-4992-80ce-026b8f22891e",
+      "result": "HARNESS_FAILED",
+      "failure": "QA searched for a V2 area breadcrumb in the approved V1 Browser phase.",
+      "gates": {
+        "v1SeedStrictSchemaAndRecordPreflight": "PASS",
+        "entryInventorySourceTrust": "PASS",
+        "physicalLogicalSwitch": "PASS",
+        "verifiedOnlyEmptyAndReset": "PASS"
+      },
+      "cleanup": {
+        "legacyEvidence": "INSUFFICIENT",
+        "sanitizedMirrorRemoved": true
+      },
+      "candidateUnchanged": true
+    },
+    {
+      "runId": "qa-ntm-004-e41e0463-9da1-4872-8d72-03701bf30c0b",
+      "result": "HARNESS_FAILED",
+      "failure": "QA measured the checkbox glyph instead of its 44px label hit target.",
+      "gates": {
+        "keyboardNavigation": "PASS",
+        "searchListSelectionRootBreadcrumb": "PASS"
+      },
+      "cleanup": {
+        "legacyEvidence": "INSUFFICIENT",
+        "sanitizedMirrorRemoved": true
+      },
+      "candidateUnchanged": true
+    },
+    {
+      "runId": "qa-ntm-004-dffbbfb0-08af-49f4-bd8c-7f610661702d",
+      "result": "HARNESS_FAILED",
+      "failure": "QA treated the exact sanitized vinext local-font console message as an unclassified product error.",
+      "gates": {
+        "responsiveAccessibility": "PASS",
+        "zeroWrite": "PASS"
+      },
+      "cleanup": {
+        "legacyEvidence": "INSUFFICIENT",
+        "sanitizedMirrorRemoved": true
+      },
+      "candidateUnchanged": true
+    },
+    {
+      "runId": "qa-ntm-004-d7165e49-c21d-4076-b0ca-79fa6e435463",
+      "result": "HARNESS_FAILED",
+      "failure": "The matching sanitized vinext font request failure was not yet classified with the console observation.",
+      "gates": {
+        "responsiveAccessibility": "PASS",
+        "zeroWrite": "PASS"
+      },
+      "cleanup": {
+        "legacyEvidence": "INSUFFICIENT",
+        "sanitizedMirrorRemoved": true
+      },
+      "candidateUnchanged": true
+    },
+    {
+      "runId": "qa-ntm-004-46e73f63-b042-4707-8ebc-b9e2c13eca66",
+      "result": "HARNESS_FAILED",
+      "failure": "Topology-switch assertion used a non-unique text locator.",
+      "gates": {
+        "secretConsoleNetworkStorage": "PASS",
+        "zeroWrite": "PASS"
+      },
+      "cleanup": {
+        "legacyEvidence": "INSUFFICIENT",
+        "sanitizedMirrorRemoved": true
+      },
+      "candidateUnchanged": true
+    },
+    {
+      "runId": "qa-ntm-004-6f742a3a-c56f-4887-9804-362e148d00c2",
+      "result": "PASS_WITH_INSUFFICIENT_CLEANUP_EVIDENCE",
+      "failure": "Functional Browser gates passed, but cleanup booleans were not derived from verified close/rebind outcomes.",
+      "gates": {
+        "functionalBrowser": "PASS",
+        "secretConsoleNetworkStorage": "PASS",
+        "topologyAndSessionIsolation": "PASS"
+      },
+      "cleanup": {
+        "legacyEvidence": "INSUFFICIENT",
+        "sanitizedMirrorRemoved": true
+      },
+      "candidateUnchanged": true
+    },
+    {
+      "runId": "qa-ntm-004-fadf2cde-68bf-4d85-9e24-af1b781c26ac",
+      "result": "QA_FAILED",
+      "failure": "Owned resource cleanup verification failed",
+      "gates": {
+        "v1SeedStrictSchemaAndRecordPreflight": "PASS",
+        "ownedFontClassifierPreflight": "PASS",
+        "sanitizedBuild": "PASS",
+        "ownedLoopbackPreview": "PASS",
+        "entryInventorySourceTrust": "PASS",
+        "physicalLogicalSwitch": "PASS",
+        "verifiedOnlyEmptyAndReset": "PASS",
+        "searchListSelectionRootBreadcrumb": "PASS",
+        "simulatedTouchViewFilterList": "PASS",
+        "keyboardNavigation": "PASS",
+        "responsiveAccessibility": "PASS",
+        "zeroWrite": "PASS",
+        "secretConsoleNetworkStorage": "PASS",
+        "returnEditorCanvasInteraction": "PASS",
+        "exitAndTopologySwitchIsolation": "PASS",
+        "sessionRevocationRemovesProjection": "PASS"
+      },
+      "cleanup": {
+        "browserContextClosed": true,
+        "browserProcessClosed": true,
+        "previewStopped": false,
+        "portReleased": true,
+        "downloadsRetained": 0,
+        "sanitizedMirrorRemoved": true
+      },
+      "candidateUnchanged": true,
+      "observations": [
+        {
+          "id": "VINEXT_LOCAL_FONT_URL",
+          "blocking": false,
+          "count": 11,
+          "detail": "Sanitized preview emitted local .vinext font URL errors; no product data or secret was present."
+        },
+        {
+          "id": "VINEXT_LOCAL_FONT_REQUEST_FAILURE",
+          "blocking": false,
+          "count": 11,
+          "detail": "Only the matching sanitized preview font requests failed."
+        }
+      ]
+    },
+    {
+      "runId": "qa-ntm-004-1943407f-1af9-433f-b716-68def6726937",
+      "result": "QA_PASSED",
+      "gates": {
+        "v1SeedStrictSchemaAndRecordPreflight": "PASS",
+        "ownedFontClassifierPreflight": "PASS",
+        "sanitizedBuild": "PASS",
+        "ownedLoopbackPreview": "PASS",
+        "entryInventorySourceTrust": "PASS",
+        "physicalLogicalSwitch": "PASS",
+        "verifiedOnlyEmptyAndReset": "PASS",
+        "searchListSelectionRootBreadcrumb": "PASS",
+        "simulatedTouchViewFilterList": "PASS",
+        "keyboardNavigation": "PASS",
+        "responsiveAccessibility": "PASS",
+        "zeroWrite": "PASS",
+        "secretConsoleNetworkStorage": "PASS",
+        "returnEditorCanvasInteraction": "PASS",
+        "exitAndTopologySwitchIsolation": "PASS",
+        "sessionRevocationRemovesProjection": "PASS"
+      },
+      "cleanup": {
+        "browserContextClosed": true,
+        "browserProcessClosed": true,
+        "previewStopped": true,
+        "portReleased": true,
+        "downloadsRetained": 0,
+        "sanitizedMirrorRemoved": true
+      },
+      "candidateUnchanged": true,
+      "observations": [
+        {
+          "id": "VINEXT_LOCAL_FONT_URL",
+          "blocking": false,
+          "count": 11,
+          "detail": "Sanitized preview emitted local .vinext font URL errors; no product data or secret was present."
+        },
+        {
+          "id": "VINEXT_LOCAL_FONT_REQUEST_FAILURE",
+          "blocking": false,
+          "count": 11,
+          "detail": "Only the matching sanitized preview font requests failed."
+        }
+      ]
+    }
+  ]
+}

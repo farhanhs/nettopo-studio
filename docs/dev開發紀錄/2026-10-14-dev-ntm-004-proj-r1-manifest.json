@@ -1,0 +1,348 @@
+{
+  "candidateId": "DEV_NTM_004-PROJ-R1-2026-10-14",
+  "status": "READY_FOR_QA",
+  "writerStopped": true,
+  "primaryDev": "019fa64f-d5f1-7d61-bf93-47a9e7c293c7",
+  "nextOwner": {
+    "ticket": "QA_NTM_004",
+    "threadId": "019fac8e-94dc-79c1-b156-7f242cf82967",
+    "hostId": "local"
+  },
+  "worktree": "C:/Users/DUS/Desktop/project/nettopo-studio/.local/worktrees/dev-rel-001-checkpoint",
+  "branch": "codex/dev-rel-001-checkpoint",
+  "baseHead": "590339395ec8cf5af5591d3be4379bd3ab4ebc6b",
+  "uncommittedCandidate": true,
+  "contract": {
+    "revision": "SECTION5-R1.1",
+    "sha256": "d87640d787533de697b405f433843c132da38294bcea69d656778c0fc4b6bb34",
+    "scopeReview": "C:/Users/DUS/Desktop/project/nettopo-studio/docs/dev開發紀錄/2026-10-14-pm-ntm-projection-scope-review.md"
+  },
+  "productPaths": [
+    {
+      "path": "app/lib/trusted-network-digest.ts",
+      "before": null,
+      "after": "207ce5fa1ea7f24161bf114b5a83697ddb02eadefb4cffc0ed794f3a9c951a85"
+    },
+    {
+      "path": "app/lib/trusted-network-projection.ts",
+      "before": null,
+      "after": "02fc9e1311c3c54c83094e762160db2ba57ae01fb7c065b14ce6f8d85b3d800f"
+    },
+    {
+      "path": "app/components/topology/TrustedNetworkReader.tsx",
+      "before": null,
+      "after": "c310d1054b2d6306fff382ed512b319f3ba130de2454e4c029f806c63b14a0f8"
+    },
+    {
+      "path": "app/components/topology/TrustedNetworkReader.module.css",
+      "before": null,
+      "after": "a932957dda987e3a090cb532d0aab8e4083c8ca914c9872424b2a0d6f2698d27"
+    },
+    {
+      "path": "app/lib/trusted-network-change-plan.ts",
+      "before": "e403bd8be3a448870158353e2fa0cbb30e90af59c79ed85fd385b2a73933d6fb",
+      "after": "bed33da19183b67f3f326eb9fefb7a55bcb87c829d31391fd94945e7130bea4b"
+    },
+    {
+      "path": "app/lib/trusted-network-model.ts",
+      "before": "b0217c37e2ef34a8432a40a21b16305892d73e94c14b18b8ea52cc4cecaa16e7",
+      "after": "387f63681cd20bf96469d7dbb770b9474885349eadd890416d5559a1fa246356"
+    },
+    {
+      "path": "app/page.tsx",
+      "before": "bfdbdc45a3295dcc2adbdfbc241c4ca83f83d32e99f12e2e8a3cb9d71382f5d1",
+      "after": "35f722104907e4988260f79fdaa898974270ff6021d7f4d3ada2853f2cb9f8ce"
+    }
+  ],
+  "devTestPaths": [
+    {
+      "path": "tests/dev-ntm-004-digest.test.mjs",
+      "sha256": "11aa48b17f28e96ece83b4053fb80a2682552cf1213b5b94922df1ef0be319c4"
+    },
+    {
+      "path": "tests/dev-ntm-004-trust.test.mjs",
+      "sha256": "684a255e3cbf92d45a343794de634e40c0eaa31d86ae9ec12507080d880c543e"
+    },
+    {
+      "path": "tests/dev-ntm-004-projection.test.mjs",
+      "sha256": "68e2e8eb6c36bdc2c7de300d69a535fc5ce250d917a3e53e6a12817b5ab68b76"
+    },
+    {
+      "path": "tests/dev-ntm-004-browser.mjs",
+      "sha256": "fd97399b2fd5e8930079f6f92e487f538e6d52fd18deb9dbd92aacf1ce2831e8"
+    },
+    {
+      "path": "tests/fixtures/dev-ntm-004/projection-vectors.json",
+      "sha256": "a9bc4db2790db2ac9459a95632e9f6d4987c4fccd10db3b05a7dfba3eb9e9aee"
+    }
+  ],
+  "fileHashes": {
+    "app/api/audit-logs/route.ts": "b2e5a04e0c1032457c3fd7a899fe6bedacd4f4afb8f898edbc5a1fd8a4fa4174",
+    "app/api/credentials/route.ts": "31c78d157a6422721bc526447e22e300233507fbb823a51ec118b2c05563a365",
+    "app/api/dev/identities/route.ts": "84d2e3d62b889f6791dd094601a9fcd5c45cb0dd9827a2486c162a63e2f97bd4",
+    "app/api/dev/session/route.ts": "812938726729dccce2b26ed194e6959adc9f7547cc8a6eca6280bf7972ae3954",
+    "app/api/health/schema/route.ts": "0a5685d5f06c2e04eb74aba29c2d8d71a00c85cf828ea5d5369f6b4009efe38f",
+    "app/api/pilot/session/route.ts": "78c7f8de3852d242c873becceb8813c8ea5b844fddc1d825814ff3e3ebddd0ac",
+    "app/api/runtime-capabilities/route.ts": "e7e34729a822c0ec754404b233896e52be8f099833396fd86b2fe162dee8782a",
+    "app/api/session/route.ts": "5a22e38bc292495e038e43afeafb06727135b0a668793c508dcaffff11497607",
+    "app/api/topology/route.ts": "0cdfc2569957896eca286668736d99727dd3cd4c32ea91af600b816ec2944295",
+    "app/chatgpt-auth.ts": "1407f614cc83d7049fdb08cd713d2516866ba58e24e820f7f4fd9d718b9d3007",
+    "app/components/import/FileDropZone.tsx": "0ecbd0e09d2922e176d5a0f8f54642214cd5a4feebc5ded4aa363d0de169f221",
+    "app/components/import/ImportIssueList.tsx": "063bd7002e984af041475886b26895482d5d5e637bb4d3cbfad009bed6e0d487",
+    "app/components/import/ImportPreviewModal.tsx": "081f789051f11b36bd6406e772981cda7f6e9b0bd5b4a3a8a0664a1371523b05",
+    "app/components/import/ImportSummary.tsx": "b4299d4db94c33cf83d7940723bd5b709ba951a56b40e4efd789ab67d365aef9",
+    "app/components/import/MaskedCredentialPreview.tsx": "d3d2d732d370be961f14e0b63099072fd0e20669f2f9ae410c6d88780bbe5194",
+    "app/components/import/MissingInfoChecklist.tsx": "6f3cb385608783ee5880f1060c2f6c07581dbf30a13bcbf0994b7762c336330f",
+    "app/components/topology/TrustedNetworkReader.module.css": "a932957dda987e3a090cb532d0aab8e4083c8ca914c9872424b2a0d6f2698d27",
+    "app/components/topology/TrustedNetworkReader.tsx": "c310d1054b2d6306fff382ed512b319f3ba130de2454e4c029f806c63b14a0f8",
+    "app/globals.css": "1b94242fa83a0744cd75538f9de5ab5c8a2e69a0b92adf3a0e9c6533da7aa5b6",
+    "app/layout.tsx": "d6c7b08fd059705f3a5ef58d5209f01745419036b91d311efbadd8b3d5404d8e",
+    "app/lib/credential-masking.ts": "685f6222ddded6188d8315c6aee339857c7ab482769abe82c79d1b7752b89b02",
+    "app/lib/demo-topologies.ts": "79885027b81d407a5738a1c465656e85e26b82ea6f90ce432dddc98d99ca1664",
+    "app/lib/login-auth.ts": "ac8fbceec8367bb6f466d69b9bf7c859174c4c9a00de8ee3c96ca18db5b81d1d",
+    "app/lib/server/http-security.ts": "6ab9e604baefc01a7b70b0c2a991c953076a5207d2acaea6b452d8740eec70a4",
+    "app/lib/server/pilot-policy.ts": "baf423c749ed5b73424d73526faf1bbe120041752e146055664acf7a99e83643",
+    "app/lib/server/pilot-request.ts": "50d5ea181a598d8d48ca3070adcec1bd6acdbf01122069bbf0a779a709dd6a87",
+    "app/lib/server/pilot-session.ts": "6317136f092e14d7154b15293bf022ff9aa507d0894b8e050aedef7b047f94c7",
+    "app/lib/server/rbac-policy.ts": "47b633113b440b47afde8eb4bda03872ca3fe7ee3fe63efe769638172adfa0e8",
+    "app/lib/server/request-identity.ts": "9852cab2d0b4a46f43cb9c5c48a2abccd3513ead682238d94a4491ae2dc7935d",
+    "app/lib/server/runtime-policy.ts": "e596dda891150d001864058bcd3857eb7f992093925c5a8144b6f1e3717c6673",
+    "app/lib/topology-db.ts": "08c17bcac2c72a8aad14f76268ca1b2f8dcd0edd07522574e514a4a5e7b43efb",
+    "app/lib/topology-document-parser.ts": "f657c7804c3812eff694ccb4e75eec069373e2e7219b753a0573df3cb83e8eff",
+    "app/lib/topology-layout.ts": "7f898931072e2ae6ff193060c47715d3f739d1755f187f99bc0c9d36564e4a10",
+    "app/lib/topology-missing-info.ts": "1037517f4c1c66f0a7e0e8824966be308f670b309d93e2b87e36706394e53220",
+    "app/lib/topology-routing.ts": "3b57e6913f28eddec6052e132f70ecce9f78f61c21be19600d1b67cabc7b1bc8",
+    "app/lib/topology-store.ts": "8a5d2b7bca304683ae484e7f5d05165afd2acf64541c4c477a8b133f755a0003",
+    "app/lib/topology-transfer.ts": "d3e77f1aeda7a6f76e0d70962502f44891c69c819e04d533fab35a59144fb780",
+    "app/lib/topology-types.ts": "474beaf4e2a044230e21971459da40ce50aef7df4f8884ebbf0a709a2f3fb1d4",
+    "app/lib/topology-validation.ts": "f3d727859e6c4aea86d8e8dcd9f50e6cbb24f248b12e2c1165375ecfdcf5df19",
+    "app/lib/topology-visibility.ts": "be42cde72ee900d32607a18d536b54fe33b37f601f2e802da9e9eff647aa16e8",
+    "app/lib/trusted-network-change-plan.ts": "bed33da19183b67f3f326eb9fefb7a55bcb87c829d31391fd94945e7130bea4b",
+    "app/lib/trusted-network-digest.ts": "207ce5fa1ea7f24161bf114b5a83697ddb02eadefb4cffc0ed794f3a9c951a85",
+    "app/lib/trusted-network-interface-candidates.ts": "d53c2f462f59d0a87c7588c6e4240b37885be1bc5000e73a77588a5f93357701",
+    "app/lib/trusted-network-model.ts": "387f63681cd20bf96469d7dbb770b9474885349eadd890416d5559a1fa246356",
+    "app/lib/trusted-network-projection.ts": "02fc9e1311c3c54c83094e762160db2ba57ae01fb7c065b14ce6f8d85b3d800f",
+    "app/lib/trusted-network-types.ts": "53ef00f4f668f151cc9e0a82c23550343428624399a8cd61d78d11d62e40997b",
+    "app/page.tsx": "35f722104907e4988260f79fdaa898974270ff6021d7f4d3ada2853f2cb9f8ce",
+    "build/sites-vite-plugin.ts": "abd6bc3a592961e978ab72fceb8ee7647824d9a2321ee5b5777b2a05d69526cc",
+    "db/credential-crypto.ts": "3da84fec7f3e7e3a41783c4891a283b5125fa50b2412d06ee4c860ecc866adf3",
+    "db/data-dictionary.ts": "148a805123568ec9751d0b85c90ec4ec668617d80fcbeed30ea47b59094b4501",
+    "db/migrations/0001_formal_topology_schema.sql": "6bc0195c84be1413d69aa6f048d9fd548236c521d1472c6f9d80fab03df34256",
+    "db/migrations/0002_dictionary_constraints.sql": "a48749253d7cba4dcce4397592ec1ee6945543b82d96d3ffe1747f1369a55742",
+    "db/migrations/0003_project_device_credentials.sql": "ba95378fb6855b8da02614106dae7440c3a00cd0a62e7b9c5e98bfa80b4edefd",
+    "db/migrations/0004_topology_quantity_and_collapse.sql": "4f2d818af4753841526616bf4f311376c9a5b57dd8f81acc9abe4f5c02204083",
+    "db/postgres-connection.ts": "8331671583905259f88276e34439ff78f6b6ad640c30da954c271d4d4be5a7fd",
+    "db/postgres-migrations.js": "f10858e772ef53c60802d9d77a7d74fb6dad50ccba195213fa8a617838e25369",
+    "db/postgres-schema-check.ts": "22a894df703dcd7c7266aa7ebbc298f0995a88fa44f4cd847ef19860a4603dd9",
+    "db/postgres-schema-version.ts": "6c142aba7a962e425c39122c2b1faf7c9ebef6cd7e1836db12a9c59a7a633481",
+    "db/schema.ts": "0aecb02d5c157c6891c9688e3d5d41817e46622e708a9a100187b5bcc7e6281d",
+    "db/topology-postgres.ts": "528495d31dca9a118c9e32fb6a323cc9a420e607ba38cf4d57e506a22b4d9c80",
+    "db/topology-scope.ts": "cc4e3c53ea493d58a0cc42b7e83c44fafad8a2ecd6e40fafb41ab4d77e5afb55",
+    "db/virtual-test-data.ts": "bea38b371b92f0f6ceba9d489bd2768cfd71911083c15100ccf5d70c84c76392",
+    "eslint.config.mjs": "0130b6081a3042165f5c0ea00eebc9b0a97d7ef2b58a35acd6373090270d89e1",
+    "examples/sean-sie-spine-leaf-demo.json": "f3895be3a6bb74f16d60ff98c1cec1ba3f28de87c4313810d88fd40892ada2a1",
+    "next.config.ts": "a972c4f0ffa6dd714e7909b02d1ac19d2f2fe3d01f191efd2c5054bd6f142ec1",
+    "package-lock.json": "4d30e1dff901bcf26e1bd06071f34a12d6cc5bc28ee52d142d877749dccaa8b8",
+    "package.json": "af65067a2c5dc6ef36749e14a504365c954eab0b7e9ca8fbb566ce715aa8c0a9",
+    "postcss.config.mjs": "7b299d3d3b16699ddda397c0b2373b3af4f25f8fc9ccc9b3d9e64ef083bc1c21",
+    "public/favicon.svg": "3e8863288c2d43dd33d2a71de317dcf9198f09932ea8d61e0def1b846a865435",
+    "public/file.svg": "2b67812c325c199a02536cdbeea0c593a72f707d323b72ee3e08dbab06753bd4",
+    "public/globe.svg": "b614b9bf183925957661ac851498fe1d8029fd43a62fbfed86f9e2624a57e7cf",
+    "public/window.svg": "644768c4aaeb4767bce293344eeb0c125fb804a94d801440424072202d85e3a1",
+    "scripts/build-local.mjs": "9b1c73e8832d983d1117651d85095f6f040c66ed351f1be9ad6625ddfd942b04",
+    "scripts/preview-server.mjs": "4ce1d8b97ab72ad9aee495e8a98344a7190dd8a1104c51c723ad9b305e372a39",
+    "scripts/validate-runtime-policy.mjs": "1592d3ba653d82560ef76d731d72c85cd93b8024ba3588d148bdceb38432f086",
+    "tests/dev-ntm-001-core.test.mjs": "88e2ec23a5e51c60cae07a977304171c742ce48f24c77cc807159b616459df9a",
+    "tests/dev-ntm-002-candidates.test.mjs": "137e674aa2628be47df7b1982633a8622de3a5871748005bb5f977a660d4cbbf",
+    "tests/dev-ntm-003-change-plan.test.mjs": "fa50fea0600ddf90b4ee40bcb3f3354daf47333100f344107cf224ee2f1290f7",
+    "tests/dev-ntm-004-browser.mjs": "fd97399b2fd5e8930079f6f92e487f538e6d52fd18deb9dbd92aacf1ce2831e8",
+    "tests/dev-ntm-004-digest.test.mjs": "11aa48b17f28e96ece83b4053fb80a2682552cf1213b5b94922df1ef0be319c4",
+    "tests/dev-ntm-004-projection.test.mjs": "68e2e8eb6c36bdc2c7de300d69a535fc5ce250d917a3e53e6a12817b5ab68b76",
+    "tests/dev-ntm-004-trust.test.mjs": "684a255e3cbf92d45a343794de634e40c0eaa31d86ae9ec12507080d880c543e",
+    "tests/dev-uix-005-drag-persistence.test.mjs": "bfb47bdc9117be7ec71bce2b86f2a5ae63738d046039ff170fd699a73e750538",
+    "tests/dev-uix-006-inspector-remount.test.mjs": "deab0fcac5f13accc7ca4a1db2397cd7ecb58ab86406cf3b865a9d934a797c8c",
+    "tests/dev-uix-007-topbar-responsive.test.mjs": "c625ee57cbb4fd9145cfc4a18e69bade64a4f3586beb863f6e661e6f7e3fa2f2",
+    "tests/dev-uix-008-canvas-resize.test.mjs": "fa7b472b1aa390533b873b9616fb081cd325f416d0bba833e71edfdeadd94dad",
+    "tests/fixtures/dev-ntm-004/projection-vectors.json": "a9bc4db2790db2ac9459a95632e9f6d4987c4fccd10db3b05a7dfba3eb9e9aee",
+    "tests/fixtures/qa-ntm-001/legacy-project.json": "f3e65292e489ef5472458cb7728c687ba086fa4bb4792265b0860e93c4d163b9",
+    "tests/fixtures/qa-ntm-001/valid-project-v2.json": "7a10bafef80ec3fb15cd722b117a4657994e37d3bc5abba7bc325355d0ce0ec7",
+    "tests/qa-ntm-001-core.test.mjs": "24cdf38a9a26e72eff12716ac4a087c3d87aee45b2001d9dac262158bce1f772",
+    "tests/qa-ntm-002-formal.test.mjs": "e19b5667d25e90872ee1f41ff2e2ae09ebb99ef6dc3039a5096ee746172c8940",
+    "tests/qa-ntm-002-preparation.test.mjs": "9ec88971be2a3b7b87670049f52236bcaabf8156bd82f30b656ae65a762d1367",
+    "tests/qa-ntm-003-formal.test.mjs": "5c9480733b53ab891918675f15820ef5c644cc41ad3b9efb05ce1dc0582f783e",
+    "tests/qa-ntm-003-preparation.test.mjs": "d218fe30cd05dadf1b80e08de2c91d5d73d42bced833b17da8a312b200414650",
+    "tests/topology-layout.test.mjs": "d5a537801701d69139a1b9bcc2a6d970159b364d09fa15e244e96fcdf00235bc",
+    "tests/topology-routing.test.mjs": "0b30dcbc244e3aa0892e69bb5f72dee0943f1a66cf4d1bcf1591aec4320fe781",
+    "tests/topology-transfer.test.mjs": "a3b81bda36a433c09721742c1b5fb22a6b40370bb898aff03bf0ade7491f504e",
+    "tests/topology-types.test.mjs": "f7f10bc594f1b6e4692a779bc753d30463a22e8ac323558ec41b3164a1ec5db5",
+    "tests/topology-validation.test.mjs": "08cc6ea95738be965dedaeedc36ca11fde24814944a6eb6de9ec60b201731742",
+    "tests/topology-visibility.test.mjs": "47a00ebb551b73f16142e031eca67043cf683deb60384216fb394bb007169f1f",
+    "tsconfig.json": "3469e601b6856c4b10f89bdbf5679e22001b4ab5b876983b3780f776780ccd64",
+    "vite.config.ts": "9cb5bad4423d714e64c9ec39a2ad7ffd12b203abb5cbd77547f768e2aefe193b",
+    "worker/cloudflare-env.d.ts": "093c586e45a17d534d879693adf8e5a6ccd3c705cc266d378d2be174c121bfd6",
+    "worker/index.ts": "2990d0289c92463ac5463d9d051484ac2e88bfa9ad9e11ee4e82f7a235a5bcd9"
+  },
+  "installedToolPackages": {
+    "vite": {
+      "version": "8.0.13",
+      "sha256": "5d084b8d09cedc0206adeea4096e9aaa5f9489efb919b4dc55486c5ee790a7d2"
+    },
+    "vinext": {
+      "version": "0.0.50",
+      "sha256": "3096f55ff25d5d729094c8e550181db9d3b849fdb5af28a2e6bde6e3278fca4f"
+    },
+    "@xyflow/react": {
+      "version": "12.11.2",
+      "sha256": "cc9a587caa48523a931c0316cf7994e098029b928f3343231e4e007781e10124"
+    },
+    "react": {
+      "version": "19.2.6",
+      "sha256": "e631b6ac066fa758d9b36f226d96e8fc05425d1e8993ffcc99c6de2d6aa7268c"
+    },
+    "react-dom": {
+      "version": "19.2.6",
+      "sha256": "2c195b9bfa1b4f7dee5dd6f955c0fbb716e83c3e9c2e7a80b5e19c5a18507718"
+    },
+    "zod": {
+      "version": "4.4.3",
+      "sha256": "c630bd10b52dcf71c112a2bf78dbf2734b9db58d62de663b8d86c2ec2c8cda2e"
+    },
+    "dexie": {
+      "version": "4.4.4",
+      "sha256": "b4a8f235847b903162d17459bcf96f3bd5bc2ca595c158b026a8bb5083a68bb2"
+    },
+    "zustand": {
+      "version": "5.0.14",
+      "sha256": "ba50e4360c27bd3e677be84c5f119b15e4c8b7890ececbb248f4f531d3a272c3"
+    },
+    "typescript": {
+      "version": "5.9.3",
+      "sha256": "822ef7ca6452205657b6288b066481ecf508bfbf43455d715cf7d3ec457561e6"
+    },
+    "@playwright/test": {
+      "version": "1.62.1",
+      "sha256": "be51f784a5742a1aa075e0173f5f04f189a791cc30c40e3bb18be584f696764e"
+    },
+    "playwright": {
+      "version": "1.62.1",
+      "sha256": "ca170ec143a88ed3043ac953eb3b2377b2b97304104f4e1e23316684ce2c35af"
+    }
+  },
+  "node": "v24.18.0",
+  "safeNodeTestAllowlist": [
+    "tests/dev-ntm-001-core.test.mjs",
+    "tests/dev-ntm-002-candidates.test.mjs",
+    "tests/dev-ntm-003-change-plan.test.mjs",
+    "tests/dev-ntm-004-digest.test.mjs",
+    "tests/dev-ntm-004-trust.test.mjs",
+    "tests/dev-ntm-004-projection.test.mjs",
+    "tests/qa-ntm-001-core.test.mjs",
+    "tests/qa-ntm-002-formal.test.mjs",
+    "tests/qa-ntm-003-formal.test.mjs",
+    "tests/dev-uix-005-drag-persistence.test.mjs",
+    "tests/dev-uix-006-inspector-remount.test.mjs",
+    "tests/dev-uix-007-topbar-responsive.test.mjs",
+    "tests/dev-uix-008-canvas-resize.test.mjs",
+    "tests/topology-routing.test.mjs",
+    "tests/topology-layout.test.mjs",
+    "tests/topology-visibility.test.mjs",
+    "tests/topology-transfer.test.mjs",
+    "tests/topology-validation.test.mjs",
+    "tests/topology-types.test.mjs"
+  ],
+  "testSelectionAudit": {
+    "imports": "CORE/GEN/PLAN/projection -> pure lib/types/validation; Zod/Papa/fflate; no store/API/repository execution",
+    "fixtures": "synthetic QA_NTM_001 JSON, DEV_NTM_004 frozen PLAN oracle, existing routing demo JSON",
+    "fileReads": "UIX guards page/CSS; fixture and core source reads only",
+    "childProcesses": "none in Node allowlist; separate owned Browser runner only",
+    "environment": "OS-only allowlist; no live env or DSN; QA_NTM_PREP_ONLY unset",
+    "database": "no DB in selected import graph; native fixture tests excluded and not rerun",
+    "unknownTests": "not included without helper/import/side-effect audit"
+  },
+  "phaseResults": {
+    "safeNodeSubset": {
+      "status": "PASS",
+      "files": 19,
+      "total": 176,
+      "pass": 176,
+      "fail": 0,
+      "skip": 0,
+      "log": ".local/ntm004-safe-subset.log"
+    },
+    "initialFullSuite": {
+      "status": "FAIL",
+      "total": 398,
+      "pass": 386,
+      "fail": 3,
+      "skip": 9,
+      "finalCandidateEvidence": false,
+      "log": ".local/ntm004-cbf1f2cc-cce0-4340-a6b2-de2dda4ce256/full-node.log"
+    },
+    "tsc": "PASS",
+    "scopedLint": "PASS 0 errors / 0 warnings",
+    "fullLint": "NOT RUN: current wrapper environment loading is outside approved isolation",
+    "build": "PASS sanitized-mirror build-local.mjs + runtime-policy validation",
+    "browser": "PASS V1 local product only",
+    "v2Module": "PASS synthetic fixture semantics",
+    "v2Browser": "BLOCKED: no approved V2 product read path",
+    "v2Persistence": "NOT RUN",
+    "realDatabase": "NOT RUN after unintended first full-suite native fixture failure",
+    "live": "NOT RUN",
+    "independentQa": "NOT RUN by DEV"
+  },
+  "excludedDatabaseTests": [
+    {
+      "path": "tests/qa-dbm-001-real-postgres.test.mjs",
+      "firstResult": "FAIL required DATABASE_URL missing",
+      "next": "BLOCKED; no approved DB environment"
+    },
+    {
+      "path": "tests/qa-pil-001-real-postgres.test.mjs",
+      "firstResult": "FAIL required DATABASE_URL missing",
+      "next": "BLOCKED; no approved DB environment"
+    },
+    {
+      "path": "tests/qa-pil-006-postgres-lifecycle.test.mjs",
+      "firstResult": "FAIL initdb; unintentionally included in original glob; safety deviation reported to PM",
+      "next": "BLOCKED; do not rerun",
+      "cleanup": "fixture catch removed owned run; DEV/PM verified no postgres/initdb/pg_ctl and no child fixture runs"
+    }
+  ],
+  "browserEvidence": {
+    "directory": ".local/ntm004-03fb92a7-9cb7-4695-b2ee-ae69989a7167",
+    "files": {
+      ".local/ntm004-03fb92a7-9cb7-4695-b2ee-ae69989a7167/build.log": "5236f827dc264ea957ba4a4c04b6f1d5caa3dbebd243d4ba56950f38af34f5d5",
+      ".local/ntm004-03fb92a7-9cb7-4695-b2ee-ae69989a7167/candidate.json": "1e6d0dfb6a66050eaaf38fdd45d32daf7eeb676d913e65017e490ef1d9396b17",
+      ".local/ntm004-03fb92a7-9cb7-4695-b2ee-ae69989a7167/deny-dotenv.cjs": "ee66ef909dd71336ce0f87ea2ea97b81afa8c77fdf843f0b1c9e1b66a2e93adf",
+      ".local/ntm004-03fb92a7-9cb7-4695-b2ee-ae69989a7167/dotenv-guard.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      ".local/ntm004-03fb92a7-9cb7-4695-b2ee-ae69989a7167/policy.log": "96ff499a1dd6482e32829e9a50213f4ab935b3f0ad0bd3c4f0697dbd0be07cd2",
+      ".local/ntm004-03fb92a7-9cb7-4695-b2ee-ae69989a7167/preview.log": "b1c1ebd2ffc337b7461f03c06f2e79989095a1cb5ae4a73c09dafcad96dec4f1",
+      ".local/ntm004-03fb92a7-9cb7-4695-b2ee-ae69989a7167/reader-1024x900.png": "39eae4c415a82d80a0e9710417ef3be74867fe58b1271c96fe5361edd5d0e057",
+      ".local/ntm004-03fb92a7-9cb7-4695-b2ee-ae69989a7167/reader-1280x900.png": "36d8dd48330e4aa55f72973f9172d46e24bdc70785cf814b4cf0238c9746d7fe",
+      ".local/ntm004-03fb92a7-9cb7-4695-b2ee-ae69989a7167/reader-360-detail.png": "803aea919e42faea692490cc51ee31efc9156a21009a30ff9479a1ff485f4dd6",
+      ".local/ntm004-03fb92a7-9cb7-4695-b2ee-ae69989a7167/reader-360x800.png": "25f62bd1fffa151e41b135fc7096984e26a2ea3285dc3cce7811160612c2813f",
+      ".local/ntm004-03fb92a7-9cb7-4695-b2ee-ae69989a7167/reader-700x520.png": "607d781fbe3e334011c7660fdca831764d9a16116800a6b7af56e64827ec767d",
+      ".local/ntm004-03fb92a7-9cb7-4695-b2ee-ae69989a7167/reader-768x900.png": "0f8b289aa257f69d4fa0d7ff176dc2db63a32a8a08effab04726646cbd4e13ab",
+      ".local/ntm004-03fb92a7-9cb7-4695-b2ee-ae69989a7167/result.json": "e6185e4414c2c5e8aeabd535e57b914155fe54019d6761beab295284abf92bf3"
+    },
+    "sourceHashesUnchanged": true,
+    "noDotenvReadGuard": true,
+    "mirrorNoEnvironmentFiles": true,
+    "childOsEnvAllowlist": true,
+    "dependencyJunctionOnly": true,
+    "highConfidenceLogSecretScanClean": true,
+    "ownedPort": 57661,
+    "cleanup": "preview exit awaited, Chromium/context closed; sanitized mirror retained as evidence"
+  },
+  "historyRuns": [
+    ".local/ntm004-e4a1d723-f09e-4033-b956-5b8f2eb32a3c",
+    ".local/ntm004-f8190be9-6f4c-4b38-9d33-8607faf008e0",
+    ".local/ntm004-cbf1f2cc-cce0-4340-a6b2-de2dda4ce256",
+    ".local/ntm004-009fa3ed-f695-4ded-8bf7-a8125d169bed",
+    ".local/ntm004-527d7ddb-f6e7-48b4-a037-64807499e080",
+    ".local/ntm004-8f646c72-6a19-4e40-812e-2242c60dd628",
+    ".local/ntm004-4bbe6ae5-c33c-4931-98fe-90a3c012456d",
+    ".local/ntm004-03fb92a7-9cb7-4695-b2ee-ae69989a7167"
+  ],
+  "gitStop": "PRE-COMMIT after required independent QA; no stage/commit/push/merge/deploy"
+}

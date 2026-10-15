@@ -102,17 +102,7 @@ const decisionSchema = z.discriminatedUnion("kind", [
 const compare = (a: string, b: string) => a < b ? -1 : a > b ? 1 : 0;
 const ids = (values: Iterable<string>) => [...new Set(values)].sort(compare);
 const normalized = (value: string) => value.normalize("NFC").trim().toLocaleLowerCase("en-US");
-function canonical(value: unknown): string {
-  if (Array.isArray(value)) return "[" + value.map(canonical).join(",") + "]";
-  if (value !== null && typeof value === "object") return "{" + Object.entries(value)
-    .filter(([, v]) => v !== undefined).sort(([a], [b]) => compare(a, b))
-    .map(([k, v]) => JSON.stringify(k) + ":" + canonical(v)).join(",") + "}";
-  return JSON.stringify(value);
-}
-async function fingerprint(value: unknown) {
-  const digest = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(canonical(value)));
-  return Array.from(new Uint8Array(digest), (b) => b.toString(16).padStart(2, "0")).join("");
-}
+import { canonicalTrustedValue as canonical, fingerprintTrustedValue as fingerprint } from "./trusted-network-digest.ts";
 function unionAliases(current: string[], extra: string[]) {
   const seen = new Set(current.map(normalized));
   const result = [...current];

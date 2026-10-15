@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { fingerprintTrustedValue } from "./trusted-network-digest.ts";
 
 import { validateProject } from "./topology-validation.ts";
 import type {
@@ -580,6 +581,44 @@ export function downcastProjectV2(projectInput: unknown): LegacyProject {
 
 export function isTrustedNetworkModelError(error: unknown): error is TrustedNetworkModelError {
   return error instanceof TrustedNetworkModelError;
+}
+
+export type TrustedFieldStatus = {
+  state: "verified" | "unverified" | "stale";
+  evidenceIds: readonly string[];
+  verifiedAt?: string;
+};
+
+// Read inspection only. Callers validate the document once at their boundary.
+export async function inspectTrustedField(
+  project: ProjectV2,
+  key: { entityType: TrustedEntityType; entityId: string; fieldPath: string },
+): Promise<TrustedFieldStatus> {
+  const records: Record<TrustedEntityType, readonly { id: string }[]> = {
+    device: project.devices, link: project.links, group: project.groups,
+    area: project.trustedNetwork.areas, interface: project.trustedNetwork.interfaces,
+    vlan: project.trustedNetwork.vlans, subnet: project.trustedNetwork.subnets,
+    "interface-vlan": project.trustedNetwork.interfaceVlans,
+    "interface-subnet": project.trustedNetwork.interfaceSubnets,
+    resiliency: project.trustedNetwork.resiliencyRelations,
+  };
+  const entity = records[key.entityType]?.find((r) => r.id === key.entityId);
+  const matches = project.trustedNetwork.fieldTrust.filter((r) => r.entityType === key.entityType
+    && r.entityId === key.entityId && r.fieldPath === key.fieldPath);
+  const unverified: TrustedFieldStatus = { state: "unverified", evidenceIds: [] };
+  // Ambiguous trust keys cannot select an input-order-dependent winner.
+  if (!entity || matches.length !== 1) return unverified;
+  const record = matches[0];
+  const evidenceIds = [...new Set(record.evidenceIds)]
+    .filter((id) => project.trustedNetwork.evidence.some((e) => e.id === id)).sort();
+  if (record.verification !== "verified") return { state: "unverified", evidenceIds };
+  if (!record.verifiedByUserId || !record.verifiedAt || !Number.isFinite(Date.parse(record.verifiedAt))
+    || !evidenceIds.length || evidenceIds.length !== new Set(record.evidenceIds).size) return unverified;
+  const descriptor = Object.getOwnPropertyDescriptor(entity, key.fieldPath);
+  if (key.fieldPath !== "$record" && (!descriptor || !("value" in descriptor))) return { state: "stale", evidenceIds };
+  const value = key.fieldPath === "$record" ? entity : descriptor?.value;
+  if (await fingerprintTrustedValue(value) !== record.valueFingerprint.toLowerCase()) return { state: "stale", evidenceIds };
+  return { state: "verified", evidenceIds, verifiedAt: record.verifiedAt };
 }
 
 export type { ProjectV2, TrustedNetworkIssue } from "./trusted-network-types.ts";

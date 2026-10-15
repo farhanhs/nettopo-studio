@@ -1,0 +1,36 @@
+{
+  "ticket": "QA_NTM_004",
+  "formalResult": "NOT_RUN",
+  "executionPrerequisites": {
+    "devReadyForQa": true,
+    "writerStopped": true,
+    "candidateManifestLocked": true,
+    "productServerStartedDuringPreparation": false
+  },
+  "isolation": {
+    "bind": "127.0.0.1",
+    "port": "owned-random-non-5432",
+    "browserProfile": "qa-ntm-004-owned-temporary-profile",
+    "storage": "fresh-isolated-browser-storage",
+    "environment": "explicit-no-current-env-allowlist-plus-sanitized-project-root",
+    "dotenvIsolation": {
+      "legacyWrapperAllowed": false,
+      "strategy": "qa-owned-sanitized-project-mirror",
+      "exclude": [".env", ".env.local", ".env.development", ".env.production", ".env.test", ".env.*.local"],
+      "verifyBeforeSpawn": ["no-dotenv-files-in-tool-root", "no-env-file-cli-flags", "no-loadEnv-current-worktree", "explicit-runtime-policy-values-only"],
+      "nodeModules": "read-only-explicit-path",
+      "reason": "Vite/vinext/Next may load dotenv from the project root even when the child process environment is cleared"
+    },
+    "database": "not-required-not-started",
+    "docker": "not-required-not-started",
+    "cleanup": ["server-pid-stopped", "port-closed", "profile-removed", "downloads-removed", "sanitized-project-mirror-removed", "temp-fixtures-removed"]
+  },
+  "matrix": [
+    { "id": "physical-logical-switch", "input": ["pointer", "keyboard"], "viewports": [360, 768, 1024, 1280] },
+    { "id": "stable-id-search-and-breadcrumb", "input": ["keyboard", "touch"], "viewports": [360, 768, 1280] },
+    { "id": "verified-only-reasons", "input": ["pointer", "keyboard"], "viewports": [360, 1024] },
+    { "id": "invalid-selection-fallback", "input": ["pointer", "keyboard"], "viewports": [768, 1280] },
+    { "id": "hidden-data-and-secret-scan", "input": ["network", "dom", "console", "storage"], "viewports": [1024] },
+    { "id": "short-height-critical-controls", "input": ["keyboard", "touch"], "viewports": [700] }
+  ]
+}

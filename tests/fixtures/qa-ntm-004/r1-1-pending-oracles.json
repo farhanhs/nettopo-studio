@@ -1,0 +1,51 @@
+{
+  "ticket": "QA_NTM_004",
+  "classification": "synthetic-qa-only",
+  "formalResult": "NOT_RUN",
+  "contractStatus": "PENDING_DSG_SECTION_5_R1_1",
+  "sourceFacts": {
+    "coreLegacyFingerprint": "stableHash(JSON.stringify(rawValue))",
+    "planFingerprint": "async SHA-256(canonical raw value)",
+    "algorithmsEquivalent": false
+  },
+  "pendingRequirements": [
+    {
+      "id": "core-legacy-unverified-compatibility",
+      "covers": ["PROJ-02", "PROJ-03"],
+      "mustDefine": [
+        "how legacy-upcast unverified fieldTrust is recognized without recomputing it as a PLAN fingerprint",
+        "whether blank legacy port labels produce no endpoint, an explicit unknown endpoint, or another typed projection state",
+        "how physical and logical interface projection distinguishes missing evidence from missing entity"
+      ]
+    },
+    {
+      "id": "plan-field-trust-and-stale-compatibility",
+      "covers": ["PROJ-03"],
+      "mustDefine": [
+        "how projection validates PLAN-produced fieldTrust using the PLAN canonical SHA-256 algorithm",
+        "canonical raw value rules for scalar, optional and record values",
+        "typed stale outcome when a value is absent, newly present, reordered or canonically different"
+      ]
+    },
+    {
+      "id": "record-versus-field-verification-boundary",
+      "covers": ["PROJ-03", "PROJ-05"],
+      "mustDefine": [
+        "which exact field paths close a projected record",
+        "whether record-level trust is representable and how it differs from field-level trust",
+        "prohibition on automatically upgrading a record because one field is verified",
+        "prohibition on automatically upgrading a field because another field or parent record is verified"
+      ]
+    },
+    {
+      "id": "typed-errors-sort-and-selection-redaction",
+      "covers": ["PROJ-03", "PROJ-04", "PROJ-05"],
+      "mustDefine": [
+        "closed typed result and error discriminants with safe reason codes",
+        "total deterministic sort rank including unknown and legacy states",
+        "unknown, hidden and filtered selection fallback without echoing an inaccessible requested ID",
+        "optional value stale handling without implicit clear or implicit verification"
+      ]
+    }
+  ]
+}

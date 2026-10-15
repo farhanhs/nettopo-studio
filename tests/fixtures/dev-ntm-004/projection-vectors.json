@@ -1,0 +1,308 @@
+{
+  "baselineCommit": "590339395ec8cf5af5591d3be4379bd3ab4ebc6b",
+  "planOracle": {
+    "project": {
+      "projectSchemaVersion": 2,
+      "devices": [
+        {
+          "id": "d-a",
+          "name": "Synthetic A",
+          "type": "switch",
+          "x": 0,
+          "y": 0
+        },
+        {
+          "id": "d-b",
+          "name": "Synthetic B",
+          "type": "server",
+          "x": 400,
+          "y": 240
+        }
+      ],
+      "links": [
+        {
+          "id": "l-a",
+          "from": "d-a",
+          "to": "d-b",
+          "kind": "wired",
+          "fromPort": " GE 1 ",
+          "vlan": "10",
+          "fromInterfaceId": "if-legacy-v1-348c6f50e72997a4b002f47264167a20"
+        }
+      ],
+      "groups": [],
+      "trustedNetwork": {
+        "modelVersion": 1,
+        "areas": [],
+        "interfaces": [
+          {
+            "id": "if-legacy-v1-348c6f50e72997a4b002f47264167a20",
+            "deviceId": "d-a",
+            "name": " GE 1 ",
+            "kind": "physical",
+            "aliases": []
+          }
+        ],
+        "vlans": [],
+        "subnets": [],
+        "interfaceVlans": [],
+        "interfaceSubnets": [],
+        "resiliencyRelations": [],
+        "evidence": [
+          {
+            "id": "ev-legacy-v1-348c6f50e72997a4b002f47264167a20",
+            "method": "legacy-upcast",
+            "sourceKind": "legacy-project",
+            "displayName": "Legacy project port label",
+            "ruleCode": "LEGACY_PORT_UPCAST",
+            "safeSummary": "Explicit legacy port label was preserved as an unverified provisional interface."
+          }
+        ],
+        "fieldTrust": [
+          {
+            "id": "trust-legacy-v1-348c6f50e72997a4b002f47264167a20",
+            "entityType": "interface",
+            "entityId": "if-legacy-v1-348c6f50e72997a4b002f47264167a20",
+            "fieldPath": "name",
+            "valueFingerprint": "31d672678bade64b49dde079f6303937d3355008fffcf2fc2e6fee8eb0d8b498",
+            "evidenceIds": [
+              "ev-legacy-v1-348c6f50e72997a4b002f47264167a20"
+            ],
+            "verification": "unverified"
+          }
+        ]
+      }
+    },
+    "owner": {
+      "projectScopeId": "ntm004-oracle",
+      "deviceId": "d-a"
+    },
+    "candidatePlan": {
+      "deviceId": "d-a",
+      "candidates": [
+        {
+          "interface": {
+            "id": "if-new",
+            "deviceId": "d-a",
+            "name": " Port New ",
+            "kind": "physical",
+            "aliases": [
+              "z",
+              "a"
+            ],
+            "description": " Original "
+          },
+          "source": "explicit",
+          "evidenceIds": [
+            "ev-new"
+          ],
+          "verification": "unverified"
+        }
+      ],
+      "conflicts": [],
+      "evidence": [
+        {
+          "id": "ev-new",
+          "method": "parsed",
+          "sourceKind": "json",
+          "displayName": "Synthetic input"
+        }
+      ],
+      "missingInfo": []
+    },
+    "preview": {
+      "planVersion": "trusted-network-plan-r1.1",
+      "planId": "plan-6be98f7143e05723d1164b0ae73bb7b6924348bb718e7f75007f898ef445f64d",
+      "owner": {
+        "projectScopeId": "ntm004-oracle",
+        "deviceId": "d-a"
+      },
+      "baseRevision": "34847a3937d612a73e2835fec3eeff18fd4d814a483f0349676017009a4894aa",
+      "candidateFingerprint": "97e9ff716c3ec9c0744ec9b39ee4177d95b12beb5b2c45081166e4a1afce18d1",
+      "proposals": [
+        {
+          "entityType": "interface",
+          "entityId": "if-new",
+          "fieldPath": "$record",
+          "proposalId": "proposal-358eb3669dbe7c879a2f535c6bc32f1b1451d0468c5d6147d01a13fedc533813",
+          "operation": "add",
+          "proposedFingerprint": "9e5bf5e4f0956b96eae1a3b7589e9ffe548d45b4a23893c71249da211c799703",
+          "proposedValue": {
+            "id": "if-new",
+            "deviceId": "d-a",
+            "name": " Port New ",
+            "kind": "physical",
+            "aliases": [
+              "z",
+              "a"
+            ],
+            "description": " Original "
+          },
+          "evidenceIds": [
+            "ev-new"
+          ],
+          "protected": false,
+          "conflict": "none",
+          "dependsOn": [],
+          "applicability": "applicable"
+        }
+      ],
+      "issues": [],
+      "summary": {
+        "total": 1,
+        "blocking": 0,
+        "warnings": 0,
+        "protected": 0
+      },
+      "canResolve": true,
+      "previewFingerprint": "c25c8d31d2a3a8f035d43ce2db4b6c8483225ae775a514f3eaad37a12f1b2141"
+    },
+    "result": {
+      "project": {
+        "devices": [
+          {
+            "id": "d-a",
+            "name": "Synthetic A",
+            "type": "switch",
+            "x": 0,
+            "y": 0
+          },
+          {
+            "id": "d-b",
+            "name": "Synthetic B",
+            "type": "server",
+            "x": 400,
+            "y": 240
+          }
+        ],
+        "groups": [],
+        "links": [
+          {
+            "from": "d-a",
+            "fromInterfaceId": "if-legacy-v1-348c6f50e72997a4b002f47264167a20",
+            "fromPort": " GE 1 ",
+            "id": "l-a",
+            "kind": "wired",
+            "to": "d-b",
+            "vlan": "10"
+          }
+        ],
+        "projectSchemaVersion": 2,
+        "trustedNetwork": {
+          "areas": [],
+          "evidence": [
+            {
+              "displayName": "Legacy project port label",
+              "id": "ev-legacy-v1-348c6f50e72997a4b002f47264167a20",
+              "method": "legacy-upcast",
+              "ruleCode": "LEGACY_PORT_UPCAST",
+              "safeSummary": "Explicit legacy port label was preserved as an unverified provisional interface.",
+              "sourceKind": "legacy-project"
+            },
+            {
+              "displayName": "Synthetic input",
+              "id": "ev-new",
+              "method": "parsed",
+              "sourceKind": "json"
+            }
+          ],
+          "fieldTrust": [
+            {
+              "entityId": "if-legacy-v1-348c6f50e72997a4b002f47264167a20",
+              "entityType": "interface",
+              "evidenceIds": [
+                "ev-legacy-v1-348c6f50e72997a4b002f47264167a20"
+              ],
+              "fieldPath": "name",
+              "id": "trust-legacy-v1-348c6f50e72997a4b002f47264167a20",
+              "valueFingerprint": "31d672678bade64b49dde079f6303937d3355008fffcf2fc2e6fee8eb0d8b498",
+              "verification": "unverified"
+            },
+            {
+              "entityId": "if-new",
+              "entityType": "interface",
+              "evidenceIds": [
+                "ev-new"
+              ],
+              "fieldPath": "name",
+              "id": "trust-plan-2d50f1c21423243f874daa6502ca9990b8f81cb27a8657c0cb3ec37372fc39b0",
+              "valueFingerprint": "197f854d44a2f0eb84124c1269d03fc18e2acee749de829defa3d5ab059dda4c",
+              "verification": "unverified"
+            },
+            {
+              "entityId": "if-new",
+              "entityType": "interface",
+              "evidenceIds": [
+                "ev-new"
+              ],
+              "fieldPath": "kind",
+              "id": "trust-plan-ca9cba7aa246c19a566ff54ca436d15a20a56913b7b6dbe93ddd947e4b44063c",
+              "valueFingerprint": "d6bbe9193e8dfe2f58f0670a99b3f50c339b8e9ec4f62ccc23ba1c1232dee095",
+              "verification": "unverified"
+            },
+            {
+              "entityId": "if-new",
+              "entityType": "interface",
+              "evidenceIds": [
+                "ev-new"
+              ],
+              "fieldPath": "aliases",
+              "id": "trust-plan-0e9b9918ed2a06b095e50f2a7c46b147810f0540417155ede5d8232339a40609",
+              "valueFingerprint": "d3f3eae0185f0f2b1e018dac218e33abf5040047b35452f5b36a2d06654ffda7",
+              "verification": "unverified"
+            },
+            {
+              "entityId": "if-new",
+              "entityType": "interface",
+              "evidenceIds": [
+                "ev-new"
+              ],
+              "fieldPath": "description",
+              "id": "trust-plan-c32aaccccbf071f6b90ba1bec70da73a513f11107c1ccb8db498d60808609147",
+              "valueFingerprint": "40f840632f903150361d584f1e196194c2b7262aa072051db57a2d5b4d8a8969",
+              "verification": "unverified"
+            }
+          ],
+          "interfaceSubnets": [],
+          "interfaceVlans": [],
+          "interfaces": [
+            {
+              "aliases": [],
+              "deviceId": "d-a",
+              "id": "if-legacy-v1-348c6f50e72997a4b002f47264167a20",
+              "kind": "physical",
+              "name": " GE 1 "
+            },
+            {
+              "aliases": [
+                "z",
+                "a"
+              ],
+              "description": " Original ",
+              "deviceId": "d-a",
+              "id": "if-new",
+              "kind": "physical",
+              "name": " Port New "
+            }
+          ],
+          "modelVersion": 1,
+          "resiliencyRelations": [],
+          "subnets": [],
+          "vlans": []
+        }
+      },
+      "receipt": {
+        "planId": "plan-6be98f7143e05723d1164b0ae73bb7b6924348bb718e7f75007f898ef445f64d",
+        "beforeRevision": "34847a3937d612a73e2835fec3eeff18fd4d814a483f0349676017009a4894aa",
+        "afterRevision": "577dc36bb973a3272f119dbb89023ebec0c64f7e57162802530c45b516e4dabb",
+        "acceptedProposalIds": [
+          "proposal-358eb3669dbe7c879a2f535c6bc32f1b1451d0468c5d6147d01a13fedc533813"
+        ],
+        "excludedProposalIds": [],
+        "trustInvalidated": [],
+        "verified": [],
+        "persistence": "not-performed"
+      }
+    }
+  }
+}

@@ -1,5 +1,14 @@
 # Engineer Ticket Register
 
+## 2026-10-14 NTM004 視圖接續
+
+| Order | Ticket | Status | Scope |
+|---|---|---|---|
+| 165 | [DEV_NTM_004](active/DEV_NTM_004.md) | QA_PASSED | PROJ-R1獨立QA module189/189＋V1 Browser PASS，104/104候選不變；10/15核准commit-only，產品停寫；woff2風險/未驗項保留，next PM核實SHA |
+| 166 | [QA_NTM_004](active/QA_NTM_004.md) | QA_PASSED | PROJ-R1：module 189/189＋獨立V1 Browser/zero-write/secret/touch/cleanup PASS；真V2 persistence、DB/RBAC、匿名UAT未驗；原PRE-COMMIT報告保留，10/15由DEV精確存檔 |
+
+base `590339395ec8cf5af5591d3be4379bd3ab4ebc6b`。CORE/GEN/PLAN 已按10/13核准提交推送，以下舊狀態保留歷史；10/15使用者另核准本候選commit-only，見 [checkpoint 紀錄](../dev開發紀錄/2026-10-15-dev-ntm-004-checkpoint.md) 與 root 2026-10-15-pm-ntm-004-commit。無push／merge／deploy／下一票授權。
+
 - 更新日期：2026-09-08
 - 排序：Priority → Planned Order → Ticket ID
 - 狀態來源：目前工作樹、開發／測試紀錄與已確認產品方向

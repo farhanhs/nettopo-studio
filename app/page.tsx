@@ -23,6 +23,8 @@ import { Group as PanelGroup, Panel, Separator as PanelResizeHandle } from "reac
 import { type FormEvent, type ReactNode, useCallback, useEffect, useId, useMemo, useRef, useState } from "react";
 import { FileDropZone } from "./components/import/FileDropZone";
 import { ImportPreviewModal } from "./components/import/ImportPreviewModal";
+import { TrustedNetworkReader } from "./components/topology/TrustedNetworkReader";
+import { upcastProject } from "./lib/trusted-network-model";
 import {
   LAYOUT_DESCRIPTIONS,
   orderLayersByConnectivity,
@@ -678,6 +680,15 @@ function TopologyApp() {
   const [panelLayoutReady, setPanelLayoutReady] = useState(false);
   const [tab, setTab] = useState<"devices" | "links" | "groups">("devices");
   const [selection, setSelection] = useState<Selection>();
+  const readerScopeKey = JSON.stringify([activeCustomerId, activeTopologyId, currentUser?.id, currentUser?.role, currentUser?.siteIds, devUserEmail]);
+  const [readerScope, setReaderScope] = useState<string>();
+  const readerActive = ready && readerScope === readerScopeKey;
+  const [readerPermit, setReaderPermit] = useState<string>();
+  const [readerDenied, setReaderDenied] = useState(false);
+  const readerProject = useMemo(() => {
+    if (!readerActive || readerPermit !== readerScopeKey) return null;
+    try { return upcastProject(structuredClone(project)); } catch { return null; }
+  }, [readerActive, readerPermit, readerScopeKey, project]);
   const [showDeviceForm, setShowDeviceForm] = useState(false);
   const [showLinkForm, setShowLinkForm] = useState(false);
   const [showGroupForm, setShowGroupForm] = useState(false);
@@ -702,6 +713,46 @@ function TopologyApp() {
   const [flowViewportSize, setFlowViewportSize] = useState<FlowViewportSize>({ width: 0, height: 0 });
   const [flowInstance, setFlowInstance] = useState<ReactFlowInstance<Node, Edge>>();
   const fittedTopologyRef = useRef<string | undefined>(undefined);
+
+  function leaveReader() {
+    setReaderScope(undefined);
+    setReaderPermit(undefined);
+    setFlowInstance(undefined);
+    fittedTopologyRef.current = undefined;
+  }
+
+  useEffect(() => {
+    if (!readerActive) return;
+    const controller = new AbortController();
+    let generation = 0;
+    const check = async () => {
+      const current = ++generation;
+      setReaderPermit(undefined);
+      try {
+        const response = await fetch(USE_SERVER_STORAGE ? "/api/session" : "/api/dev/session", {
+          cache: "no-store", signal: controller.signal,
+          headers: USE_SERVER_STORAGE && devUserEmail ? { "x-nettopo-dev-user-email": devUserEmail } : {},
+        });
+        let allowed = response.ok;
+        if (allowed && USE_SERVER_STORAGE) {
+          const payload = await response.json();
+          allowed = payload.currentUser?.id === currentUser?.id && payload.currentUser?.role === currentUser?.role
+            && JSON.stringify(payload.currentUser?.siteIds) === JSON.stringify(currentUser?.siteIds);
+        }
+        if (!controller.signal.aborted && current === generation) {
+          setReaderPermit(allowed ? readerScopeKey : undefined);
+          setReaderDenied(!allowed);
+        }
+      } catch {
+        if (!controller.signal.aborted && current === generation) setReaderDenied(true);
+      }
+    };
+    void check();
+    const onFocus = () => { void check(); };
+    window.addEventListener("focus", onFocus);
+    const timer = window.setInterval(onFocus, 60_000);
+    return () => { controller.abort(); window.clearInterval(timer); window.removeEventListener("focus", onFocus); };
+  }, [readerActive, readerScopeKey, devUserEmail, currentUser]);
 
   useEffect(() => {
     queueMicrotask(() => {
@@ -764,7 +815,7 @@ function TopologyApp() {
     const observer = new ResizeObserver(syncFlowViewportSize);
     observer.observe(shell);
     return () => observer.disconnect();
-  }, [panelLayoutReady, ready]);
+  }, [panelLayoutReady, ready, readerActive]);
 
   const activeCustomer = customers.find((customer) => customer.id === activeCustomerId);
   const activeTopology = topologies.find((topology) => topology.id === activeTopologyId);
@@ -1347,6 +1398,7 @@ function TopologyApp() {
   }
 
   async function logoutFromWorkspace() {
+    leaveReader();
     const isPilotRuntime = runtimeCapabilities?.profile === "pilot";
     const logoutEndpoint = isPilotRuntime ? "/api/pilot/session" : "/api/dev/session";
     await fetch(logoutEndpoint, {
@@ -1382,6 +1434,7 @@ function TopologyApp() {
                 id="customer-select"
                 value={activeCustomerId ?? ""}
                 onChange={(event) => {
+                  leaveReader();
                   void selectCustomer(event.target.value);
                   setSelection(undefined);
                   setNotice("已切換客戶");
@@ -1390,13 +1443,13 @@ function TopologyApp() {
               >
                 {customers.map((customer) => <option key={customer.id} value={customer.id}>{customer.name}</option>)}
               </select>
-              <button className="mini-action" onClick={() => setShowCustomerForm(true)} disabled={!canCreateRecords}>新增</button>
+              <button className="mini-action" onClick={() => setShowCustomerForm(true)} disabled={readerActive || !canCreateRecords}>新增</button>
             </div>
-            <div className="switch-actions">
+            {!readerActive && <div className="switch-actions">
               <button onClick={() => setCustomerAction("rename")} disabled={!activeCustomerId || !canManageActiveCustomer}>改名</button>
               <button onClick={() => setCustomerAction("duplicate")} disabled={!activeCustomerId || !canCreateRecords}>複製</button>
               <button className="danger-link" onClick={() => setCustomerAction("delete")} disabled={!activeCustomerId || !canDeleteActiveCustomer}>刪除</button>
-            </div>
+            </div>}
           </div>
           <div className="switcher-field">
             <label htmlFor="topology-select">拓樸</label>
@@ -1405,6 +1458,7 @@ function TopologyApp() {
                 id="topology-select"
                 value={activeTopologyId ?? ""}
                 onChange={(event) => {
+                  leaveReader();
                   void selectTopology(event.target.value);
                   setSelection(undefined);
                   setNotice("已切換拓樸");
@@ -1413,13 +1467,13 @@ function TopologyApp() {
               >
                 {currentTopologies.map((topology) => <option key={topology.id} value={topology.id}>{topology.name}</option>)}
               </select>
-              <button className="mini-action" onClick={() => setShowTopologyForm(true)} disabled={!activeCustomerId || !canCreateRecords}>新增</button>
+              <button className="mini-action" onClick={() => setShowTopologyForm(true)} disabled={readerActive || !activeCustomerId || !canCreateRecords}>新增</button>
             </div>
-            <div className="switch-actions">
+            {!readerActive && <div className="switch-actions">
               <button onClick={() => setTopologyAction("rename")} disabled={!activeTopologyId || !canWriteActiveTopology}>改名</button>
               <button onClick={() => setTopologyAction("duplicate")} disabled={!activeTopologyId || !canCreateRecords}>複製</button>
               <button className="danger-link" onClick={() => setTopologyAction("delete")} disabled={!activeTopologyId || !canWriteActiveTopology}>刪除</button>
-            </div>
+            </div>}
           </div>
           <div className="save-state">
             <div className="save-indicator" aria-label="儲存狀態">
@@ -1445,6 +1499,7 @@ function TopologyApp() {
             <select
               value={devUserEmail}
               onChange={(event) => {
+                leaveReader();
                 void setDevUserEmail(event.target.value);
                 setSelection(undefined);
                 setNotice("正在切換測試身分...");
@@ -1454,7 +1509,11 @@ function TopologyApp() {
               {devIdentities.map((identity) => <option key={identity.email} value={identity.email}>{identity.label}</option>)}
             </select>
           </label>}
-          <label className="layout-picker">
+          <button className="mini-action" disabled={!ready || !activeTopologyId} onClick={() => {
+            if (readerActive) leaveReader();
+            else { setReaderDenied(false); setReaderPermit(undefined); setReaderScope(readerScopeKey); }
+          }}>{readerActive ? "返回編輯器" : "唯讀檢視"}</button>
+          {!readerActive && <><label className="layout-picker">
             <span>排版模式</span>
             <select value={layoutMode} onChange={(event) => setLayoutMode(event.target.value as LayoutMode)}>
               <option value="auto-detect">自動偵測</option>
@@ -1466,7 +1525,7 @@ function TopologyApp() {
           <button className="mini-action" onClick={() => setShowTransfer("import")}>匯入</button>
           <button className="mini-action" onClick={() => setShowTransfer("export")}>匯出</button>
           <button className="secondary" onClick={autoLayout} disabled={!canWriteActiveTopology}>自動整理</button>
-          <button className="primary" onClick={() => window.print()}>匯出 PDF</button>
+          <button className="primary" onClick={() => window.print()}>匯出 PDF</button></>}
         </div>
       </header>
 
@@ -1474,6 +1533,9 @@ function TopologyApp() {
         <div className="workspace workspace-loading">
           <span>正在載入拓樸工作區...</span>
         </div>
+      ) : readerActive ? (readerPermit === readerScopeKey
+        ? <TrustedNetworkReader key={readerScopeKey} project={readerProject} scopeKey={readerScopeKey} onExit={leaveReader} />
+        : <section className="workspace workspace-loading" role="status"><p>{readerDenied ? "無法確認目前的閱讀權限。" : "正在確認閱讀權限..."}</p><button type="button" onClick={leaveReader}>返回編輯器</button></section>
       ) : <PanelGroup
         className="workspace"
         defaultLayout={panelLayout}
