@@ -1,0 +1,2 @@
+schemaVersion,sharing,id,from,to,kind,fromPort,toPort,vlan,speed
+2,safe,qa-block-link,qa-block-device,qa-missing-device,wired,LAN1,LAN2,,1 Gbps

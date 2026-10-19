@@ -1,0 +1,6 @@
+{
+  "devices": [{ "id": "legacy-device", "name": "Legacy Router", "type": "router", "x": 10, "y": 20 }],
+  "links": [],
+  "groups": []
+}
+

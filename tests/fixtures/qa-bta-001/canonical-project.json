@@ -1,0 +1,13 @@
+{
+  "devices": [
+    { "id": "qa-device-a", "name": "QA Router A", "type": "router", "ip": "192.0.2.10", "model": "QA Router", "location": "Rack A", "url": "https://example.invalid/device-a", "quantity": 1, "x": 80, "y": 120, "groupId": "qa-group-a" },
+    { "id": "qa-device-b", "name": "QA Switch B", "type": "switch", "ip": "198.51.100.20", "model": "QA Switch", "location": "Rack B", "quantity": 2, "x": 360, "y": 240, "groupId": "qa-group-a" }
+  ],
+  "links": [
+    { "id": "qa-link-a", "from": "qa-device-a", "to": "qa-device-b", "kind": "wired", "fromPort": "LAN 1", "toPort": "Gi0/1", "vlan": "100", "speed": "1 Gbps" }
+  ],
+  "groups": [
+    { "id": "qa-group-a", "name": "QA Site A", "kind": "site", "color": "#526cf5", "collapsed": false }
+  ]
+}
+

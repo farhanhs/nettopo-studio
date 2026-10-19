@@ -1,0 +1,12 @@
+{
+  "classification": "synthetic-qa-only",
+  "values": {
+    "username": "qa_beta_user_sentinel",
+    "password": "QA-BETA-PASSWORD-SENTINEL-NOT-A-REAL-SECRET",
+    "token": "QA-BETA-TOKEN-SENTINEL-NOT-A-REAL-TOKEN",
+    "dsn": "postgresql://qa_beta_sentinel.invalid/never-connect"
+  },
+  "mustNotAppearIn": [
+    "Project", "Zustand", "Dexie", "DOM", "network-response", "JSON", "CSV", "ZIP", "logs", "public-package"
+  ]
+}

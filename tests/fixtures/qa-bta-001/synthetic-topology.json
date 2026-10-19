@@ -1,0 +1,14 @@
+{
+  "devices": [
+    { "id": "qa-router-1", "name": "QA Router", "type": "router", "quantity": 1, "x": 80, "y": 120, "groupId": "qa-site-1" },
+    { "id": "qa-switch-1", "name": "QA Switch", "type": "switch", "quantity": 1, "x": 360, "y": 120, "groupId": "qa-site-1" },
+    { "id": "qa-server-1", "name": "QA Server", "type": "server", "quantity": 1, "x": 640, "y": 120, "groupId": "qa-site-1" }
+  ],
+  "links": [
+    { "id": "qa-link-1", "from": "qa-router-1", "to": "qa-switch-1", "kind": "wired", "fromPort": "LAN 1", "toPort": "Gi0/1", "speed": "1 Gbps" },
+    { "id": "qa-link-2", "from": "qa-switch-1", "to": "qa-server-1", "kind": "wired", "fromPort": "Gi0/2", "toPort": "eth0", "speed": "1 Gbps" }
+  ],
+  "groups": [
+    { "id": "qa-site-1", "name": "QA Anonymous Site", "kind": "site", "color": "#526cf5", "collapsed": false }
+  ]
+}

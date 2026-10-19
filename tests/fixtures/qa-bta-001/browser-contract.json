@@ -1,0 +1,19 @@
+{
+  "origin": "http://127.0.0.1:4317",
+  "channels": ["chrome", "msedge"],
+  "banner": "本機試用模式｜資料只保存在此瀏覽器設定檔",
+  "bannerSelector": "[data-local-beta=\"true\"]",
+  "control": {
+    "statusPath": "/__local_beta/status",
+    "shutdownPath": "/__local_beta/shutdown",
+    "tokenHeader": "x-nettopo-beta-control"
+  },
+  "viewports": [
+    { "width": 1280, "height": 900 },
+    { "width": 1024, "height": 700 },
+    { "width": 768, "height": 900 },
+    { "width": 360, "height": 640 }
+  ],
+  "forbiddenUi": ["password-input", "company-login", "dev-identity-selector"],
+  "formalResult": "NOT_RUN"
+}

@@ -1,0 +1,2 @@
+schemaVersion,sharing,id,name,type,ip,mac,model,location,url,quantity,x,y,groupId
+2,safe,qa-sentinel-device,QA Sentinel Router,router,,,,,,1,80,120,

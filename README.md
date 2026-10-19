@@ -1,5 +1,11 @@
 # NetTopo Studio
 
+## Local Beta Candidate
+
+The `codex/public-beta-0.1` worktree prepares a single-user Windows local Beta, not a deployed or published release. It does not require a company account, Docker or PostgreSQL. Start with [繁中快速說明](docs/beta/QUICKSTART.zh-TW.md), [資料與備份](docs/beta/DATA-AND-BACKUP.zh-TW.md), [限制](docs/beta/KNOWN-ISSUES.md) and [回饋](docs/beta/FEEDBACK.md). Use only synthetic data. The downloaded prebuilt package runs setup once, then start/stop offline at `http://127.0.0.1:4317`; it never asks the downloader to build.
+
+Producer tooling is under `scripts/beta/`; the fixed ZIP and its source/runtime/hash evidence are required before independent QA. Development self-checks are not QA acceptance. Commit, push and release remain separate approval gates.
+
 A browser-based network topology editor for quickly documenting routers, ISP modems, firewalls, switches, servers, NAS, ERP systems, wireless access points, and client devices.
 
 ## Current capabilities

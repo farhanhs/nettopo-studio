@@ -1,0 +1,26 @@
+{
+  "ticket": "QA_BTA_001",
+  "releaseProfile": "local-feedback-beta",
+  "clarifications": {
+    "backupScope": "per-topology-existing-json-and-five-csv-only",
+    "workspaceSnapshot": false,
+    "downloadTriggerProvesDiskWrite": false,
+    "sourceCommitMayDescribeDirtyCandidate": false,
+    "dirtySourceRequiresAllowlistedHashes": true,
+    "manifestMustBeAcyclic": true
+  },
+  "cases": [
+    { "id": "BTA-A01", "area": "clean-package-setup", "formalResult": "NOT_RUN" },
+    { "id": "BTA-A02", "area": "setup-negative-paths", "formalResult": "NOT_RUN" },
+    { "id": "BTA-A03", "area": "local-entry-security", "formalResult": "NOT_RUN" },
+    { "id": "BTA-A04", "area": "editing-layout-responsive", "formalResult": "NOT_RUN" },
+    { "id": "BTA-A05", "area": "persistence-reload-atomicity", "formalResult": "NOT_RUN" },
+    { "id": "BTA-A06", "area": "json-csv-roundtrip", "formalResult": "NOT_RUN" },
+    { "id": "BTA-A07", "area": "import-preview-apply", "formalResult": "NOT_RUN" },
+    { "id": "BTA-A08", "area": "offline-loopback", "formalResult": "NOT_RUN" },
+    { "id": "BTA-A09", "area": "secret-boundary", "formalResult": "NOT_RUN" },
+    { "id": "BTA-A10", "area": "backup-upgrade-restore", "formalResult": "NOT_RUN" },
+    { "id": "BTA-A11", "area": "owned-process-cleanup", "formalResult": "NOT_RUN" },
+    { "id": "BTA-A12", "area": "provenance-license-public-content", "formalResult": "NOT_RUN" }
+  ]
+}

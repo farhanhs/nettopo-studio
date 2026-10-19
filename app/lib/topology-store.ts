@@ -18,6 +18,7 @@ const ACTIVE_CUSTOMER_KEY = "nettopo-active-customer-id";
 const ACTIVE_TOPOLOGY_KEY = "nettopo-active-topology-id";
 const DEV_USER_EMAIL_KEY = "nettopo-dev-user-email";
 const USE_SERVER_STORAGE = process.env.NEXT_PUBLIC_TOPOLOGY_STORAGE === "server";
+const LOCAL_BETA_BUILD = process.env.NEXT_PUBLIC_LOCAL_BETA === "1";
 
 type ProjectUpdater = Project | ((current: Project) => Project);
 
@@ -36,6 +37,8 @@ type TopologyStore = {
   project: Project;
   ready: boolean;
   saving: boolean;
+  localEditing: boolean;
+  writeError?: string;
   devUserEmail: string;
   initialize: () => Promise<void>;
   setDevUserEmail: (email: string) => Promise<void>;
@@ -103,8 +106,8 @@ function safeTopologies(topologies: TopologyRecord[]) {
 
 const LOCAL_ADMIN_USER: UserRecord = {
   id: "user-sean-sie",
-  email: "sean.sie@dus.local",
-  name: "謝慶宣",
+  email: "local@example.invalid",
+  name: "本機使用者",
   role: "engineer",
   siteIds: [],
   createdAt: new Date(0).toISOString(),
@@ -113,17 +116,22 @@ const LOCAL_ADMIN_USER: UserRecord = {
 
 const DEFAULT_DEV_USER_EMAIL = "";
 type RuntimeCapabilities = {
+  profile?: string;
+  storageMode?: string;
   capabilities?: {
+    localBeta?: boolean;
     demoSeed?: boolean;
   };
 };
 
 function readDevUserEmail() {
+  if (LOCAL_BETA_BUILD) return "";
   if (typeof window === "undefined") return DEFAULT_DEV_USER_EMAIL;
   return localStorage.getItem(DEV_USER_EMAIL_KEY) || DEFAULT_DEV_USER_EMAIL;
 }
 
 function topologyHeaders(): Record<string, string> {
+  if (LOCAL_BETA_BUILD) return {};
   const email = readDevUserEmail();
   return email ? { "x-nettopo-dev-user-email": email } : {};
 }
@@ -131,11 +139,14 @@ function topologyHeaders(): Record<string, string> {
 async function readRuntimeCapabilities() {
   try {
     const response = await fetch("/api/runtime-capabilities", { cache: "no-store" });
-    if (!response.ok) return { demoSeed: false };
+    if (!response.ok) throw new Error("Capability unavailable");
     const payload = await response.json() as RuntimeCapabilities;
-    return { demoSeed: Boolean(payload.capabilities?.demoSeed) };
+    const localEditing = payload.profile === "local-beta" && payload.storageMode === "indexeddb" && payload.capabilities?.localBeta === true;
+    if (LOCAL_BETA_BUILD && (!localEditing || USE_SERVER_STORAGE)) throw new Error("BTA_PROFILE_INVALID");
+    return { demoSeed: !LOCAL_BETA_BUILD && Boolean(payload.capabilities?.demoSeed), localEditing };
   } catch {
-    return { demoSeed: false };
+    if (LOCAL_BETA_BUILD) throw new Error("BTA_PROFILE_INVALID");
+    return { demoSeed: false, localEditing: false };
   }
 }
 
@@ -156,6 +167,7 @@ async function serverAction(body: Record<string, unknown>) {
 }
 
 let serverWriteQueue: Promise<unknown> = Promise.resolve();
+let pendingLocalWrites = 0;
 
 function queueServerWrite<T>(write: () => Promise<T>) {
   const pending = serverWriteQueue.then(write, write);
@@ -203,7 +215,7 @@ function buildActiveState(dataset: RepositoryDataset, preferredTopologyId?: stri
     customers,
     topologies,
     sites: dataset.sites ?? [],
-    currentUser: dataset.currentUser ?? LOCAL_ADMIN_USER,
+    currentUser: dataset.currentUser ?? (LOCAL_BETA_BUILD ? undefined : LOCAL_ADMIN_USER),
     permissions: dataset.permissions ?? { canCreate: true, canWriteAll: true, canReadAll: true },
     activeCustomerId,
     activeTopologyId,
@@ -223,19 +235,19 @@ async function seedInitialData(demoSeed: boolean) {
   const timestamp = nowIso();
   const customer: CustomerRecord = {
     id: uid("customer"),
-    name: "示範客戶",
+    name: LOCAL_BETA_BUILD ? "新客戶" : "示範客戶",
     createdAt: timestamp,
     updatedAt: timestamp,
   };
   const topology: TopologyRecord = {
     id: uid("topology"),
     customerId: customer.id,
-    ownerUserId: LOCAL_ADMIN_USER.id,
-    createdByUserId: LOCAL_ADMIN_USER.id,
-    updatedByUserId: LOCAL_ADMIN_USER.id,
+    ownerUserId: LOCAL_BETA_BUILD ? undefined : LOCAL_ADMIN_USER.id,
+    createdByUserId: LOCAL_BETA_BUILD ? undefined : LOCAL_ADMIN_USER.id,
+    updatedByUserId: LOCAL_BETA_BUILD ? undefined : LOCAL_ADMIN_USER.id,
     name: "我的網路架構",
     versionLabel: "v1",
-    project: safeProject(safeLegacyProject(localStorage.getItem(LEGACY_STORAGE_KEY)) ?? (demoSeed ? (await import("./topology-types")).SAMPLE_PROJECT : EMPTY_PROJECT)),
+    project: safeProject(safeLegacyProject(localStorage.getItem(LEGACY_STORAGE_KEY)) ?? (!LOCAL_BETA_BUILD && demoSeed ? (await import("./topology-types")).SAMPLE_PROJECT : EMPTY_PROJECT)),
     createdAt: timestamp,
     updatedAt: timestamp,
   };
@@ -253,7 +265,7 @@ async function seedInitialData(demoSeed: boolean) {
 }
 
 async function ensureSeanSpineLeafDemo(customerId: string, demoSeed: boolean) {
-  if (!demoSeed) return;
+  if (LOCAL_BETA_BUILD || !demoSeed) return;
   const {
     SEAN_SPINE_LEAF_PROJECT,
     SEAN_SPINE_LEAF_TOPOLOGY_ID,
@@ -275,7 +287,7 @@ async function ensureSeanSpineLeafDemo(customerId: string, demoSeed: boolean) {
   });
 }
 
-function makeEmptyCustomer(name = "示範客戶") {
+function makeEmptyCustomer(name = LOCAL_BETA_BUILD ? "新客戶" : "示範客戶") {
   const timestamp = nowIso();
   const customer: CustomerRecord = {
     id: uid("customer"),
@@ -310,7 +322,7 @@ async function readActiveData() {
     activeTopologyId = seeded.topology.id;
   }
 
-  await ensureSeanSpineLeafDemo(activeCustomerId ?? customers[0].id, runtime.demoSeed);
+  if (!LOCAL_BETA_BUILD) await ensureSeanSpineLeafDemo(activeCustomerId ?? customers[0].id, runtime.demoSeed);
   topologies = await topologyDb.topologies.toArray();
 
   const sanitizedTopologies = safeTopologies(topologies);
@@ -341,7 +353,8 @@ async function readActiveData() {
     customers: sortByUpdatedAt(customers),
     topologies: sortByUpdatedAt(topologies),
     sites: [],
-    currentUser: LOCAL_ADMIN_USER,
+    currentUser: LOCAL_BETA_BUILD ? undefined : LOCAL_ADMIN_USER,
+    localEditing: Boolean(runtime.localEditing),
     permissions: { canCreate: true, canWriteAll: true, canReadAll: true },
     activeCustomerId,
     activeTopologyId,
@@ -353,7 +366,8 @@ export const useTopologyStore = create<TopologyStore>((set, get) => ({
   customers: [],
   topologies: [],
   sites: [],
-  currentUser: LOCAL_ADMIN_USER,
+  currentUser: LOCAL_BETA_BUILD ? undefined : LOCAL_ADMIN_USER,
+  localEditing: false,
   permissions: { canCreate: true, canWriteAll: true, canReadAll: true },
   project: EMPTY_PROJECT,
   ready: false,
@@ -362,6 +376,7 @@ export const useTopologyStore = create<TopologyStore>((set, get) => ({
 
   initialize: async () => {
     if (typeof window === "undefined") return;
+    if (LOCAL_BETA_BUILD && USE_SERVER_STORAGE) throw new Error("BTA_STORAGE_MODE_INVALID");
     const devUserEmail = readDevUserEmail();
     if (USE_SERVER_STORAGE) {
       const dataset = await fetchServerDataset();
@@ -373,6 +388,7 @@ export const useTopologyStore = create<TopologyStore>((set, get) => ({
   },
 
   setDevUserEmail: async (email) => {
+    if (LOCAL_BETA_BUILD) throw new Error("BTA_API_DENIED");
     const nextEmail = email.trim() || DEFAULT_DEV_USER_EMAIL;
     localStorage.setItem(DEV_USER_EMAIL_KEY, nextEmail);
     if (USE_SERVER_STORAGE) {
@@ -386,16 +402,37 @@ export const useTopologyStore = create<TopologyStore>((set, get) => ({
 
   setProject: (updater) => {
     const current = get();
+    if (LOCAL_BETA_BUILD && !current.localEditing) throw new Error("BTA_PROFILE_INVALID");
+    const activeTopologyId = current.activeTopologyId;
+    if (LOCAL_BETA_BUILD) {
+      if (!activeTopologyId) return;
+      pendingLocalWrites++;
+      set({ saving: true, writeError: undefined });
+      void queueServerWrite(async () => {
+        // Derive queued edits from the last committed record, then publish only after commit.
+        const saved = await topologyDb.transaction("rw", topologyDb.topologies, async () => {
+          const record = await topologyDb.topologies.get(activeTopologyId);
+          if (!record) throw new Error("Missing local topology");
+          const next = typeof updater === "function" ? updater(safeProject(record.project)) : updater;
+          const changes = { project: safeProject(stripProjectCredentials(next)), updatedAt: nowIso() };
+          await topologyDb.topologies.update(activeTopologyId, changes);
+          return changes;
+        });
+        set((state) => ({
+          ...(state.activeTopologyId === activeTopologyId ? { project: cloneProject(saved.project) } : {}),
+          topologies: sortByUpdatedAt(state.topologies.map(t => t.id === activeTopologyId ? { ...t, ...saved } : t)),
+        }));
+      }).catch(() => set({ writeError: "本機儲存失敗，原資料已保留。" })).finally(() => set({ saving: --pendingLocalWrites > 0 }));
+      return;
+    }
     const nextProject = typeof updater === "function" ? updater(current.project) : updater;
     const persistedProject = safeProject(stripProjectCredentials(nextProject));
-    const activeTopologyId = current.activeTopologyId;
     const timestamp = nowIso();
     const nextTopologies = current.topologies.map((topology) =>
       topology.id === activeTopologyId
         ? { ...topology, project: cloneProject(persistedProject), updatedAt: timestamp }
         : topology,
     );
-
     set({ project: cloneProject(persistedProject), topologies: sortByUpdatedAt(nextTopologies), saving: true });
     if (!activeTopologyId) return;
     if (USE_SERVER_STORAGE) {

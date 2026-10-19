@@ -1,0 +1,30 @@
+{
+  "ticket": "QA_BTA_001",
+  "classification": "qa-only-positive-allowlist",
+  "formalProductResult": "NOT_RUN",
+  "wildcardsAllowed": false,
+  "preparationAllowlist": [
+    "tests/qa-bta-001-preparation.test.mjs",
+    "tests/qa-bta-001-harness.test.mjs",
+    "tests/qa-bta-001-browser-harness.test.mjs",
+    "tests/qa-bta-001-selection.test.mjs"
+  ],
+  "formalStages": [
+    "scripts/qa-bta/package-runner.mjs",
+    "scripts/qa-bta/browser-runner.mjs"
+  ],
+  "forbidden": [
+    "tests/*.test.mjs",
+    "current .env or DSN",
+    "PostgreSQL or Docker",
+    "global dependency installation",
+    "developer checkout node_modules as portable proof"
+  ],
+  "formalPrerequisites": [
+    "DEV_BTA_001-003 READY_FOR_QA",
+    "writer stopped",
+    "fixed source/tool/dependency manifest",
+    "fixed ZIP and outer SHA-256",
+    "QA-owned extraction/profile/download/evidence roots"
+  ]
+}

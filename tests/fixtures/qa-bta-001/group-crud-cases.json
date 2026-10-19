@@ -1,0 +1,70 @@
+{
+  "targetGroupId": "group-target",
+  "emptyGroupId": "group-empty",
+  "base": {
+    "devices": [
+      { "id": "device-a", "name": "Router A", "type": "router", "x": 80, "y": 120, "groupId": "group-target" },
+      { "id": "device-b", "name": "Switch B", "type": "switch", "x": 320, "y": 120, "groupId": "group-target" },
+      { "id": "device-c", "name": "Server C", "type": "server", "x": 560, "y": 120, "groupId": "group-other" },
+      { "id": "device-d", "name": "Client D", "type": "client", "x": 800, "y": 120 }
+    ],
+    "links": [
+      { "id": "link-internal", "from": "device-a", "to": "device-b", "kind": "wired", "fromPort": "LAN1", "toPort": "Gi0/1" },
+      { "id": "link-cross", "from": "device-b", "to": "device-c", "kind": "wired", "fromPort": "Gi0/2", "toPort": "eth0" }
+    ],
+    "groups": [
+      { "id": "group-target", "name": "Target Group", "kind": "site", "color": "#526cf5", "collapsed": true },
+      { "id": "group-other", "name": "Other Group", "kind": "domain", "color": "#18a674", "collapsed": false },
+      { "id": "group-empty", "name": "Empty Group", "kind": "vlan", "color": "#f59e0b", "collapsed": false }
+    ]
+  },
+  "edited": {
+    "devices": [
+      { "id": "device-a", "name": "Router A", "type": "router", "x": 80, "y": 120, "groupId": "group-target" },
+      { "id": "device-b", "name": "Switch B", "type": "switch", "x": 320, "y": 120, "groupId": "group-target" },
+      { "id": "device-c", "name": "Server C", "type": "server", "x": 560, "y": 120, "groupId": "group-other" },
+      { "id": "device-d", "name": "Client D", "type": "client", "x": 800, "y": 120 }
+    ],
+    "links": [
+      { "id": "link-internal", "from": "device-a", "to": "device-b", "kind": "wired", "fromPort": "LAN1", "toPort": "Gi0/1" },
+      { "id": "link-cross", "from": "device-b", "to": "device-c", "kind": "wired", "fromPort": "Gi0/2", "toPort": "eth0" }
+    ],
+    "groups": [
+      { "id": "group-target", "name": "Edited Target", "kind": "vlan", "color": "#112233", "collapsed": true },
+      { "id": "group-other", "name": "Other Group", "kind": "domain", "color": "#18a674", "collapsed": false },
+      { "id": "group-empty", "name": "Empty Group", "kind": "vlan", "color": "#f59e0b", "collapsed": false }
+    ]
+  },
+  "deletedNonEmpty": {
+    "devices": [
+      { "id": "device-a", "name": "Router A", "type": "router", "x": 80, "y": 120 },
+      { "id": "device-b", "name": "Switch B", "type": "switch", "x": 320, "y": 120 },
+      { "id": "device-c", "name": "Server C", "type": "server", "x": 560, "y": 120, "groupId": "group-other" },
+      { "id": "device-d", "name": "Client D", "type": "client", "x": 800, "y": 120 }
+    ],
+    "links": [
+      { "id": "link-internal", "from": "device-a", "to": "device-b", "kind": "wired", "fromPort": "LAN1", "toPort": "Gi0/1" },
+      { "id": "link-cross", "from": "device-b", "to": "device-c", "kind": "wired", "fromPort": "Gi0/2", "toPort": "eth0" }
+    ],
+    "groups": [
+      { "id": "group-other", "name": "Other Group", "kind": "domain", "color": "#18a674", "collapsed": false },
+      { "id": "group-empty", "name": "Empty Group", "kind": "vlan", "color": "#f59e0b", "collapsed": false }
+    ]
+  },
+  "deletedEmpty": {
+    "devices": [
+      { "id": "device-a", "name": "Router A", "type": "router", "x": 80, "y": 120, "groupId": "group-target" },
+      { "id": "device-b", "name": "Switch B", "type": "switch", "x": 320, "y": 120, "groupId": "group-target" },
+      { "id": "device-c", "name": "Server C", "type": "server", "x": 560, "y": 120, "groupId": "group-other" },
+      { "id": "device-d", "name": "Client D", "type": "client", "x": 800, "y": 120 }
+    ],
+    "links": [
+      { "id": "link-internal", "from": "device-a", "to": "device-b", "kind": "wired", "fromPort": "LAN1", "toPort": "Gi0/1" },
+      { "id": "link-cross", "from": "device-b", "to": "device-c", "kind": "wired", "fromPort": "Gi0/2", "toPort": "eth0" }
+    ],
+    "groups": [
+      { "id": "group-target", "name": "Target Group", "kind": "site", "color": "#526cf5", "collapsed": true },
+      { "id": "group-other", "name": "Other Group", "kind": "domain", "color": "#18a674", "collapsed": false }
+    ]
+  }
+}

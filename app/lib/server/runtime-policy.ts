@@ -1,10 +1,12 @@
-export type RuntimeProfile = "development" | "test" | "production" | "pilot";
+export type RuntimeProfile = "development" | "test" | "production" | "pilot" | "local-beta";
 export type AuthMode = "demo" | "oidc" | "disabled" | "pilot";
 
 export type RuntimePolicy = {
   profile: RuntimeProfile;
   authMode: AuthMode;
+  storageMode?: "indexeddb" | "server";
   capabilities: {
+    localBeta?: boolean;
     demoAuth: boolean;
     devIdentityOverride: boolean;
     demoSeed: boolean;
@@ -22,7 +24,7 @@ export const DEV_IDENTITY_ALLOWLIST = [
   { email: "sales@company.local", label: "Sales / Purchasing" },
 ] as const;
 
-const PROFILE_VALUES = new Set(["development", "test", "production", "pilot"]);
+const PROFILE_VALUES = new Set(["development", "test", "production", "pilot", "local-beta"]);
 const AUTH_MODE_VALUES = new Set(["demo", "oidc", "disabled", "pilot"]);
 const PILOT_EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -66,11 +68,22 @@ export function getRuntimePolicy(env: NodeJS.ProcessEnv = process.env): RuntimeP
   const mode = authMode(env.NETTOPO_AUTH_MODE);
   const nonProduction = profile === "development" || profile === "test";
   const pilot = profile === "pilot" && mode === "pilot";
+  const beta = profile === "local-beta";
+  const betaValid = beta && env.NETTOPO_AUTH_MODE === "disabled"
+    && env.NETTOPO_STORAGE_MODE === "indexeddb" && env.NEXT_PUBLIC_TOPOLOGY_STORAGE === "local"
+    && env.NEXT_PUBLIC_LOCAL_BETA === "1" && env.HOST === "127.0.0.1" && env.PORT === "4317"
+    && !Object.entries(env).some(([key, value]) => Boolean(value) && (
+      /^(DATABASE_URL|MIGRATION_DATABASE_URL)$/.test(key)
+      || /^(NETTOPO_PILOT_|NETTOPO_DEV_SESSION_|OIDC_|DUS_|CREDENTIAL_)/.test(key)
+      || (/^NETTOPO_ENABLE_/.test(key) && value !== "0")
+    ));
 
   return {
     profile,
     authMode: mode,
+    ...(beta ? { storageMode: env.NETTOPO_STORAGE_MODE === "indexeddb" ? "indexeddb" as const : "server" as const } : {}),
     capabilities: {
+      ...(beta ? { localBeta: betaValid } : {}),
       demoAuth: nonProduction && mode === "demo",
       devIdentityOverride: nonProduction && flag(env.NETTOPO_ENABLE_DEV_IDENTITY_HEADER),
       demoSeed: nonProduction && flag(env.NETTOPO_ENABLE_DEMO_SEED),
@@ -82,6 +95,13 @@ export function getRuntimePolicy(env: NodeJS.ProcessEnv = process.env): RuntimeP
 
 export function validateRuntimePolicy(env: NodeJS.ProcessEnv = process.env, host = env.HOST) {
   const policy = getRuntimePolicy(env);
+  if (policy.profile === "local-beta") {
+    if (env.NETTOPO_STORAGE_MODE !== "indexeddb" || env.NEXT_PUBLIC_TOPOLOGY_STORAGE !== "local") {
+      throw new Error("BTA_STORAGE_MODE_INVALID");
+    }
+    if (!policy.capabilities.localBeta || host !== "127.0.0.1") throw new Error("BTA_PROFILE_INVALID");
+    return policy;
+  }
   const requestedDevCapability =
     flag(env.NETTOPO_ENABLE_DEV_IDENTITY_HEADER) ||
     flag(env.NETTOPO_ENABLE_DEMO_SEED) ||
@@ -123,6 +143,7 @@ export function runtimePolicySummary(policy = getRuntimePolicy()) {
   return {
     profile: policy.profile,
     authMode: policy.authMode,
+    ...(policy.storageMode ? { storageMode: policy.storageMode } : {}),
     capabilities: { ...policy.capabilities },
   };
 }

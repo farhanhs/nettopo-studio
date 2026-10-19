@@ -1,0 +1,54 @@
+{
+  "contract": "LOCAL-FEEDBACK-BETA-V1@R1.1",
+  "candidatePolicy": "Run only against an immutable DEV fixed packet after writer stop and hash lock.",
+  "phases": [
+    {
+      "id": "A04",
+      "name": "CRUD and layout",
+      "steps": ["create device/group/link", "edit device/group/link", "delete link/device/group", "run auto-layout"],
+      "expected": ["all normal pointer actions succeed at 360/768/1024/1280", "deleted IDs are absent after reload", "remaining relations are valid"],
+      "evidence": ["before/after canonical projections", "viewport hit-test ledger", "screenshots for 360 and 1280"],
+      "stopConditions": ["visible enabled control is intercepted", "unexpected destructive cascade"]
+    },
+    {
+      "id": "A05",
+      "name": "same-profile package restart persistence",
+      "steps": ["capture canonical projection", "close page/context", "stop package", "start package", "reopen same owned profile"],
+      "expected": ["canonical projection equals pre-stop state", "package status and owned PID lifecycle are clean"],
+      "evidence": ["pre/post projection JSON", "package lifecycle JSON", "listener cleanup"],
+      "stopConditions": ["profile ownership uncertain", "port or process belongs to another run"]
+    },
+    {
+      "id": "A06",
+      "name": "Full and Safe round-trip",
+      "steps": ["export full JSON/CSV", "export safe JSON/CSV", "reimport each into fresh topology", "reload and re-export"],
+      "expected": ["full equals independent canonical projection", "safe equals independent safe projection", "IDs, relations and geometry are preserved", "CSV ZIP has exactly five canonical members"],
+      "evidence": ["download hashes", "projection comparison JSON", "ZIP member list"],
+      "stopConditions": ["download is empty", "unexpected member or plaintext secret"]
+    },
+    {
+      "id": "A07",
+      "name": "Preview negative controls",
+      "steps": ["open blocking fixture", "verify Apply disabled", "exclude blocking item", "open warning fixture", "verify Apply disabled before acknowledgement", "acknowledge warning", "Cancel then Apply in separate runs"],
+      "expected": ["blocking cannot be acknowledged through", "excluded incomplete record is absent", "warning requires acknowledgement", "Cancel is zero-write", "summary counts and Missing Info match fixture"],
+      "evidence": ["Preview screenshot", "button state ledger", "before/after IndexedDB projection"],
+      "stopConditions": ["blocking Apply becomes enabled", "Cancel mutates storage"]
+    },
+    {
+      "id": "A09",
+      "name": "Sentinel injection and sink scan",
+      "steps": ["run scanner positive control", "inject synthetic catalog only through approved Preview input", "Cancel and Apply sanitized path", "scan observed sinks and unpacked downloads"],
+      "expected": ["positive control finds every sentinel", "raw sentinels remain visible only in the owned input fixture", "Project/Zustand/Dexie/DOM/console/network/log/JSON/CSV/ZIP scans are clean"],
+      "evidence": ["positive-control hits", "per-sink zero-hit ledger", "unpacked ZIP scan"],
+      "stopConditions": ["scanner positive control misses", "sentinel appears in a prohibited sink"]
+    },
+    {
+      "id": "A10",
+      "name": "legacy support and future rejection",
+      "steps": ["import supported legacy project", "import future schemaVersion project", "attempt ZIP import"],
+      "expected": ["legacy import succeeds with explicit compatibility notice", "future version is blocked with zero-write", "ZIP import is explicitly rejected"],
+      "evidence": ["Preview issue text", "before/after IndexedDB projection", "network/console ledger"],
+      "stopConditions": ["future version applies", "unknown format silently falls back"]
+    }
+  ]
+}

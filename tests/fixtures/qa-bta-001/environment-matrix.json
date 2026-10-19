@@ -1,0 +1,29 @@
+{
+  "platform": "Windows",
+  "browsers": ["Chrome", "Edge"],
+  "paths": ["plain-ascii", "path with spaces", "中文路徑"],
+  "networkModes": ["online-first-setup", "external-network-blocked-loopback-allowed"],
+  "negativeCases": ["node-missing", "runtime-dependency-missing", "port-owned-by-unknown-process", "non-loopback-host", "invalid-profile"],
+  "requestCases": [
+    "originless-same-origin-capability-get",
+    "framework-rsc-get",
+    "navigation-and-static-assets",
+    "owned-status",
+    "owned-shutdown-with-instance-token",
+    "cross-site-request-denied",
+    "protected-api-denied"
+  ],
+  "constraints": {
+    "noGlobalInstall": true,
+    "noDocker": true,
+    "noPostgres": true,
+    "noCompanyLogin": true,
+    "noBuildByTester": true,
+    "fixedOriginRequired": true
+  },
+  "ownedLifecycle": {
+    "statusRequiresOwnedState": true,
+    "shutdownRequiresPeerAndInstanceToken": true,
+    "unknownProcessMustNotBeKilled": true
+  }
+}

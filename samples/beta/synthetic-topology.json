@@ -1,0 +1,66 @@
+{
+  "schemaVersion": 1,
+  "kind": "nettopo-project",
+  "sharing": "safe",
+  "exportedAt": "2026-10-19T02:03:00.777Z",
+  "topologyName": "Synthetic Beta sample",
+  "project": {
+    "devices": [
+      {
+        "id": "synthetic-router",
+        "name": "Synthetic Router",
+        "type": "router",
+        "model": "TEST-R",
+        "x": 80,
+        "y": 100,
+        "groupId": "synthetic-site"
+      },
+      {
+        "id": "synthetic-switch",
+        "name": "Synthetic Switch",
+        "type": "switch",
+        "model": "TEST-S",
+        "x": 400,
+        "y": 100,
+        "groupId": "synthetic-site"
+      },
+      {
+        "id": "synthetic-camera",
+        "name": "Synthetic Cameras",
+        "type": "camera",
+        "quantity": 3,
+        "x": 720,
+        "y": 100,
+        "groupId": "synthetic-site"
+      }
+    ],
+    "links": [
+      {
+        "id": "synthetic-uplink",
+        "from": "synthetic-router",
+        "to": "synthetic-switch",
+        "kind": "wired",
+        "fromPort": "Gi0/1",
+        "toPort": "Gi0/1",
+        "speed": "1 Gbps"
+      },
+      {
+        "id": "synthetic-camera-link",
+        "from": "synthetic-switch",
+        "to": "synthetic-camera",
+        "kind": "wired",
+        "fromPort": "Gi0/2",
+        "toPort": "Eth0",
+        "speed": "100 Mbps"
+      }
+    ],
+    "groups": [
+      {
+        "id": "synthetic-site",
+        "name": "Synthetic Site",
+        "kind": "site",
+        "color": "#468b66"
+      }
+    ]
+  }
+}

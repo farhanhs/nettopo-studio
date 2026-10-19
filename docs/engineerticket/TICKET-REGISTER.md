@@ -1,5 +1,22 @@
 # Engineer Ticket Register
 
+## 2026-10-19 本機 Beta — 當前唯一啟動範圍
+
+Branch `codex/public-beta-0.1`；Worktree `C:/Users/DUS/Desktop/project/nettopo-studio/.local/worktrees/public-beta-0.1`；Base `b5c53916cbda6f8bcd2f42f9d9772ef181c1adee`（10/19已依使用者授權自a9abe63 FF至main）。共享治理依root R3；[原核准計畫](C:/Users/DUS/Desktop/project/nettopo-studio/docs/開發計畫/2026-10-09-local-feedback-beta-plan.md)與[本輪接續](C:/Users/DUS/Desktop/project/nettopo-studio/docs/dev開發紀錄/2026-10-19-pm-beta-resume.md)，PM_BTA_001在root。此下歷史佇列不是本樹開工授權；已提交NTM只作main基準，不啟新NTM/Auth/AIL/其他票。不stage/新commit/push/tag/Release；必要QA後PRE-COMMIT停。
+
+| Order | Ticket | Status | Owner / Dependency |
+|---|---|---|---|
+| 155 | [DSG_BTA_001](active/DSG_BTA_001.md) | READY | R1.1 §12已同步10/19使用者裁定：Group edit保留identity/membership；delete保留設備/連線並改未分類；DEV已獲PM同票續修授權，A08仍BLOCKED。 |
+| 156 | [DEV_BTA_001](active/DEV_BTA_001.md) | READY_FOR_QA | 10/19 R4 ZIP4c04dc3d群組與深度回歸QA通過；安全補驗A11 PASS，A02/A03/A12依declared limits/authorized scope通過。A08仍平台BLOCKED，未實機限制交PM判定；產品不變、writer停、無Git操作。 |
+| 157 | [DEV_BTA_002](active/DEV_BTA_002.md) | READY_FOR_QA | 10/19 R4沿原producer固定包4c04dc3d，74 source含group helper、drift0，lifecycle12/12；producer/runtime與R3無差異。保留R1/R2失敗歷史，writer stop交QA。 |
+| 158 | [DEV_BTA_003](active/DEV_BTA_003.md) | READY_FOR_QA | 10/19 R4包4c04dc3d保留原notices/backup/sample，文件來源與R3無差異；group完整JSON真匯出還原自測通過。writer stop；獨立QA後PRE-COMMIT，非QA PASS。 |
+| 159 | [QA_BTA_001](active/QA_BTA_001.md) | BLOCKED | R4可安全獨立A01–A12矩陣已收束；A08 OS enforcement平台權限BLOCKED，未進PRE-COMMIT |
+| 160 | [OPS_BTA_001](active/OPS_BTA_001.md) | BLOCKED | PM持有待指派，不新增OPS對話；等待另授權 |
+
+目前固定 R4（ZIP `4c04dc3d…9195a`）的 A04/A05/A06/A07/A09/A10 已取得獨立 QA 證據，R1–R3 失敗保留於歷史；A08 OS-level enforcement 仍平台 BLOCKED。整包 A01–A12 的分項／沿用證據以 R4 QA 報告總表為準，尚未 PRE-COMMIT 或 Release 放行。使用者核准的暫時規則只限 QA 程式副本，不能替代 Windows 實際管理權限，OPS 草稿不許直接實跑；OPS_BTA_001 發布仍 BLOCKED。DEV 自測另記，不代 QA；各組只改自身票/register列，送達與實際開工分開記。
+
+2026-10-19 Beta工程存檔追加：使用者僅核准DEV_BTA_001–003固定R4及對應DSG/QA閉包的本機stage/commit，隨收錄此註記的commit生效；沒有push/發布。上述不stage/commit為授權前歷史，僅本次存檔解除；QA_BTA_001仍BLOCKED/A08，DEV票仍READY_FOR_QA，不是整包PASS/DONE/Release-ready。[精確存檔範圍](../dev開發紀錄/2026-10-19-beta-engineering-snapshot.md)。
+
 ## 2026-10-14 NTM004 視圖接續
 
 | Order | Ticket | Status | Scope |

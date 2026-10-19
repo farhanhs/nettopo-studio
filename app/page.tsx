@@ -38,6 +38,8 @@ import {
   TOPOLOGY_NODE_WIDTH as NODE_WIDTH,
 } from "./lib/topology-routing";
 import { useTopologyStore } from "./lib/topology-store";
+import { deleteTopologyGroupKeepMembers, editTopologyGroup, type GroupOperationResult } from "./lib/topology-group-operations";
+import { validateProject } from "./lib/topology-validation";
 import {
   buildImportPlan,
   buildImportPlanFromFileDescriptors,
@@ -109,9 +111,11 @@ const PANEL_LIMITS = {
 const elk = new ELK();
 const LOGIN_SESSION_KEY = "nettopo-login-session";
 const USE_SERVER_STORAGE = process.env.NEXT_PUBLIC_TOPOLOGY_STORAGE === "server";
+const LOCAL_BETA_BUILD = process.env.NEXT_PUBLIC_LOCAL_BETA === "1";
 
 type RuntimeCapabilities = {
-  profile: "development" | "test" | "production" | "pilot";
+  profile: "development" | "test" | "production" | "pilot" | "local-beta";
+  storageMode?: "indexeddb" | "server";
   authMode: "demo" | "oidc" | "disabled" | "pilot";
   capabilities: {
     demoAuth: boolean;
@@ -119,11 +123,18 @@ type RuntimeCapabilities = {
     demoSeed: boolean;
     pilotAuth: boolean;
     pilotFullExport: boolean;
+    localBeta?: boolean;
   };
 };
 type FlowViewportSize = { width: number; height: number };
 
 type DevIdentity = { email: string; label: string };
+
+function hasLocalBetaAccess(payload: RuntimeCapabilities) {
+  return LOCAL_BETA_BUILD && !USE_SERVER_STORAGE && payload.profile === "local-beta"
+    && payload.authMode === "disabled" && payload.storageMode === "indexeddb"
+    && payload.capabilities.localBeta === true;
+}
 
 function uid(prefix: string) {
   return `${prefix}-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 7)}`;
@@ -507,21 +518,19 @@ function LoginGate({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     void fetch("/api/runtime-capabilities", { cache: "no-store" })
-      .then((response) => response.json())
-      .then((payload: RuntimeCapabilities) => setCapabilities(payload))
-      .catch(() => setCapabilities({
-        profile: "production",
-        authMode: "disabled",
-        capabilities: { demoAuth: false, devIdentityOverride: false, demoSeed: false, pilotAuth: false, pilotFullExport: false },
-      }));
-
-    if (sessionStorage.getItem(LOGIN_SESSION_KEY) !== "authenticated") {
-      queueMicrotask(() => setAuthChecked(true));
-      return;
-    }
-
-    void restoreSession()
-      .then((valid) => {
+      .then((response) => {
+        if (!response.ok) throw new Error("Capability unavailable");
+        return response.json();
+      })
+      .then(async (payload: RuntimeCapabilities) => {
+        setCapabilities(payload);
+        if (LOCAL_BETA_BUILD) {
+          if (!hasLocalBetaAccess(payload)) throw new Error("BTA_PROFILE_INVALID");
+          setAuthenticated(true);
+          return;
+        }
+        if (sessionStorage.getItem(LOGIN_SESSION_KEY) !== "authenticated") return;
+        const valid = await restoreSession();
         if (valid) setAuthenticated(true);
         else {
           sessionStorage.removeItem(LOGIN_SESSION_KEY);
@@ -529,8 +538,9 @@ function LoginGate({ children }: { children: ReactNode }) {
         }
       })
       .catch(() => {
-        sessionStorage.removeItem(LOGIN_SESSION_KEY);
+        if (!LOCAL_BETA_BUILD) sessionStorage.removeItem(LOGIN_SESSION_KEY);
         setAuthenticated(false);
+        setError(LOCAL_BETA_BUILD ? "本機試用模式檢查失敗，請重新執行 start.cmd。" : "無法確認登入狀態。");
       })
       .finally(() => setAuthChecked(true));
   }, []);
@@ -571,8 +581,8 @@ function LoginGate({ children }: { children: ReactNode }) {
           <div className="login-card">
             <header>
               <p>歡迎使用</p>
-              <h2>檢查登入狀態</h2>
-              <span>正在確認本機 Demo session...</span>
+              <h2>{LOCAL_BETA_BUILD ? "啟動本機工作區" : "檢查登入狀態"}</h2>
+              <span>正在確認執行模式...</span>
             </header>
           </div>
         </section>
@@ -581,6 +591,7 @@ function LoginGate({ children }: { children: ReactNode }) {
   }
 
   if (!authenticated) {
+    if (LOCAL_BETA_BUILD) return <main className="login-shell"><section className="login-panel"><h1>NetTopo Studio</h1><p role="alert">{error || "本機試用模式尚未就緒，請執行 start.cmd。"}</p></section></main>;
     const demoEnabled = Boolean(capabilities?.capabilities.demoAuth);
     const pilotEnabled = Boolean(capabilities?.capabilities.pilotAuth);
     return (
@@ -593,8 +604,8 @@ function LoginGate({ children }: { children: ReactNode }) {
             <i />
             <i />
           </div>
-          <p className="login-eyebrow">DIGITAL UNITED SERVICE</p>
-          <h1>數位聯合服務網路設備拓樸工具</h1>
+          <p className="login-eyebrow">NetTopo Studio</p>
+          <h1>網路設備拓樸工具</h1>
           <p className="login-description">
             集中管理網路設備、連線關係與站點拓樸，讓維運資訊更清楚、更容易追蹤。
           </p>
@@ -620,7 +631,7 @@ function LoginGate({ children }: { children: ReactNode }) {
             {pilotEnabled && <form className="pilot-login-form" onSubmit={(event) => void enterPilot(event)}>
               <label>
                 <span>Pilot Email</span>
-                <input value={pilotEmail} onChange={(event) => setPilotEmail(event.target.value)} placeholder="pilot.engineer@company.local" type="email" required />
+                <input value={pilotEmail} onChange={(event) => setPilotEmail(event.target.value)} placeholder="engineer@example.invalid" type="email" required />
               </label>
               <button className="login-submit" type="submit">進入 Internal Pilot</button>
               <p className="login-security-note">INTERNAL PILOT：僅限假資料與測試客戶，不得輸入正式設備帳密。</p>
@@ -629,7 +640,7 @@ function LoginGate({ children }: { children: ReactNode }) {
 
             {error && <p className="login-error" role="alert">{error}</p>}
 
-            {capabilities && capabilities.profile !== "production" && capabilities.profile !== "pilot" && <small className="login-security-note">DEVELOPMENT MODE：Demo session 使用 HttpOnly cookie，不含密碼。</small>}
+            {capabilities && ["development", "test"].includes(capabilities.profile) && <small className="login-security-note">DEVELOPMENT MODE：Demo session 使用 HttpOnly cookie，不含密碼。</small>}
           </div>
         </section>
       </main>
@@ -659,6 +670,8 @@ function TopologyApp() {
     project,
     ready,
     saving,
+    localEditing,
+    writeError,
     devUserEmail,
     initialize,
     setDevUserEmail,
@@ -692,6 +705,10 @@ function TopologyApp() {
   const [showDeviceForm, setShowDeviceForm] = useState(false);
   const [showLinkForm, setShowLinkForm] = useState(false);
   const [showGroupForm, setShowGroupForm] = useState(false);
+  const [groupAction, setGroupAction] = useState<{ type: "edit" | "delete"; id: string; topologyId: string }>();
+  const [groupBusy, setGroupBusy] = useState(false);
+  const groupBusyRef = useRef(false);
+  const [groupError, setGroupError] = useState("");
   const [showCustomerForm, setShowCustomerForm] = useState(false);
   const [showTopologyForm, setShowTopologyForm] = useState(false);
   const [showTransfer, setShowTransfer] = useState<"import" | "export">();
@@ -729,11 +746,12 @@ function TopologyApp() {
       const current = ++generation;
       setReaderPermit(undefined);
       try {
-        const response = await fetch(USE_SERVER_STORAGE ? "/api/session" : "/api/dev/session", {
+        const response = await fetch(LOCAL_BETA_BUILD ? "/api/runtime-capabilities" : USE_SERVER_STORAGE ? "/api/session" : "/api/dev/session", {
           cache: "no-store", signal: controller.signal,
           headers: USE_SERVER_STORAGE && devUserEmail ? { "x-nettopo-dev-user-email": devUserEmail } : {},
         });
         let allowed = response.ok;
+        if (allowed && LOCAL_BETA_BUILD) allowed = hasLocalBetaAccess(await response.json());
         if (allowed && USE_SERVER_STORAGE) {
           const payload = await response.json();
           allowed = payload.currentUser?.id === currentUser?.id && payload.currentUser?.role === currentUser?.role
@@ -766,7 +784,7 @@ function TopologyApp() {
   }, []);
 
   useEffect(() => {
-    void initialize();
+    void initialize().catch(() => setNotice("工作區載入失敗，資料尚未變更。請確認本機模式與瀏覽器儲存空間。"));
   }, [initialize]);
 
   useEffect(() => {
@@ -826,9 +844,12 @@ function TopologyApp() {
   const canCreateWithSelectedSite = availableSites.length > 0;
   const canSubmitSiteScopedCreate = canCreateWithSelectedSite || canUseUnspecifiedSite;
   const canCreateRecords = permissions.canCreate;
-  const canWriteActiveTopology = canWriteTopology(currentUser, activeTopology);
+  const canWriteActiveTopology = (localEditing && !USE_SERVER_STORAGE) || canWriteTopology(currentUser, activeTopology);
+  const canManageGroups = LOCAL_BETA_BUILD && canWriteActiveTopology;
+  const actionGroup = groupAction && groupAction.topologyId === activeTopologyId
+    ? project.groups.find(group => group.id === groupAction.id) : undefined;
   const canManageActiveCustomer = currentUser?.role === "boss" || canWriteActiveTopology;
-  const canDeleteActiveCustomer = currentUser?.role === "boss";
+  const canDeleteActiveCustomer = (localEditing && !USE_SERVER_STORAGE) || currentUser?.role === "boss";
   const isPilotProfile = runtimeCapabilities?.profile === "pilot";
   const canUseFullExport = !isPilotProfile || (Boolean(runtimeCapabilities?.capabilities.pilotFullExport) && currentUser?.role === "boss");
 
@@ -1039,6 +1060,84 @@ function TopologyApp() {
     setProject((current) => ({ ...current, groups: [...current.groups, group] }));
     setShowGroupForm(false);
     setNotice("容器已建立，可在設備資料中指定");
+  }
+
+  function openGroupAction(id: string, type: "edit" | "delete") {
+    if (!canManageGroups || saving || groupBusyRef.current || !activeTopologyId) return;
+    if (!project.groups.some(group => group.id === id)) return;
+    setGroupError("");
+    setGroupAction({ type, id, topologyId: activeTopologyId });
+  }
+
+  function closeGroupAction() {
+    if (groupBusyRef.current) return;
+    setGroupAction(undefined);
+    setGroupError("");
+  }
+
+  async function commitGroupChange(transform: (current: Project) => GroupOperationResult, success: string) {
+    if (!canManageGroups || !groupAction || groupAction.topologyId !== activeTopologyId ||
+      saving || groupBusyRef.current || !actionGroup) return;
+    const { topologyId, id } = groupAction;
+    try {
+      const preview = transform(project);
+      if (preview.status !== "changed") { setGroupError("容器已不存在，資料未變更。"); return; }
+      validateProject(preview.project);
+    } catch { setGroupError("請確認容器名稱、分類與識別色。"); return; }
+    groupBusyRef.current = true;
+    setGroupBusy(true);
+    setGroupError("");
+    // setProject is enqueue-only. Observe the existing commit-before-publish boundary, not optimistic UI state.
+    const committed = await new Promise<boolean>(resolve => {
+      let expected: Project | undefined;
+      const unsubscribe = useTopologyStore.subscribe(state => {
+        if (state.saving) return;
+        unsubscribe();
+        const saved = state.topologies.find(topology => topology.id === topologyId)?.project;
+        resolve(!state.writeError && expected !== undefined && JSON.stringify(saved) === JSON.stringify(expected));
+      });
+      try {
+        setProject(current => {
+          const state = useTopologyStore.getState();
+          const topology = state.topologies.find(candidate => candidate.id === topologyId);
+          const writable = (state.localEditing && !USE_SERVER_STORAGE) || canWriteTopology(state.currentUser, topology);
+          if (!LOCAL_BETA_BUILD || !writable || state.activeTopologyId !== topologyId) throw new Error("Group write unavailable");
+          const result = transform(current);
+          if (result.status !== "changed") throw new Error("Group no longer exists");
+          expected = validateProject(result.project);
+          return expected;
+        });
+        if (!useTopologyStore.getState().saving) { unsubscribe(); resolve(false); }
+      } catch { unsubscribe(); resolve(false); }
+    });
+    groupBusyRef.current = false;
+    setGroupBusy(false);
+    if (!committed) {
+      setGroupError(useTopologyStore.getState().writeError || "容器變更未儲存，請重新確認後再試。");
+      return;
+    }
+    if (groupAction.type === "delete") {
+      setGroupCollapseOverrides(current => {
+        const overrides = { ...(current[topologyId] ?? {}) };
+        delete overrides[id];
+        return { ...current, [topologyId]: overrides };
+      });
+    }
+    setGroupAction(undefined);
+    if (useTopologyStore.getState().activeTopologyId === topologyId) setNotice(success);
+  }
+
+  async function editGroup(data: FormData) {
+    if (!groupAction || !canManageGroups) return;
+    const id = groupAction.id;
+    const patch = { name: clean(data.get("name")), kind: clean(data.get("kind")) as Group["kind"], color: clean(data.get("color")).toLowerCase() };
+    await commitGroupChange(current => editTopologyGroup(current, id, patch), "容器已更新");
+  }
+
+  async function deleteGroup() {
+    if (!groupAction || !canManageGroups) return;
+    const id = groupAction.id;
+    await commitGroupChange(current => deleteTopologyGroupKeepMembers(current, id), "容器已刪除，設備與連線已保留");
   }
 
   async function autoLayout() {
@@ -1412,12 +1511,13 @@ function TopologyApp() {
   return (
     <main className="app-shell">
       <header className="topbar">
+        {localEditing && <div className="development-banner" role="status" data-local-beta="true">本機試用模式｜資料只保存在此瀏覽器設定檔</div>}
         {runtimeCapabilities && runtimeCapabilities.profile === "pilot" && (
           <div className="development-banner pilot-banner">
             INTERNAL PILOT · synthetic test data only · do not enter production credentials
           </div>
         )}
-        {runtimeCapabilities && runtimeCapabilities.profile !== "production" && runtimeCapabilities.profile !== "pilot" && (
+        {runtimeCapabilities && ["development", "test"].includes(runtimeCapabilities.profile) && (
           <div className="development-banner">
             DEVELOPMENT MODE · demoAuth={String(runtimeCapabilities.capabilities.demoAuth)} · devIdentityOverride={String(runtimeCapabilities.capabilities.devIdentityOverride)} · demoSeed={String(runtimeCapabilities.capabilities.demoSeed)}
           </div>
@@ -1478,7 +1578,7 @@ function TopologyApp() {
           <div className="save-state">
             <div className="save-indicator" aria-label="儲存狀態">
               <span className={`saved-dot ${saving ? "saving" : ""}`} />
-              <small>{saving ? "儲存中" : "已自動儲存"}</small>
+              <small role={writeError ? "alert" : undefined}>{writeError || (saving ? "儲存中" : "已自動儲存")}</small>
             </div>
             {ready && currentUser && (
               <aside className="session-profile" aria-label="登入者資料">
@@ -1595,13 +1695,13 @@ function TopologyApp() {
                     const members = project.devices.filter((device) => device.groupId === group.id);
                     const quantity = members.reduce((sum, device) => sum + deviceQuantity(device), 0);
                     return (
-                      <div className="group-row" key={group.id}>
+                      <div className="group-row" key={group.id} data-group-id={group.id}>
                         <span style={{ background: group.color }} />
                         <div>
                           <strong>{group.name}</strong>
                           <small>{group.kind === "site" ? "分點" : group.kind === "domain" ? "網域" : "VLAN"} · {members.length} 節點 / {quantity} 台</small>
                         </div>
-                        <button
+                        <div className="group-actions"><button
                           type="button"
                           className="group-toggle"
                           title={group.collapsed ? "展開群組" : "折疊群組"}
@@ -1612,6 +1712,10 @@ function TopologyApp() {
                         >
                           {group.collapsed ? "+" : "−"}
                         </button>
+                        {canManageGroups && <>
+                          <button type="button" className="group-action" title={`編輯容器 ${group.name}`} aria-label={`編輯容器 ${group.name}`} disabled={saving || groupBusy} onClick={() => openGroupAction(group.id, "edit")}>編輯</button>
+                          <button type="button" className="group-action group-delete" title={`刪除容器 ${group.name}`} aria-label={`刪除容器 ${group.name}`} disabled={saving || groupBusy} onClick={() => openGroupAction(group.id, "delete")}>刪除</button>
+                        </>}</div>
                       </div>
                     );
                   })}
@@ -1619,7 +1723,7 @@ function TopologyApp() {
                 {canWriteActiveTopology && <button className="wide-button" onClick={() => setShowGroupForm(true)}>+ 新增容器</button>}
             </>
             )}
-            <div className="local-note">權限模式<br /><span>{activeCustomer?.name ?? "未選客戶"} / {activeTopology?.name ?? "未選拓樸"} / {activeSite?.name ?? "未指定站點"}。{canWriteActiveTopology ? "目前身分可編輯此拓樸。" : "目前身分僅可讀取此拓樸。"}</span></div>
+            <div className="local-note">{localEditing ? "本機資料" : "權限模式"}<br /><span>{activeCustomer?.name ?? "未選客戶"} / {activeTopology?.name ?? "未選拓樸"}。{localEditing ? "僅保存在目前瀏覽器設定檔。" : `${activeSite?.name ?? "未指定站點"}。${canWriteActiveTopology ? "目前身分可編輯此拓樸。" : "目前身分僅可讀取此拓樸。"}`}</span></div>
           </aside>
         </Panel>
 
@@ -1724,9 +1828,29 @@ function TopologyApp() {
         </form>
       </Modal>}
 
+      {groupAction?.type === "edit" && actionGroup && <Modal title="編輯架構容器" onClose={closeGroupAction}>
+        <form className="form-grid" onSubmit={event => { event.preventDefault(); void editGroup(new FormData(event.currentTarget)); }}>
+          <label className="full">容器名稱<input name="name" required maxLength={2000} defaultValue={actionGroup.name} disabled={groupBusy} /></label>
+          <label>分類<select name="kind" defaultValue={actionGroup.kind} disabled={groupBusy}><option value="site">分點</option><option value="domain">網域</option><option value="vlan">VLAN</option></select></label>
+          <label>識別色<input name="color" type="color" defaultValue={actionGroup.color} disabled={groupBusy} /></label>
+          {groupError && <p className="group-error full" role="alert">{groupError}</p>}
+          <div className="form-actions full"><button type="button" className="secondary" disabled={groupBusy} onClick={closeGroupAction}>取消</button><button type="submit" className="primary" disabled={groupBusy || saving || !canManageGroups}>儲存變更</button></div>
+        </form>
+      </Modal>}
+
+      {groupAction?.type === "delete" && actionGroup && <Modal title="刪除容器" onClose={closeGroupAction}>
+        <div className="confirm-panel">
+          <p>確定刪除「<strong>{actionGroup.name}</strong>」？</p>
+          <p>成員設備：{project.devices.filter(device => device.groupId === actionGroup.id).length} 個節點</p>
+          <p>刪除容器後，設備與連線會保留；此容器內的設備將改為未分類。</p>
+          {groupError && <p className="group-error" role="alert">{groupError}</p>}
+          <div className="form-actions"><button type="button" className="secondary" disabled={groupBusy} onClick={closeGroupAction}>取消</button><button type="button" className="danger" disabled={groupBusy || saving || !canManageGroups} onClick={() => void deleteGroup()}>刪除容器</button></div>
+        </div>
+      </Modal>}
+
       {showCustomerForm && <Modal title="新增客戶" onClose={() => setShowCustomerForm(false)}>
         <form action={addCustomer} className="form-grid">
-          <label className="full">客戶名稱<input name="name" required placeholder="例如：興恆毅、A 客戶總公司" /></label>
+          <label className="full">客戶名稱<input name="name" required placeholder="例如：測試客戶 A" /></label>
           <SiteField
             sites={availableSites}
             defaultSiteId={activeTopology?.siteId}

@@ -1,0 +1,1053 @@
+{
+  "purpose": "Local engineering archive only. QA_BTA_001 remains BLOCKED; A08 not waived. No push or release.",
+  "branch": "codex/public-beta-0.1",
+  "base": "b5c53916cbda6f8bcd2f42f9d9772ef181c1adee",
+  "authorization": {
+    "thread": "019fc279-b2e8-7520-893c-dce960f76acc",
+    "humanTurn": "01a15441-fb6f-7850-9c88-ab5be0cdf927",
+    "humanMessage": "01a15441-fc2e-7a33-aa69-6cb3dc8b93ed",
+    "date": "2026-10-19"
+  },
+  "zipSha256": "4c04dc3de0efb121932ff601ab2afb03a6b2b82e60958643e388fe807bd9195a",
+  "handoffSha256": "a83fd10995cfa88c2470e771c39a58c9cbd9a5e0abe239a35ff82521e7a02c57",
+  "sourceManifestSha256": "4b1b0825a51acf934b812b0a073daab73b35467415d3f6784958e9c8564c98fb",
+  "includedPaths": [
+    {
+      "path": ".github/ISSUE_TEMPLATE/beta-feedback.yml",
+      "scope": "R4 product/package/public source"
+    },
+    {
+      "path": "app/api/runtime-capabilities/route.ts",
+      "scope": "R4 product/package/public source"
+    },
+    {
+      "path": "app/globals.css",
+      "scope": "R4 product/package/public source"
+    },
+    {
+      "path": "app/layout.tsx",
+      "scope": "R4 product/package/public source"
+    },
+    {
+      "path": "app/lib/server/local-beta-request.ts",
+      "scope": "R4 product/package/public source"
+    },
+    {
+      "path": "app/lib/server/runtime-policy.ts",
+      "scope": "R4 product/package/public source"
+    },
+    {
+      "path": "app/lib/topology-group-operations.ts",
+      "scope": "R4 product/package/public source"
+    },
+    {
+      "path": "app/lib/topology-store.ts",
+      "scope": "R4 product/package/public source"
+    },
+    {
+      "path": "app/page.tsx",
+      "scope": "R4 product/package/public source"
+    },
+    {
+      "path": "docs/beta/DATA-AND-BACKUP.zh-TW.md",
+      "scope": "R4 product/package/public source"
+    },
+    {
+      "path": "docs/beta/FEEDBACK.md",
+      "scope": "R4 product/package/public source"
+    },
+    {
+      "path": "docs/beta/KNOWN-ISSUES.md",
+      "scope": "R4 product/package/public source"
+    },
+    {
+      "path": "docs/beta/licenses/plugin-rsc-0.5.26-LICENSE.txt",
+      "scope": "R4 product/package/public source"
+    },
+    {
+      "path": "docs/beta/QUICKSTART.zh-TW.md",
+      "scope": "R4 product/package/public source"
+    },
+    {
+      "path": "docs/dev測試紀錄/qa-bta-001-browser-runner-preparation-2026-10-19.md",
+      "scope": "Independent QA records"
+    },
+    {
+      "path": "docs/dev測試紀錄/qa-bta-001-formal-2026-10-19.md",
+      "scope": "Independent QA records"
+    },
+    {
+      "path": "docs/dev測試紀錄/qa-bta-001-harness-preparation-2026-10-19.md",
+      "scope": "Independent QA records"
+    },
+    {
+      "path": "docs/dev測試紀錄/qa-bta-001-preparation-2026-10-09.md",
+      "scope": "Independent QA records"
+    },
+    {
+      "path": "docs/dev測試紀錄/qa-bta-001-r2-2026-10-19.md",
+      "scope": "Independent QA records"
+    },
+    {
+      "path": "docs/dev測試紀錄/qa-bta-001-r3-2026-10-19.md",
+      "scope": "Independent QA records"
+    },
+    {
+      "path": "docs/dev測試紀錄/qa-bta-001-r4-2026-10-19.md",
+      "scope": "Independent QA records"
+    },
+    {
+      "path": "docs/dev開發紀錄/2026-10-09-dev-bta-preflight.md",
+      "scope": "Beta contract/tickets/DEV records"
+    },
+    {
+      "path": "docs/dev開發紀錄/2026-10-09-dsg-bta-001.md",
+      "scope": "Beta contract/tickets/DEV records"
+    },
+    {
+      "path": "docs/dev開發紀錄/2026-10-19-beta-engineering-paths.json",
+      "scope": "Engineering archive metadata"
+    },
+    {
+      "path": "docs/dev開發紀錄/2026-10-19-beta-engineering-snapshot.md",
+      "scope": "Engineering archive metadata"
+    },
+    {
+      "path": "docs/dev開發紀錄/2026-10-19-dev-beta.md",
+      "scope": "Beta contract/tickets/DEV records"
+    },
+    {
+      "path": "docs/engineerticket/active/DEV_BTA_001.md",
+      "scope": "Beta contract/tickets/DEV records"
+    },
+    {
+      "path": "docs/engineerticket/active/DEV_BTA_002.md",
+      "scope": "Beta contract/tickets/DEV records"
+    },
+    {
+      "path": "docs/engineerticket/active/DEV_BTA_003.md",
+      "scope": "Beta contract/tickets/DEV records"
+    },
+    {
+      "path": "docs/engineerticket/active/DSG_BTA_001.md",
+      "scope": "Beta contract/tickets/DEV records"
+    },
+    {
+      "path": "docs/engineerticket/active/QA_BTA_001.md",
+      "scope": "Beta contract/tickets/DEV records"
+    },
+    {
+      "path": "docs/engineerticket/contracts/LOCAL-FEEDBACK-BETA-V1.md",
+      "scope": "Beta contract/tickets/DEV records"
+    },
+    {
+      "path": "docs/engineerticket/TICKET-REGISTER.md",
+      "scope": "Beta register hunk"
+    },
+    {
+      "path": "LICENSE",
+      "scope": "R4 product/package/public source"
+    },
+    {
+      "path": "README.md",
+      "scope": "R4 product/package/public source"
+    },
+    {
+      "path": "release/beta/runtime/lib/commands.mjs",
+      "scope": "R4 product/package/public source"
+    },
+    {
+      "path": "release/beta/runtime/lib/environment.mjs",
+      "scope": "R4 product/package/public source"
+    },
+    {
+      "path": "release/beta/runtime/lib/integrity.mjs",
+      "scope": "R4 product/package/public source"
+    },
+    {
+      "path": "release/beta/runtime/server.mjs",
+      "scope": "R4 product/package/public source"
+    },
+    {
+      "path": "release/beta/runtime/tools/run-approved-lifecycle.mjs",
+      "scope": "R4 product/package/public source"
+    },
+    {
+      "path": "release/beta/runtime/tools/setup.mjs",
+      "scope": "R4 product/package/public source"
+    },
+    {
+      "path": "release/beta/runtime/tools/start.mjs",
+      "scope": "R4 product/package/public source"
+    },
+    {
+      "path": "release/beta/runtime/tools/stop.mjs",
+      "scope": "R4 product/package/public source"
+    },
+    {
+      "path": "release/beta/setup.cmd",
+      "scope": "R4 product/package/public source"
+    },
+    {
+      "path": "release/beta/start.cmd",
+      "scope": "R4 product/package/public source"
+    },
+    {
+      "path": "release/beta/stop.cmd",
+      "scope": "R4 product/package/public source"
+    },
+    {
+      "path": "samples/beta/synthetic-topology-csv-bundle.zip",
+      "scope": "R4 product/package/public source"
+    },
+    {
+      "path": "samples/beta/synthetic-topology.json",
+      "scope": "R4 product/package/public source"
+    },
+    {
+      "path": "scripts/beta/build.mjs",
+      "scope": "R4 product/package/public source"
+    },
+    {
+      "path": "scripts/beta/package.mjs",
+      "scope": "R4 product/package/public source"
+    },
+    {
+      "path": "scripts/beta/public-material.mjs",
+      "scope": "R4 product/package/public source"
+    },
+    {
+      "path": "scripts/beta/scan.mjs",
+      "scope": "R4 product/package/public source"
+    },
+    {
+      "path": "scripts/beta/vite.config.ts",
+      "scope": "R4 product/package/public source"
+    },
+    {
+      "path": "scripts/qa-bta/browser-assertions.mjs",
+      "scope": "Beta DEV/QA tests and fixtures"
+    },
+    {
+      "path": "scripts/qa-bta/browser-runner.mjs",
+      "scope": "Beta DEV/QA tests and fixtures"
+    },
+    {
+      "path": "scripts/qa-bta/full-browser-runner.mjs",
+      "scope": "Beta DEV/QA tests and fixtures"
+    },
+    {
+      "path": "scripts/qa-bta/harness.mjs",
+      "scope": "Beta DEV/QA tests and fixtures"
+    },
+    {
+      "path": "scripts/qa-bta/list-zip.ps1",
+      "scope": "Beta DEV/QA tests and fixtures"
+    },
+    {
+      "path": "scripts/qa-bta/package-runner.mjs",
+      "scope": "Beta DEV/QA tests and fixtures"
+    },
+    {
+      "path": "scripts/qa-bta/r3-deep-runner.mjs",
+      "scope": "Beta DEV/QA tests and fixtures"
+    },
+    {
+      "path": "scripts/qa-bta/r3-group-crud-probe.mjs",
+      "scope": "Beta DEV/QA tests and fixtures"
+    },
+    {
+      "path": "scripts/qa-bta/r4-group-browser-runner.mjs",
+      "scope": "Beta DEV/QA tests and fixtures"
+    },
+    {
+      "path": "scripts/qa-bta/r4-runtime-negative-runner.mjs",
+      "scope": "Beta DEV/QA tests and fixtures"
+    },
+    {
+      "path": "tests/dev-bta-001-group-browser.test.mjs",
+      "scope": "Beta DEV/QA tests and fixtures"
+    },
+    {
+      "path": "tests/dev-bta-001-group-handlers.test.mjs",
+      "scope": "Beta DEV/QA tests and fixtures"
+    },
+    {
+      "path": "tests/dev-bta-001-groups.test.mjs",
+      "scope": "Beta DEV/QA tests and fixtures"
+    },
+    {
+      "path": "tests/dev-bta-001-responsive.test.mjs",
+      "scope": "Beta DEV/QA tests and fixtures"
+    },
+    {
+      "path": "tests/dev-bta-001.test.mjs",
+      "scope": "Beta DEV/QA tests and fixtures"
+    },
+    {
+      "path": "tests/dev-bta-002-integrity.test.mjs",
+      "scope": "Beta DEV/QA tests and fixtures"
+    },
+    {
+      "path": "tests/dev-bta-002-lifecycle.test.mjs",
+      "scope": "Beta DEV/QA tests and fixtures"
+    },
+    {
+      "path": "tests/dev-bta-002-portable.test.mjs",
+      "scope": "Beta DEV/QA tests and fixtures"
+    },
+    {
+      "path": "tests/dev-bta-002-process.test.mjs",
+      "scope": "Beta DEV/QA tests and fixtures"
+    },
+    {
+      "path": "tests/dev-bta-003.test.mjs",
+      "scope": "Beta DEV/QA tests and fixtures"
+    },
+    {
+      "path": "tests/fixtures/qa-bta-001/acceptance-matrix.json",
+      "scope": "Beta DEV/QA tests and fixtures"
+    },
+    {
+      "path": "tests/fixtures/qa-bta-001/blocking-v2/credentials.masked.csv",
+      "scope": "Beta DEV/QA tests and fixtures"
+    },
+    {
+      "path": "tests/fixtures/qa-bta-001/blocking-v2/devices.csv",
+      "scope": "Beta DEV/QA tests and fixtures"
+    },
+    {
+      "path": "tests/fixtures/qa-bta-001/blocking-v2/groups.csv",
+      "scope": "Beta DEV/QA tests and fixtures"
+    },
+    {
+      "path": "tests/fixtures/qa-bta-001/blocking-v2/links.csv",
+      "scope": "Beta DEV/QA tests and fixtures"
+    },
+    {
+      "path": "tests/fixtures/qa-bta-001/blocking-v2/missing-info.csv",
+      "scope": "Beta DEV/QA tests and fixtures"
+    },
+    {
+      "path": "tests/fixtures/qa-bta-001/browser-contract.json",
+      "scope": "Beta DEV/QA tests and fixtures"
+    },
+    {
+      "path": "tests/fixtures/qa-bta-001/canonical-project.json",
+      "scope": "Beta DEV/QA tests and fixtures"
+    },
+    {
+      "path": "tests/fixtures/qa-bta-001/environment-matrix.json",
+      "scope": "Beta DEV/QA tests and fixtures"
+    },
+    {
+      "path": "tests/fixtures/qa-bta-001/formal-browser-matrix.json",
+      "scope": "Beta DEV/QA tests and fixtures"
+    },
+    {
+      "path": "tests/fixtures/qa-bta-001/future-project.json",
+      "scope": "Beta DEV/QA tests and fixtures"
+    },
+    {
+      "path": "tests/fixtures/qa-bta-001/group-crud-cases.json",
+      "scope": "Beta DEV/QA tests and fixtures"
+    },
+    {
+      "path": "tests/fixtures/qa-bta-001/legacy-project.json",
+      "scope": "Beta DEV/QA tests and fixtures"
+    },
+    {
+      "path": "tests/fixtures/qa-bta-001/malformed-project.json",
+      "scope": "Beta DEV/QA tests and fixtures"
+    },
+    {
+      "path": "tests/fixtures/qa-bta-001/sentinel-catalog.json",
+      "scope": "Beta DEV/QA tests and fixtures"
+    },
+    {
+      "path": "tests/fixtures/qa-bta-001/sentinel-v2/credentials.masked.csv",
+      "scope": "Beta DEV/QA tests and fixtures"
+    },
+    {
+      "path": "tests/fixtures/qa-bta-001/sentinel-v2/devices.csv",
+      "scope": "Beta DEV/QA tests and fixtures"
+    },
+    {
+      "path": "tests/fixtures/qa-bta-001/sentinel-v2/groups.csv",
+      "scope": "Beta DEV/QA tests and fixtures"
+    },
+    {
+      "path": "tests/fixtures/qa-bta-001/sentinel-v2/links.csv",
+      "scope": "Beta DEV/QA tests and fixtures"
+    },
+    {
+      "path": "tests/fixtures/qa-bta-001/sentinel-v2/missing-info.csv",
+      "scope": "Beta DEV/QA tests and fixtures"
+    },
+    {
+      "path": "tests/fixtures/qa-bta-001/synthetic-topology.json",
+      "scope": "Beta DEV/QA tests and fixtures"
+    },
+    {
+      "path": "tests/fixtures/qa-bta-001/test-selection.json",
+      "scope": "Beta DEV/QA tests and fixtures"
+    },
+    {
+      "path": "tests/fixtures/qa-bta-001/warning-import.md",
+      "scope": "Beta DEV/QA tests and fixtures"
+    },
+    {
+      "path": "tests/qa-bta-001-browser-assertions.test.mjs",
+      "scope": "Beta DEV/QA tests and fixtures"
+    },
+    {
+      "path": "tests/qa-bta-001-browser-harness.test.mjs",
+      "scope": "Beta DEV/QA tests and fixtures"
+    },
+    {
+      "path": "tests/qa-bta-001-full-browser-harness.test.mjs",
+      "scope": "Beta DEV/QA tests and fixtures"
+    },
+    {
+      "path": "tests/qa-bta-001-group-page-handler.test.mjs",
+      "scope": "Beta DEV/QA tests and fixtures"
+    },
+    {
+      "path": "tests/qa-bta-001-group-semantics.test.mjs",
+      "scope": "Beta DEV/QA tests and fixtures"
+    },
+    {
+      "path": "tests/qa-bta-001-harness.test.mjs",
+      "scope": "Beta DEV/QA tests and fixtures"
+    },
+    {
+      "path": "tests/qa-bta-001-preparation.test.mjs",
+      "scope": "Beta DEV/QA tests and fixtures"
+    },
+    {
+      "path": "tests/qa-bta-001-selection.test.mjs",
+      "scope": "Beta DEV/QA tests and fixtures"
+    },
+    {
+      "path": "THIRD_PARTY_NOTICES.md",
+      "scope": "R4 product/package/public source"
+    }
+  ],
+  "excludedPaths": [
+    {
+      "path": "docs/dev開發紀錄/2026-10-19-ops-env-001-a08.md",
+      "reason": "Separate OPS phase; preserve outside this DEV/DSG/QA snapshot."
+    },
+    {
+      "path": "docs/engineerticket/active/OPS_BTA_001.md",
+      "reason": "Separate OPS phase; preserve outside this DEV/DSG/QA snapshot."
+    }
+  ],
+  "excludedPatterns": [
+    ".local/**",
+    ".env*",
+    "node_modules/**",
+    "dist/**",
+    "test-results/**",
+    "generated release ZIPs",
+    "OPS A08 executable drafts"
+  ],
+  "sourceInputs": [
+    {
+      "path": ".github/ISSUE_TEMPLATE/beta-feedback.yml",
+      "status": "added",
+      "sha256": "f4e1a68d0cc6a5aacebb6114f4f4fce699f0c864d872e8576047113bdcc22399"
+    },
+    {
+      "path": "LICENSE",
+      "status": "added",
+      "sha256": "62703d5cd46f8a0e1f9983007b8de2b1b31ede0feb7410b108a79b133f04b726"
+    },
+    {
+      "path": "README.md",
+      "status": "modified",
+      "sha256": "be8aa008072d9cefa15a8505796bbc24766532b17ebf5528891547f66f45d041"
+    },
+    {
+      "path": "THIRD_PARTY_NOTICES.md",
+      "status": "added",
+      "sha256": "2a15715266634df20e6adce57495152daf1b057e42aaeccbb1394e33a22d8dcc"
+    },
+    {
+      "path": "app/api/runtime-capabilities/route.ts",
+      "status": "modified",
+      "sha256": "351e58e5610b7fa7f9bc837f758a743c2fd31061aaae69b5e6ee385ff64f3eb3"
+    },
+    {
+      "path": "app/chatgpt-auth.ts",
+      "status": "base",
+      "sha256": "1407f614cc83d7049fdb08cd713d2516866ba58e24e820f7f4fd9d718b9d3007"
+    },
+    {
+      "path": "app/components/import/FileDropZone.tsx",
+      "status": "base",
+      "sha256": "41b7129885fb3ba4600eed42f6365f03e6705ab3d4d524fe271f292ed56dd0f0"
+    },
+    {
+      "path": "app/components/import/ImportIssueList.tsx",
+      "status": "base",
+      "sha256": "fbeeca88609fb481083b221dcfc1e9c4ef8b04404821be538fbf932487b9d98f"
+    },
+    {
+      "path": "app/components/import/ImportPreviewModal.tsx",
+      "status": "base",
+      "sha256": "2287882974ea2b8fc1a4919ab4ce778227699fe15c130fb80493d65d677ec341"
+    },
+    {
+      "path": "app/components/import/ImportSummary.tsx",
+      "status": "base",
+      "sha256": "d2b6613aa08c811a0a8b021a65002d8aad11f70d91082b5c2683e584ca1bed8c"
+    },
+    {
+      "path": "app/components/import/MaskedCredentialPreview.tsx",
+      "status": "base",
+      "sha256": "37f94fe60d44bf8f3b2fbd1ded4ce2fd7ec6c88ad9fc9217d371e8cc57673418"
+    },
+    {
+      "path": "app/components/import/MissingInfoChecklist.tsx",
+      "status": "base",
+      "sha256": "058788d3d59b2dba972c2d959a72e14483a9d9c9f1272fbe82c47c895329c6a0"
+    },
+    {
+      "path": "app/components/topology/TrustedNetworkReader.module.css",
+      "status": "base",
+      "sha256": "58c2247d51824fc9e91b9ac03ab8b88cd1af4078b6219cd3354f692be2747b73"
+    },
+    {
+      "path": "app/components/topology/TrustedNetworkReader.tsx",
+      "status": "base",
+      "sha256": "b00b2d09585fb54b2a313eecd477e8381fc81786a5e69e08b1ede24916e1c8c2"
+    },
+    {
+      "path": "app/globals.css",
+      "status": "modified",
+      "sha256": "8f41a7f0fa5ec64bfcea004028d18bf9081257ee2b6c6bdf01cbf2acc63f9201"
+    },
+    {
+      "path": "app/layout.tsx",
+      "status": "modified",
+      "sha256": "c9b2378f5dd1d25f5ae3a6c9275b779ad7a0fc9834daf6d11dc0e8462f0f9f69"
+    },
+    {
+      "path": "app/lib/credential-masking.ts",
+      "status": "base",
+      "sha256": "5fdac8a5d2cae69ac24c236ce01eb6df9c4ec3155f5c8a6cdc617975abbdaa4d"
+    },
+    {
+      "path": "app/lib/demo-topologies.ts",
+      "status": "base",
+      "sha256": "79885027b81d407a5738a1c465656e85e26b82ea6f90ce432dddc98d99ca1664"
+    },
+    {
+      "path": "app/lib/login-auth.ts",
+      "status": "base",
+      "sha256": "5707c585b455c2bca68a9c76e599d77dbb7d5dbb9f01dfceb1f0b9cab04a7015"
+    },
+    {
+      "path": "app/lib/server/http-security.ts",
+      "status": "base",
+      "sha256": "f6ffa0fa881537187faceeadc61024bef6dab0e191d20d86155bbd04d42f3471"
+    },
+    {
+      "path": "app/lib/server/local-beta-request.ts",
+      "status": "added",
+      "sha256": "bb607be20f53e25886c1d813e9fd200371376c5a3372f010fc69c94d1f8600bf"
+    },
+    {
+      "path": "app/lib/server/pilot-policy.ts",
+      "status": "base",
+      "sha256": "34f2c197a25d24f9bad57d4d8ad2984d5603f326249921a85511ddcdd0294e4e"
+    },
+    {
+      "path": "app/lib/server/pilot-request.ts",
+      "status": "base",
+      "sha256": "f5a9aa5219a681427bc211d59cef2289e3e88291b126c62de040f0e967e0074c"
+    },
+    {
+      "path": "app/lib/server/pilot-session.ts",
+      "status": "base",
+      "sha256": "abe77f7e8936905f0ac0c5c343837cf224921c62cfdf76bd3205794ae345fe22"
+    },
+    {
+      "path": "app/lib/server/rbac-policy.ts",
+      "status": "base",
+      "sha256": "4c75611bab8987d9bfa73fcd326b6a483584a282c620e15486ee3e14a9d394f5"
+    },
+    {
+      "path": "app/lib/server/request-identity.ts",
+      "status": "base",
+      "sha256": "c5fedbe7ca58f3cfc1ca9ac9ebe3835a3b00814c08adf3f98e450940540c38ac"
+    },
+    {
+      "path": "app/lib/server/runtime-policy.ts",
+      "status": "modified",
+      "sha256": "e3c3ae5380521b68b0cf5f6b22781658d6a7162814668326f2676cb14b7bae6f"
+    },
+    {
+      "path": "app/lib/topology-db.ts",
+      "status": "base",
+      "sha256": "08c17bcac2c72a8aad14f76268ca1b2f8dcd0edd07522574e514a4a5e7b43efb"
+    },
+    {
+      "path": "app/lib/topology-document-parser.ts",
+      "status": "base",
+      "sha256": "e1a599a2991a16e110fbb3ad555155178e7f3c1308f05f8700d6dad4b8ef317f"
+    },
+    {
+      "path": "app/lib/topology-group-operations.ts",
+      "status": "added",
+      "sha256": "e37548b3f43a55ae247726ec886e3c46fe1255d4d3e73d4eb938585cd6599efd"
+    },
+    {
+      "path": "app/lib/topology-layout.ts",
+      "status": "base",
+      "sha256": "9763ed3d393c729e740e175609e10aa5653078883f49da5cd2fa46e09eadc755"
+    },
+    {
+      "path": "app/lib/topology-missing-info.ts",
+      "status": "base",
+      "sha256": "5ca033a6f67edbd7a4dc0499893f1c27ceebcc8e0b3f5d09d331e0361dc3d2df"
+    },
+    {
+      "path": "app/lib/topology-routing.ts",
+      "status": "base",
+      "sha256": "910920f8fffe6564a4f63d2a6056ce2ea14c3a274c0bd109ed1f48934f5e0c0a"
+    },
+    {
+      "path": "app/lib/topology-store.ts",
+      "status": "modified",
+      "sha256": "6a3983564d074be1befe9d0774f6e67e705ea8596a90674fbca05f86297fb95f"
+    },
+    {
+      "path": "app/lib/topology-transfer.ts",
+      "status": "base",
+      "sha256": "ca36001e3cee6162441f40d91db568d8029370ce49d07516ca8fa555c699cda6"
+    },
+    {
+      "path": "app/lib/topology-types.ts",
+      "status": "base",
+      "sha256": "e51fe96cb204f407a11de1b58b2bdc97f8de69c69768a626f43c2f47023c6f87"
+    },
+    {
+      "path": "app/lib/topology-validation.ts",
+      "status": "base",
+      "sha256": "f123ffde2bc08c48ec5d22064f86c9b4c5f89b1d310802fe09446e906d4c81d8"
+    },
+    {
+      "path": "app/lib/topology-visibility.ts",
+      "status": "base",
+      "sha256": "be42cde72ee900d32607a18d536b54fe33b37f601f2e802da9e9eff647aa16e8"
+    },
+    {
+      "path": "app/lib/trusted-network-change-plan.ts",
+      "status": "base",
+      "sha256": "f317c4ab84577bd744e306d315624ab37a5d5ab07394a9b29cf08c166b66e686"
+    },
+    {
+      "path": "app/lib/trusted-network-digest.ts",
+      "status": "base",
+      "sha256": "b202506e6b65258f8c3db49902494a4a4d4c8f144a59e9585d24f76f2b48b8c8"
+    },
+    {
+      "path": "app/lib/trusted-network-interface-candidates.ts",
+      "status": "base",
+      "sha256": "fc8776f2010b707be2418d0206fe4d92095484671c052de930ea6680384baf1e"
+    },
+    {
+      "path": "app/lib/trusted-network-model.ts",
+      "status": "base",
+      "sha256": "f744256011dd99e390e8909b2afe95aee5067a77ff8dc2592de87078fd03f553"
+    },
+    {
+      "path": "app/lib/trusted-network-projection.ts",
+      "status": "base",
+      "sha256": "4d2dacff425bd9131acbd7a379dd51c68fdcee2a6e116923db045ade649f84dc"
+    },
+    {
+      "path": "app/lib/trusted-network-types.ts",
+      "status": "base",
+      "sha256": "9da6b0aaf1a0f43dab8effd3016dba9cd09b1ae67bdf74e556e14ef09a100914"
+    },
+    {
+      "path": "app/page.tsx",
+      "status": "modified",
+      "sha256": "c8fe9b8256b1f42bb3f3271b2f4246f39e27a6e2fcfc302ab400e0104d6a25c7"
+    },
+    {
+      "path": "docs/beta/DATA-AND-BACKUP.zh-TW.md",
+      "status": "added",
+      "sha256": "13ec9d3aa5abe73b7f85ede3f433e09510afbb6f76fcbf59a25d96e1891c23c4"
+    },
+    {
+      "path": "docs/beta/FEEDBACK.md",
+      "status": "added",
+      "sha256": "876021f7d7a832203672c5938acd4c099d93b723c88868cc11ff38a894772e6a"
+    },
+    {
+      "path": "docs/beta/KNOWN-ISSUES.md",
+      "status": "added",
+      "sha256": "22f0938dbf059820a10d3276d5daa1e7fc733547587b52346d2bdf0c4ecb9518"
+    },
+    {
+      "path": "docs/beta/QUICKSTART.zh-TW.md",
+      "status": "added",
+      "sha256": "729965fa6487f892e43bf920377b2fe772429557eebdf7e0a397a1e5e9b0c408"
+    },
+    {
+      "path": "docs/beta/licenses/plugin-rsc-0.5.26-LICENSE.txt",
+      "status": "added",
+      "sha256": "33e47cae77168711c35705d789aa8c25174cbd659c2266df9a70830a1e1ab403"
+    },
+    {
+      "path": "examples/sean-sie-spine-leaf-demo.json",
+      "status": "base",
+      "sha256": "f3895be3a6bb74f16d60ff98c1cec1ba3f28de87c4313810d88fd40892ada2a1"
+    },
+    {
+      "path": "package-lock.json",
+      "status": "base",
+      "sha256": "4d30e1dff901bcf26e1bd06071f34a12d6cc5bc28ee52d142d877749dccaa8b8"
+    },
+    {
+      "path": "package.json",
+      "status": "base",
+      "sha256": "34cdaec6df180571d475890dbded85b627e2e9af3dc0b2fa2f55cce046c9dc5e"
+    },
+    {
+      "path": "postcss.config.mjs",
+      "status": "base",
+      "sha256": "7b299d3d3b16699ddda397c0b2373b3af4f25f8fc9ccc9b3d9e64ef083bc1c21"
+    },
+    {
+      "path": "public/favicon.svg",
+      "status": "base",
+      "sha256": "3e8863288c2d43dd33d2a71de317dcf9198f09932ea8d61e0def1b846a865435"
+    },
+    {
+      "path": "release/beta/runtime/lib/commands.mjs",
+      "status": "added",
+      "sha256": "cce90d7350b58096a546daa7b24cdc82087a4fd852fb281643881b63c7eb06f1"
+    },
+    {
+      "path": "release/beta/runtime/lib/environment.mjs",
+      "status": "added",
+      "sha256": "3840848a37cde09a35cdef88ea9c2621d509500c7ba14faa63ddc1452952e546"
+    },
+    {
+      "path": "release/beta/runtime/lib/integrity.mjs",
+      "status": "added",
+      "sha256": "164d351c5dfe41da2b3e2d3929243fa9eed997086c4048eb487f773f252097e2"
+    },
+    {
+      "path": "release/beta/runtime/server.mjs",
+      "status": "added",
+      "sha256": "d15b0bbf0004555d586b2bc07cc677a9bc39cc80cba84cc32b6574c633397e52"
+    },
+    {
+      "path": "release/beta/runtime/tools/run-approved-lifecycle.mjs",
+      "status": "added",
+      "sha256": "ff594b4bef031a97cb27804b27f65a17ba78f607c4de85ef43a9e2f7ebb54710"
+    },
+    {
+      "path": "release/beta/runtime/tools/setup.mjs",
+      "status": "added",
+      "sha256": "a664d42d045d17f15161099997fac068ae5ddea5dc501b7e102f5ac585ebe4da"
+    },
+    {
+      "path": "release/beta/runtime/tools/start.mjs",
+      "status": "added",
+      "sha256": "f7419be7760b859a9ffb159168468fd97541de3e15cf78ce0e137696acdd5aa8"
+    },
+    {
+      "path": "release/beta/runtime/tools/stop.mjs",
+      "status": "added",
+      "sha256": "34d9199e98369f4b349119de67ed4c4eb81444662bd379a56be801667b800a18"
+    },
+    {
+      "path": "release/beta/setup.cmd",
+      "status": "added",
+      "sha256": "f561f9ac0da1362c48ae002dc07cc417877d796f9d9b45f0c01b82d7eae911f8"
+    },
+    {
+      "path": "release/beta/start.cmd",
+      "status": "added",
+      "sha256": "7c95ef1446dda1a4b30e064266df4ca7b4c95121e59cb95ed72bee25bad99744"
+    },
+    {
+      "path": "release/beta/stop.cmd",
+      "status": "added",
+      "sha256": "0ff2ba2bf018024b0f3a6877e48956a65cb24fa1fc86c4a18e3d589b2f6eeec7"
+    },
+    {
+      "path": "samples/beta/synthetic-topology-csv-bundle.zip",
+      "status": "added",
+      "sha256": "2516dbe5f22910797201a1ca00a830cc40ee80f9a3c7fc1d5be2ca1bc780bf53"
+    },
+    {
+      "path": "samples/beta/synthetic-topology.json",
+      "status": "added",
+      "sha256": "0f4c70c5d4bc49e262b241266b1ea2ce69a0f88ce31afc86b11e0b01e0cf51e3"
+    },
+    {
+      "path": "scripts/beta/build.mjs",
+      "status": "added",
+      "sha256": "2a595cc1e9feedb5cfd23a2266b3908cc426cc44a5015f31c6dd65d523d4921d"
+    },
+    {
+      "path": "scripts/beta/package.mjs",
+      "status": "added",
+      "sha256": "c0949c7da98f7734f8a7a7ec9fd34d214796cfcf33f42d624e71bcc6807e195b"
+    },
+    {
+      "path": "scripts/beta/public-material.mjs",
+      "status": "added",
+      "sha256": "5e35abf747b363c44089e2710aed441be6befe53697718da3b66fec421d9ba5a"
+    },
+    {
+      "path": "scripts/beta/scan.mjs",
+      "status": "added",
+      "sha256": "7fc3e891b2775a0d09b8a08d7f12fe5ae405a5bc263fad22c9409bb8111eb2f3"
+    },
+    {
+      "path": "scripts/beta/vite.config.ts",
+      "status": "added",
+      "sha256": "f95cf9802671e41743d0b98b3e6a8384a5d77193566f65e0adf51f6d6f22a943"
+    },
+    {
+      "path": "tsconfig.json",
+      "status": "base",
+      "sha256": "3469e601b6856c4b10f89bdbf5679e22001b4ab5b876983b3780f776780ccd64"
+    }
+  ],
+  "gitEquivalence": "Source raw hashes identify tested Windows bytes. Existing core.autocrlf=true may normalize text CRLF to LF in Git. Verify committed blobs against Git hash-object --path and separately require zero source raw drift; binary fixture is byte-exact.",
+  "unchangedQaFiles": [
+    {
+      "path": "docs/dev測試紀錄/qa-bta-001-browser-runner-preparation-2026-10-19.md",
+      "sha256": "cff381760f2e885e76c61bf657a5323a17b79658f5b0d563d9ba70cc28e143ed"
+    },
+    {
+      "path": "docs/dev測試紀錄/qa-bta-001-formal-2026-10-19.md",
+      "sha256": "2812c353fb59e8b3b1e59ba6fde149f5c25aebc0cff0383cbea1053e1a68e72f"
+    },
+    {
+      "path": "docs/dev測試紀錄/qa-bta-001-harness-preparation-2026-10-19.md",
+      "sha256": "af181a8483fefb84fffe44d591083f7f18bdc9363a93204befbfda3c2ad1165e"
+    },
+    {
+      "path": "docs/dev測試紀錄/qa-bta-001-preparation-2026-10-09.md",
+      "sha256": "b1ef6027592aac9469d812c6e9967a65f98fa39eb2c708d938621b2bb1cb3711"
+    },
+    {
+      "path": "docs/dev測試紀錄/qa-bta-001-r2-2026-10-19.md",
+      "sha256": "db3d424d73865c8da83e6007122f725a4889baa3768ee348e055f1742332a3e6"
+    },
+    {
+      "path": "docs/dev測試紀錄/qa-bta-001-r3-2026-10-19.md",
+      "sha256": "f8631bb3c758e3fbdc51fe0deeaa083db01b9a3df5c70d3f867c1bdf46e26579"
+    },
+    {
+      "path": "docs/dev測試紀錄/qa-bta-001-r4-2026-10-19.md",
+      "sha256": "164808dcf33b00888ca89e811b82afc0ec89dbad8ee34149d82531e701ac8732"
+    },
+    {
+      "path": "docs/engineerticket/active/QA_BTA_001.md",
+      "sha256": "ec1974d88bfe6429355f84f389ecece0a18603c8f28a2b6b9d913017dec5e34f"
+    },
+    {
+      "path": "scripts/qa-bta/browser-assertions.mjs",
+      "sha256": "f154a3b1e9e08cb56bfd7b5951883bb916a96e51c93deb7266e2a3f78ef26508"
+    },
+    {
+      "path": "scripts/qa-bta/browser-runner.mjs",
+      "sha256": "02a1b670c803b9f932129fa4e8fe18a4aab7d69d1e9d41866db623ff46d988f2"
+    },
+    {
+      "path": "scripts/qa-bta/full-browser-runner.mjs",
+      "sha256": "509650827d0ae08276c9bbf026c51b779c06bfbe4c82eb810f23f08fa2842612"
+    },
+    {
+      "path": "scripts/qa-bta/harness.mjs",
+      "sha256": "f942861aca05d3ae9c27dc41d03ae1ebfacc0d322d5da30a1c416a06f052e1e3"
+    },
+    {
+      "path": "scripts/qa-bta/list-zip.ps1",
+      "sha256": "1e57fbf3d9677010843b5deff64f0b4a9cf58ecd48767195b812062bed5af614"
+    },
+    {
+      "path": "scripts/qa-bta/package-runner.mjs",
+      "sha256": "de39620d97f2a70d3245d7b82884e80c0934ab4c62ed4f32b55de902bcb5cb63"
+    },
+    {
+      "path": "scripts/qa-bta/r3-deep-runner.mjs",
+      "sha256": "186f2b3f1bb86b04bb1d92f65bae7ef809d4a1dacc767dd5346f207d0888f7de"
+    },
+    {
+      "path": "scripts/qa-bta/r3-group-crud-probe.mjs",
+      "sha256": "95d941dad02f330c6669b8bb0a112d74b040b3043f43f6e60d871f5af5ce2608"
+    },
+    {
+      "path": "scripts/qa-bta/r4-group-browser-runner.mjs",
+      "sha256": "a876e9e6793cdfe67daadbd82f4f0953f16b21dc796c59267323a9736598ad2d"
+    },
+    {
+      "path": "scripts/qa-bta/r4-runtime-negative-runner.mjs",
+      "sha256": "c6d0ee6a0538060543bf554bf6ffcfb9d4316d6ce1806039c535f1208b6ec34e"
+    },
+    {
+      "path": "tests/fixtures/qa-bta-001/acceptance-matrix.json",
+      "sha256": "107241ec3021bfee2f295efbc6e83831fcdd62b77a7ac167bb0167153bb6245d"
+    },
+    {
+      "path": "tests/fixtures/qa-bta-001/blocking-v2/credentials.masked.csv",
+      "sha256": "e268cbec53e9611cd5f7e66a047fd127277b0f97d29cfa8b689eec2fa2931a8d"
+    },
+    {
+      "path": "tests/fixtures/qa-bta-001/blocking-v2/devices.csv",
+      "sha256": "ddee14481650d9c46a666ab91a0ff4319fe376f9325116c2bd2c238da9eab133"
+    },
+    {
+      "path": "tests/fixtures/qa-bta-001/blocking-v2/groups.csv",
+      "sha256": "0bf6b38411fec63641095cddf388f0268341ab0b83bef54f23dcd6738023c98d"
+    },
+    {
+      "path": "tests/fixtures/qa-bta-001/blocking-v2/links.csv",
+      "sha256": "c23e4ca8e9f5f1dafd4867da443b4d648672207c89082dc5698cf3a6547d860e"
+    },
+    {
+      "path": "tests/fixtures/qa-bta-001/blocking-v2/missing-info.csv",
+      "sha256": "33f51d977e412c1c0fa719f442af1812082900833bc9dd162cba6a70d40f45ac"
+    },
+    {
+      "path": "tests/fixtures/qa-bta-001/browser-contract.json",
+      "sha256": "7eb5db7d5d5169bd35d860ef52746d2385bf2ab64862dcb3bcb0f0ee963f0660"
+    },
+    {
+      "path": "tests/fixtures/qa-bta-001/canonical-project.json",
+      "sha256": "0538e94fb38e7cef7a1e01966a7bd3539075deacf4d829857346624ea53e05c0"
+    },
+    {
+      "path": "tests/fixtures/qa-bta-001/environment-matrix.json",
+      "sha256": "0c8d5ecbaba4e65f4b60e92b2acaadd499650c08ffce8aa429acce51e600930b"
+    },
+    {
+      "path": "tests/fixtures/qa-bta-001/formal-browser-matrix.json",
+      "sha256": "bacd9d98097eb212d7672683c3510184f0bf3d121c043cc361c1aea75086fc9b"
+    },
+    {
+      "path": "tests/fixtures/qa-bta-001/future-project.json",
+      "sha256": "ccc9309d5070b0128034385800f2c20e2f95ab1db109a7cb72e0632f329d4a89"
+    },
+    {
+      "path": "tests/fixtures/qa-bta-001/group-crud-cases.json",
+      "sha256": "6ca70cbbeaa2cf1814b7be816fa62b28f40f78fd18bee040d89c6239aa8cc6b4"
+    },
+    {
+      "path": "tests/fixtures/qa-bta-001/legacy-project.json",
+      "sha256": "2eabb931ae97f763f6eff74228046c9856b4045cb9580d6d85023a57369db0b6"
+    },
+    {
+      "path": "tests/fixtures/qa-bta-001/malformed-project.json",
+      "sha256": "3fc0cadbc63ce648693bcf6de5c2e9551f7f055fe4c39c49c5984bb0d21a613a"
+    },
+    {
+      "path": "tests/fixtures/qa-bta-001/sentinel-catalog.json",
+      "sha256": "1d36e0a6a46c06c86f4dd23811ca40ce929ecd39934474b61f87a2f66c582f25"
+    },
+    {
+      "path": "tests/fixtures/qa-bta-001/sentinel-v2/credentials.masked.csv",
+      "sha256": "13edb7a7b2a8af11cac23bd8226030e6bb6c20159a3380968018d03181010138"
+    },
+    {
+      "path": "tests/fixtures/qa-bta-001/sentinel-v2/devices.csv",
+      "sha256": "fd2ae69801c1e944ded00414c3460f68ef46b84639ed6ae3aa61eee49d66cbf9"
+    },
+    {
+      "path": "tests/fixtures/qa-bta-001/sentinel-v2/groups.csv",
+      "sha256": "0bf6b38411fec63641095cddf388f0268341ab0b83bef54f23dcd6738023c98d"
+    },
+    {
+      "path": "tests/fixtures/qa-bta-001/sentinel-v2/links.csv",
+      "sha256": "9826c65c9ec47b1fdc4c0130d4e50ffe4ee67c23d0e7da7394b89b9620ac98fd"
+    },
+    {
+      "path": "tests/fixtures/qa-bta-001/sentinel-v2/missing-info.csv",
+      "sha256": "33f51d977e412c1c0fa719f442af1812082900833bc9dd162cba6a70d40f45ac"
+    },
+    {
+      "path": "tests/fixtures/qa-bta-001/synthetic-topology.json",
+      "sha256": "fcfaa6ec693b77f2bf303966c3d017f5a7090be18351242bbe54c845285c2b3c"
+    },
+    {
+      "path": "tests/fixtures/qa-bta-001/test-selection.json",
+      "sha256": "9feef5a5d2c4d52f6c06cf411a3636a55ec2a821ba88ec27997428059d84d934"
+    },
+    {
+      "path": "tests/fixtures/qa-bta-001/warning-import.md",
+      "sha256": "f95c3b4fa90615ec2d8e8c956d0b17db59c2606a50b6057117de659ada35846a"
+    },
+    {
+      "path": "tests/qa-bta-001-browser-assertions.test.mjs",
+      "sha256": "6dde283c2b3986b29e9cb69135607186f98ad9852f3ba66f31df02f0c1a3b97d"
+    },
+    {
+      "path": "tests/qa-bta-001-browser-harness.test.mjs",
+      "sha256": "dbcaceb2ca6c7e23cf14854d9bfe010ee97cb5ae509a64f46bc28afdbb423451"
+    },
+    {
+      "path": "tests/qa-bta-001-full-browser-harness.test.mjs",
+      "sha256": "a9c029d423aca5b6d3c624be2c0d2ab438477cb35221daf24105895e5b87fe1e"
+    },
+    {
+      "path": "tests/qa-bta-001-group-page-handler.test.mjs",
+      "sha256": "8a367afc339cafad696ba7c2f2c14f4109125cb445b54e16067a73194673749e"
+    },
+    {
+      "path": "tests/qa-bta-001-group-semantics.test.mjs",
+      "sha256": "e33aa2afd00ecafeb45247e825425d5ebdbd52b95e62cc0ae48276bbed9eae57"
+    },
+    {
+      "path": "tests/qa-bta-001-harness.test.mjs",
+      "sha256": "dd7c2023c5d11239bd8bab1785e66fc084b18951ae9edce58927a292e3b460be"
+    },
+    {
+      "path": "tests/qa-bta-001-preparation.test.mjs",
+      "sha256": "5ed79054a0f541cb7d1ec3d427cf9c49875df143312a4c01bdd9e11b0e61a887"
+    },
+    {
+      "path": "tests/qa-bta-001-selection.test.mjs",
+      "sha256": "bb7617050735ed3798f8213ace898b75165089e13e03b8c7068120e6896024f0"
+    }
+  ],
+  "dependencies": {
+    "runtime": [
+      {
+        "name": "react",
+        "version": "19.2.6",
+        "integrity": "sha512-sfWGGfavi0xr8Pg0sVsyHMAOziVYKgPLNrS7ig+ivMNb3wbCBw3KxtflsGBAwD3gYQlE/AEZsTLgToRrSCjb0Q=="
+      },
+      {
+        "name": "react-dom",
+        "version": "19.2.6",
+        "integrity": "sha512-0prMI+hvBbPjsWnxDLxlCGyM8PN6UuWjEUCYmZhO67xIV9Xasa/r/vDnq+Xyq4Lo27g8QSbO5YzARu0D1Sps3g=="
+      },
+      {
+        "name": "scheduler",
+        "version": "0.27.0",
+        "integrity": "sha512-eNv+WrVbKu1f3vbYJT/xtiF5syA5HPIMtf9IgY/nKg0sWqzAUEvqY/xm7OcZc/qafLx/iO9FgOmeSAp4v5ti/Q=="
+      }
+    ],
+    "runtimeLockSha256": "c30684e8aff7c454425413160360868995b6ae2dbf0299e9d157ead2127a4fc9",
+    "producer": {
+      "node": "24.18.0",
+      "npm": "11.16.0",
+      "producer": "scripts/beta/package.mjs",
+      "producerSha256": "c0949c7da98f7734f8a7a7ec9fd34d214796cfcf33f42d624e71bcc6807e195b"
+    }
+  },
+  "excludedArtifactEvidenceLocation": ".local/bta-20261019/engineering-snapshot/"
+}
