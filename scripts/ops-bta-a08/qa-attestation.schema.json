@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 1,
+  "status": "QA_TOOL_REVIEW_PASS",
+  "required": ["attestationId", "status", "actualRulesApplied", "candidate", "opsManifestSha256"],
+  "attestationIdPattern": "^QA-A08-",
+  "actualRulesApplied": false,
+  "forbiddenBindings": ["configSha256", "mutableConfigHash"],
+  "runbook": {
+    "verifyCandidateAndManifest": true,
+    "verifyClosureAndToolHashes": true,
+    "verifyNoMutation": true,
+    "verifyHostAndAdminPreflight": true
+  }
+}

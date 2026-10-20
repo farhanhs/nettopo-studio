@@ -1,0 +1,59 @@
+{
+  "contract": "LOCAL-FEEDBACK-BETA-V1@R1.1:A08",
+  "candidate": {
+    "zipSha256": "4c04dc3de0efb121932ff601ab2afb03a6b2b82e60958643e388fe807bd9195a",
+    "packetSha256": "a83fd10995cfa88c2470e771c39a58c9cbd9a5e0abe239a35ff82521e7a02c57",
+    "sourceManifest": "4b1b0825a51acf934b812b0a073daab73b35467415d3f6784958e9c8564c98fb",
+    "artifactManifest": "f84b91cd3bd397cdce58d0c3ded6e9c5c701967a0ff03b542c2d855c4cf53f1d",
+    "archivedHead": "b6d508caee148b0557f0c9370252c8d1b2fcf8ef"
+  },
+  "externalControl": {
+    "sameDestinationAndPort": true,
+    "phases": ["pre-success", "during-deny", "post-success"],
+    "destination": "example.com",
+    "port": 443,
+    "scheme": "https",
+    "method": "HEAD",
+    "timeoutMs": 5000,
+    "maxAttemptsPerExecutablePerPhase": 1,
+    "allowRedirects": false,
+    "credentials": false,
+    "rejectPrivateOrLinkLocalDns": true
+  },
+  "networkControlExecutables": [
+    { "id": "node", "executableOwner": "ops", "required": true },
+    { "id": "chrome", "executableOwner": "ops", "required": true },
+    { "id": "edge", "executableOwner": "ops", "required": true }
+  ],
+  "productChannels": [
+    { "id": "node-launcher", "observerPositiveControl": "qa-loopback-fixture", "required": true },
+    { "id": "node-server", "observerPositiveControl": "qa-loopback-fixture", "required": true },
+    { "id": "browser-page", "observerPositiveControl": "qa-loopback-fixture", "required": true },
+    { "id": "browser-subresource", "observerPositiveControl": "qa-loopback-fixture", "required": true },
+    { "id": "browser-dedicated-worker", "observerPositiveControl": "qa-loopback-fixture", "required": true },
+    { "id": "browser-service-worker", "observerPositiveControl": "qa-loopback-fixture", "required": true },
+    { "id": "browser-websocket", "observerPositiveControl": "qa-loopback-fixture", "required": true }
+  ],
+  "loopback": {
+    "origin": "http://127.0.0.1:4317",
+    "requiredDuringEveryPhase": true,
+    "lanListenerForbidden": true
+  },
+  "dailyFlow": [
+    "entry",
+    "edit",
+    "save",
+    "reload",
+    "backup",
+    "restore",
+    "exchange"
+  ],
+  "cleanup": [
+    "owned-rules-removed",
+    "owned-processes-exited",
+    "owned-profiles-closed",
+    "listener-4317-zero",
+    "baseline-rules-unchanged",
+    "zip-hash-unchanged"
+  ]
+}

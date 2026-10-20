@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "ticket": "OPS_ENV_001",
+  "candidate": {
+    "zipSha256": "4c04dc3de0efb121932ff601ab2afb03a6b2b82e60958643e388fe807bd9195a",
+    "head": "b6d508caee148b0557f0c9370252c8d1b2fcf8ef"
+  },
+  "status": "MOCK_ONLY_NOT_A08_PASS",
+  "scenarios": {
+    "normal_create_cleanup": "PASS",
+    "partial_create_rollback": "EXPECTED_FAILURE_WITH_ZERO_RESIDUE",
+    "timeout_nested_finally": "EXPECTED_FAILURE_WITH_ZERO_RESIDUE",
+    "unknown_resource_preserved": "EXPECTED_FAILURE_WITH_UNKNOWN_PRESERVED"
+  },
+  "realFirewallRulesApplied": false,
+  "externalProbe": "NOT_RUN",
+  "beta4317": "NOT_TOUCHED",
+  "browser": "NOT_RUN"
+}

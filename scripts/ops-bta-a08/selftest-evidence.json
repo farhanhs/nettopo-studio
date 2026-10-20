@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 1,
+  "ticket": "OPS_ENV_001",
+  "status": "PASS_MOCK_ONLY",
+  "runner": "scripts/ops-bta-a08/selftest.ps1",
+  "cases": ["success", "baseline", "pre-control", "create", "readback", "during", "runner", "timeout", "cleanup", "post", "cleanup-post"],
+  "assertions": ["exact-error-code", "exact-stage-trace", "owned-count-zero", "unknown-marker-preserved", "cleanup-post-final-cleanup-error-aggregation", "rule-recovery-after-create-throw", "expected-deny-exit-code-only", "network-tls-parameter-negative-classification", "browser-cdp-request-stage-redirect-block", "journal-success-failure-recovery-duplicate-reservation"],
+  "externalActions": { "firewall": false, "network": false, "browser": false, "beta": false, "loopback4317": false }
+}

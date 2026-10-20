@@ -7,7 +7,7 @@ import { pathToFileURL } from "node:url";
 import { assertSentinelPositiveControl, canonicalProjectProjection, safeProjectProjection, scanNamedBuffers } from "./browser-assertions.mjs";
 import { extractCsvBundle } from "./full-browser-runner.mjs";
 
-const [modulePath, packageRoot, fixtureRoot, evidenceRoot] = process.argv.slice(2).map(value => path.resolve(value));
+const [modulePath, packageRoot, fixtureRoot, evidenceRoot, browserExecutableArg, nodeExecutableArg] = process.argv.slice(2).map(value => value ? path.resolve(value) : value);
 assert.ok(modulePath && packageRoot && fixtureRoot && evidenceRoot);
 assert.equal(fs.existsSync(evidenceRoot), false);
 fs.mkdirSync(evidenceRoot, { recursive: false });
@@ -20,10 +20,12 @@ const evidence = { result: "RUNNING", phases: {}, lifecycle: [], console: [], re
 let context;
 
 function lifecycle(command) {
-  const result = spawnSync("cmd.exe", ["/d", "/s", "/c", `${command}.cmd`], { cwd: packageRoot, encoding: "utf8", windowsHide: true, timeout: 30000 });
+  const executable = nodeExecutableArg ?? process.execPath;
+  const result = spawnSync(executable, [`runtime/tools/${command}.mjs`], { cwd: packageRoot, encoding: "utf8", windowsHide: true, timeout: 30000,
+    env: { SystemRoot: process.env.SystemRoot, WINDIR: process.env.WINDIR, PATH: path.dirname(executable), BTA_PROFILE: "local-beta" } });
   const output = `${result.stdout ?? ""}${result.stderr ?? ""}`.trim();
   evidence.lifecycle.push({ command, status: result.status, output });
-  assert.equal(result.status, 0, `${command}.cmd failed: ${output}`);
+  assert.equal(result.status, 0, `${command} lifecycle failed: ${output}`);
   return output;
 }
 
@@ -43,7 +45,7 @@ async function snapshot(page) {
 }
 
 async function openPage() {
-  context = await playwright.chromium.launchPersistentContext(profile, { channel: "chrome", headless: true, acceptDownloads: true, viewport: { width: 1280, height: 900 }, serviceWorkers: "block", args: ["--disable-background-networking", "--no-first-run"] });
+  context = await playwright.chromium.launchPersistentContext(profile, { ...(browserExecutableArg ? { executablePath: browserExecutableArg } : { channel: "chrome" }), headless: true, acceptDownloads: true, viewport: { width: 1280, height: 900 }, serviceWorkers: "block", args: ["--disable-background-networking", "--no-first-run"] });
   const page = context.pages()[0] ?? await context.newPage();
   page.on("console", message => evidence.console.push({ type: message.type(), text: message.text().slice(0, 1000) }));
   page.on("response", response => {

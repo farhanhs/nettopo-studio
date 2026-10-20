@@ -10,7 +10,7 @@ Branch `codex/public-beta-0.1`；Worktree `C:/Users/DUS/Desktop/project/nettopo-
 | 156 | [DEV_BTA_001](active/DEV_BTA_001.md) | READY_FOR_QA | 10/19 R4 ZIP4c04dc3d群組與深度回歸QA通過；安全補驗A11 PASS，A02/A03/A12依declared limits/authorized scope通過。A08仍平台BLOCKED，未實機限制交PM判定；產品不變、writer停、無Git操作。 |
 | 157 | [DEV_BTA_002](active/DEV_BTA_002.md) | READY_FOR_QA | 10/19 R4沿原producer固定包4c04dc3d，74 source含group helper、drift0，lifecycle12/12；producer/runtime與R3無差異。保留R1/R2失敗歷史，writer stop交QA。 |
 | 158 | [DEV_BTA_003](active/DEV_BTA_003.md) | READY_FOR_QA | 10/19 R4包4c04dc3d保留原notices/backup/sample，文件來源與R3無差異；group完整JSON真匯出還原自測通過。writer stop；獨立QA後PRE-COMMIT，非QA PASS。 |
-| 159 | [QA_BTA_001](active/QA_BTA_001.md) | BLOCKED | R4可安全獨立A01–A12矩陣已收束；A08 OS enforcement平台權限BLOCKED，未進PRE-COMMIT |
+| 159 | [QA_BTA_001](active/QA_BTA_001.md) | BLOCKED | 10/20 run journal failure落盤但duplicate run直到finally才拒絕，且成功status與rule/process/profile實際零殘留證據不足；QA_TOOL_REVIEW_FAILED並release-for-repair，真Firewall/連外仍NOT RUN |
 | 160 | [OPS_BTA_001](active/OPS_BTA_001.md) | BLOCKED | PM持有待指派，不新增OPS對話；等待另授權 |
 
 目前固定 R4（ZIP `4c04dc3d…9195a`）的 A04/A05/A06/A07/A09/A10 已取得獨立 QA 證據，R1–R3 失敗保留於歷史；A08 OS-level enforcement 仍平台 BLOCKED。整包 A01–A12 的分項／沿用證據以 R4 QA 報告總表為準，尚未 PRE-COMMIT 或 Release 放行。使用者核准的暫時規則只限 QA 程式副本，不能替代 Windows 實際管理權限，OPS 草稿不許直接實跑；OPS_BTA_001 發布仍 BLOCKED。DEV 自測另記，不代 QA；各組只改自身票/register列，送達與實際開工分開記。

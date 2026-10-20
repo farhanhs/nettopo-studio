@@ -1,0 +1,39 @@
+{
+  "schemaVersion": 1,
+  "ticket": "OPS_ENV_001",
+  "candidate": {
+    "branch": "codex/public-beta-0.1",
+    "head": "b6d508caee148b0557f0c9370252c8d1b2fcf8ef",
+    "zipSha256": "4c04dc3de0efb121932ff601ab2afb03a6b2b82e60958643e388fe807bd9195a",
+    "manifestSha256": "f84b91cd3bd397cdce58d0c3ded6e9c5c701967a0ff03b542c2d855c4cf53f1d",
+    "writerStop": true
+  },
+  "opsFiles": [
+    { "path": "scripts/ops-bta-a08/ops-bta-a08.ps1", "sha256": "c2e82b372b0dc6b88a737ff70099fb2a33ab7b54defc3e54aeb8310858541b9d" },
+    { "path": "scripts/ops-bta-a08/selftest.ps1", "sha256": "a96dee952d4ea2ea4a8e41d6b82b077f1232aed916ebf29d6a53eafa99117e0e" },
+    { "path": "scripts/ops-bta-a08/lifecycle-seam.ps1", "sha256": "783c22e97e17262471d28f0ee591df096c8ec6cf3a9c1c797143de991114b877" },
+    { "path": "scripts/ops-bta-a08/journal-seam.ps1", "sha256": "44793ff176aa92d1202c0a56be2c1d7708a97a7012d1d1298f1e7dea573ef1ce" },
+    { "path": "scripts/ops-bta-a08/journal-selftest.ps1", "sha256": "0d557028151f57e7be55963a93c55ed37ab7a65fef54d62c9cc28b6f1716089b" },
+    { "path": "scripts/ops-bta-a08/README.md", "sha256": "c38befa5effe191695cbbfbabc498ee4133cd2a49c185d9347ff4ba800ea5247" },
+    { "path": "scripts/ops-bta-a08/control-config.json", "sha256": "d9c6c1f4f14b55883ffabad10158741f6d7dcc221a20455a5ae47afdf023febc" },
+    { "path": "scripts/ops-bta-a08/browser-control.mjs", "sha256": "5ae3ffd1878ffb82504691943d3f67f7d743fc99f556a2c370db75801b6b995a" },
+    { "path": "scripts/ops-bta-a08/run-preflight.cmd", "sha256": "3de64d48d4ab61a22e10ed535c12d5b115bbb76a24b46677d2f3a591e72d64b3" },
+    { "path": "scripts/ops-bta-a08/selftest-evidence.json", "sha256": "4e7649ae1d6db239db07339988655c84bd430d3aa00122b7d8fa47cfa5a2f622" },
+    { "path": "scripts/ops-bta-a08/qa-attestation.schema.json", "sha256": "9f203a5ed1dba5f2dbe8abfbc4b75766869fcac153fcc7aebd215a13ea0e62f9" },
+    { "path": "scripts/ops-bta-a08/tcp-control-probe.mjs", "sha256": "e0fcb356248ec468589de7bb15c7f839432aeabb10ec32798c9391688f951589" },
+    { "path": "scripts/ops-bta-a08/probe-classification-selftest.mjs", "sha256": "cc5330d5a872dc9af5956cc8e9fb3ce0f548c73f5f20525594ecec6f6cf83288" },
+    { "path": "scripts/ops-bta-a08/mock-evidence.json", "sha256": "8c704fa9807dcd64a16bc9387b8f02fad7d8065fd8474b262b7eec11af9f304c" }
+  ],
+  "fixture": {
+    "root": ".local/qa-bta-a08-r4-20261020",
+    "closureManifest": { "path": ".local/qa-bta-a08-r4-20261020/fixture-closure.json", "sha256": "4afec6cfdca70e07ebe2e0628e105ab94e2c2b43ca581c1e4e0a592b3a09da79", "fileCount": 1313 },
+    "node": { "path": "toolchain/node.exe", "sha256": "9a4eb5f1c29c6a2e93852ead46b999e284a6a5ca8bab4d4e241d587d025a52de", "version": "24.18.0" },
+    "chrome": { "path": "browsers/chrome/chrome.exe", "sha256": "de999bce6a1c954df71a8f15bf751b336172f55ac1a0325bb0580cbc2121268c", "version": "155.0.8059.85" },
+    "edge": { "path": "browsers/edge/msedge.exe", "sha256": "c2451a012ff88e82449834de5b526ebb42b5a3fc25958d795910d2b172c975b6", "version": "155.0.4283.62" }
+  },
+  "qaReview": "PENDING_QA_SECURITY_REVIEW",
+  "externalControl": "CONFIGURED_PM_APPROVED_EXAMPLE_COM_HEAD_ONLY",
+  "selfTest": "PASS_MOCK_ONLY",
+  "realFirewall": "NOT_RUN",
+  "formalA08": "BLOCKED"
+}

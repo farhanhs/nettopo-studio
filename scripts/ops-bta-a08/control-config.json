@@ -1,0 +1,61 @@
+{
+  "schemaVersion": 1,
+  "ticket": "OPS_ENV_001",
+  "candidate": {
+    "zipSha256": "4c04dc3de0efb121932ff601ab2afb03a6b2b82e60958643e388fe807bd9195a",
+    "manifestSha256": "f84b91cd3bd397cdce58d0c3ded6e9c5c701967a0ff03b542c2d855c4cf53f1d",
+    "head": "b6d508caee148b0557f0c9370252c8d1b2fcf8ef",
+    "writerStop": true
+  },
+  "fixture": {
+    "relativeRoot": ".local/qa-bta-a08-r4-20261020",
+    "packageRelativeRoot": "package/NetTopo-Studio-0.1.0-beta.1",
+    "closureManifest": { "relativePath": "fixture-closure.json", "sha256": "4afec6cfdca70e07ebe2e0628e105ab94e2c2b43ca581c1e4e0a592b3a09da79", "fileCount": 1313 },
+    "executables": {
+      "node": { "relativePath": "toolchain/node.exe", "sha256": "9a4eb5f1c29c6a2e93852ead46b999e284a6a5ca8bab4d4e241d587d025a52de" },
+      "chrome": { "relativePath": "browsers/chrome/chrome.exe", "sha256": "de999bce6a1c954df71a8f15bf751b336172f55ac1a0325bb0580cbc2121268c", "sourceVersion": "155.0.8059.85" },
+      "edge": { "relativePath": "browsers/edge/msedge.exe", "sha256": "c2451a012ff88e82449834de5b526ebb42b5a3fc25958d795910d2b172c975b6", "sourceVersion": "155.0.4283.62" }
+    }
+  },
+  "qaTools": {
+    "reviewStatus": "PENDING_QA_SECURITY_REVIEW",
+    "reviewRelativePath": ".local/qa-bta-a08-r4-20261020/qa-tool-review.json",
+    "playwright": { "relativePath": ".local/qa-bta-001-20261019/tools/node_modules/playwright/index.js", "sha256": "4e98f65f0a9d9bcab8cffc0c5cfdd87fd3f5b0be74fc494ff166a466b204cd44" },
+    "files": [
+      { "relativePath": "scripts/qa-bta/a08-assertions.mjs", "sha256": "e918da4eb67d1a263d75b33744f43e12ac2ee58d744e9d81974e6bf40d906909" },
+      { "relativePath": "scripts/qa-bta/a08-formal-runner.mjs", "sha256": "dd269b77f51ca01463e0fb08dd175ecd82e0a9d1d9215d502012e473b7af2ac4" },
+      { "relativePath": "tests/fixtures/qa-bta-001/a08-channel-matrix.json", "sha256": "1e3f877fe1a569ed9bd132b26cfa3f456ac8f306ac7ac31e953fae6ef1d759f6" },
+      { "relativePath": "tests/qa-bta-001-a08-tooling.test.mjs", "sha256": "e31d26c46c6826f1c75cb6e113e99919c405fd8724868a8d717cfe5245659dee" }
+    ]
+  },
+  "qaChannelRunner": {
+    "status": "CONFIGURED",
+    "relativePath": "scripts/qa-bta/a08-channel-runner.mjs",
+    "sha256": "d1807e8f201ccac689dfaf88b630ff7381351b5a11ec131e309ce1e7ef7954e7",
+    "deepRunnerRelativePath": "scripts/qa-bta/r3-deep-runner.mjs",
+    "deepRunnerSha256": "a58c6744da9c657dd2744ba90fac1e98dff590a67c4f2f587867aae409a0315d",
+    "qaFixtureRootRelativePath": "tests/fixtures/qa-bta-001",
+    "interface": "node a08-channel-runner.mjs --config <fixed-control-config> --phase <pre-success|during-deny|post-success> --run-id <owned> --evidence-root <new> --playwright <fixed-module> --fixture-root <fixed-fixture>"
+  },
+  "externalControl": {
+    "status": "CONFIGURED",
+    "host": "example.com",
+    "port": 443,
+    "scheme": "https",
+    "path": "/",
+    "method": "HEAD",
+    "timeoutMs": 5000,
+    "maxAttemptsPerExecutablePerPhase": 1,
+    "allowRedirects": false,
+    "rejectPrivateOrLinkLocalDns": true,
+    "credentials": false,
+    "approvalId": "PM-A08-2026-10-20-EXAMPLE-CONTROL",
+    "purpose": "PM-approved public TLS reachability control only; no body, credentials, token, cookie, customer data, or redirect follow."
+  },
+  "loopback": { "host": "127.0.0.1", "port": 4317, "owner": "QA_CHANNEL_RUNNER" },
+  "ruleAddressPolicy": {
+    "ipv4": ["0.0.0.0-126.255.255.255", "128.0.0.0-255.255.255.255"],
+    "ipv6": ["::0-::0", "::2-ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff"],
+    "excluded": ["127.0.0.0/8", "::1"]
+  }
+}
