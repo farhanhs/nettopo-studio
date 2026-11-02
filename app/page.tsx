@@ -40,6 +40,7 @@ import {
 import { useTopologyStore } from "./lib/topology-store";
 import { deleteTopologyGroupKeepMembers, editTopologyGroup, type GroupOperationResult } from "./lib/topology-group-operations";
 import { validateProject } from "./lib/topology-validation";
+import { measureTopologyPrint, prepareTopologyPrint, type PrintOrientation } from "./lib/topology-print";
 import {
   buildImportPlan,
   buildImportPlanFromFileDescriptors,
@@ -712,6 +713,9 @@ function TopologyApp() {
   const [showCustomerForm, setShowCustomerForm] = useState(false);
   const [showTopologyForm, setShowTopologyForm] = useState(false);
   const [showTransfer, setShowTransfer] = useState<"import" | "export">();
+  const [showPrint, setShowPrint] = useState(false);
+  const [printOrientation, setPrintOrientation] = useState<PrintOrientation>("landscape");
+  const [printScale, setPrintScale] = useState(1);
   const [importPlan, setImportPlan] = useState<ImportPlan>();
   const [importStrategy, setImportStrategy] = useState<ImportStrategy>("new");
   const [importName, setImportName] = useState("匯入拓樸");
@@ -730,12 +734,49 @@ function TopologyApp() {
   const [flowViewportSize, setFlowViewportSize] = useState<FlowViewportSize>({ width: 0, height: 0 });
   const [flowInstance, setFlowInstance] = useState<ReactFlowInstance<Node, Edge>>();
   const fittedTopologyRef = useRef<string | undefined>(undefined);
+  const printSnapshotRef = useRef<ReturnType<typeof prepareTopologyPrint> | undefined>(undefined);
+
+  useEffect(() => {
+    const beforePrint = () => {
+      if (!flowShellRef.current || printSnapshotRef.current) return;
+      printSnapshotRef.current = prepareTopologyPrint(flowShellRef.current, printOrientation);
+    };
+    const afterPrint = () => {
+      printSnapshotRef.current?.dispose();
+      printSnapshotRef.current = undefined;
+    };
+    window.addEventListener("beforeprint", beforePrint);
+    window.addEventListener("afterprint", afterPrint);
+    return () => {
+      window.removeEventListener("beforeprint", beforePrint);
+      window.removeEventListener("afterprint", afterPrint);
+      afterPrint();
+    };
+  }, [printOrientation]);
+
+  function openPrint() {
+    if (!flowShellRef.current) return;
+    setPrintScale(measureTopologyPrint(flowShellRef.current, printOrientation).scale);
+    setShowPrint(true);
+  }
+
+  async function printTopology() {
+    await document.fonts.ready;
+    if (!flowShellRef.current) return;
+    printSnapshotRef.current?.dispose();
+    printSnapshotRef.current = prepareTopologyPrint(flowShellRef.current, printOrientation);
+    setShowPrint(false);
+    window.print();
+  }
 
   function leaveReader() {
     setReaderScope(undefined);
     setReaderPermit(undefined);
-    setFlowInstance(undefined);
-    fittedTopologyRef.current = undefined;
+    // Editor scope changes keep the mounted canvas and its one-time onInit instance.
+    if (readerActive) {
+      setFlowInstance(undefined);
+      fittedTopologyRef.current = undefined;
+    }
   }
 
   useEffect(() => {
@@ -914,9 +955,10 @@ function TopologyApp() {
         frame = window.requestAnimationFrame(fitWhenMeasured);
         return;
       }
-      if (cancelled) return;
-      void flowInstance.fitView({ padding: 0.12, minZoom: 0.25, maxZoom: 1.2, duration: 0 });
-      fittedTopologyRef.current = initialFitKey;
+      if (cancelled || !flowInstance.viewportInitialized || !nodesReady) return;
+      void flowInstance.fitView({ padding: 0.12, minZoom: 0.25, maxZoom: 1.2, duration: 0 }).then((fitted) => {
+        if (fitted && !cancelled) fittedTopologyRef.current = initialFitKey;
+      });
     };
 
     frame = window.requestAnimationFrame(fitWhenMeasured);
@@ -1509,7 +1551,7 @@ function TopologyApp() {
   }
 
   return (
-    <main className="app-shell">
+    <main className="app-shell" data-workspace-mode={readerActive ? "reader" : "editor"}>
       <header className="topbar">
         {localEditing && <div className="development-banner" role="status" data-local-beta="true">本機試用模式｜資料只保存在此瀏覽器設定檔</div>}
         {runtimeCapabilities && runtimeCapabilities.profile === "pilot" && (
@@ -1625,7 +1667,7 @@ function TopologyApp() {
           <button className="mini-action" onClick={() => setShowTransfer("import")}>匯入</button>
           <button className="mini-action" onClick={() => setShowTransfer("export")}>匯出</button>
           <button className="secondary" onClick={autoLayout} disabled={!canWriteActiveTopology}>自動整理</button>
-          <button className="primary" onClick={() => window.print()}>匯出 PDF</button></>}
+          <button className="primary" onClick={openPrint}>匯出 PDF</button></>}
         </div>
       </header>
 
@@ -1804,6 +1846,19 @@ function TopologyApp() {
           </aside>
         </Panel>
       </PanelGroup>}
+
+      {showPrint && <Modal title="匯出 PDF" onClose={() => setShowPrint(false)}>
+        <div className="form-grid">
+          <label>紙張方向<select aria-label="紙張方向" value={printOrientation} onChange={event => {
+            const orientation = event.target.value as PrintOrientation;
+            setPrintOrientation(orientation);
+            if (flowShellRef.current) setPrintScale(measureTopologyPrint(flowShellRef.current, orientation).scale);
+          }}><option value="landscape">A4 橫向</option><option value="portrait">A4 直向</option></select></label>
+          <div className="print-summary">完整拓樸 · 單頁<br />縮放 {Math.round(printScale * 100)}%</div>
+          {printScale < 0.75 && <p className="secret-warning full" role="status">圖面較大，單頁文字可能偏小。</p>}
+          <div className="form-actions full"><button type="button" className="secondary" onClick={() => setShowPrint(false)}>取消</button><button type="button" className="primary" onClick={() => void printTopology()}>列印 / 儲存 PDF</button></div>
+        </div>
+      </Modal>}
 
       {showDeviceForm && <Modal title="新增設備" onClose={() => setShowDeviceForm(false)}>
         <form action={addDevice} className="form-grid">
