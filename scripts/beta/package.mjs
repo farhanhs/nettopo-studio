@@ -5,8 +5,9 @@ import { spawnSync } from 'node:child_process';
 import { isBuiltin } from 'node:module';
 import ts from 'typescript';
 import { build } from 'esbuild';
-import { zipSync } from 'fflate';
-import { sourceFiles, root, sha256 } from './build.mjs';
+import { createBetaZip } from './zip.mjs';
+import { buildBeta, sourceFiles, root, sha256 } from './build.mjs';
+import { freshDestination, packageOptions, verifyBuildInputs, verifyCommittedSources, verifyRevision } from './approved-source.mjs';
 import { walk, fileHash, canonicalFiles, verifyArtifact } from '../../release/beta/runtime/lib/integrity.mjs';
 
 const VERSION = 'NetTopo-Studio-0.1.0-beta.1';
@@ -18,9 +19,21 @@ function git(...args) {
 }
 function owned(path) { const p = resolve(path), base = join(root, '.local/bta-20261019'); if (!p.startsWith(base + '/') && !p.startsWith(base + '\\')) throw new Error('BTA_ARTIFACT_INVALID'); return p; }
 
-export async function packageBeta(buildPath, outputPath, { documentation = true } = {}) {
+export async function packageBeta(buildPath, outputPath, options = {}) {
+  options = { ...options };
+  const { documentation = true } = options;
+  const revision = verifyRevision(root, options);
   const input = owned(buildPath), output = owned(outputPath);
+  let approved;
+  if (Object.hasOwn(options, 'approvedCommit')) {
+    if (input === output) throw new Error('BTA_OUTPUT_INVALID');
+    approved = await verifyCommittedSources(root, options);
+    await freshDestination(root, input);
+    await freshDestination(root, output);
+    await buildBeta(input);
+  }
   const inputManifest = JSON.parse(await readFile(join(input, 'build-inputs.json'), 'utf8'));
+  if (approved) verifyBuildInputs(inputManifest, approved);
   if (inputManifest.generatedConfigSha256 !== sha256(await readFile(join(root, 'scripts/beta/vite.config.ts')))) throw new Error('BTA_SOURCE_CHANGED');
   // Fail if any build input changed since this build; never label stale output as a new candidate.
   for (const f of inputManifest.files) if (sha256(await readFile(join(root, f.path))) !== f.sha256) throw new Error('BTA_SOURCE_CHANGED');
@@ -86,7 +99,7 @@ export async function packageBeta(buildPath, outputPath, { documentation = true 
   for (const path of [...sourcePaths].sort()) files.push({ path, status: !tracked.has(path) ? 'added' : changes.has(path) ? 'modified' : 'base', sha256: sha256(await readFile(join(root, path))) });
   const payload = await walk(stage);
   const manifest = {
-    format: 'nettopo-local-beta', formatVersion: 1, appVersion: '0.1.0-beta.1', baseCommit: git('rev-parse', 'HEAD'), sourceBranch: git('branch', '--show-current'),
+    format: 'nettopo-local-beta', formatVersion: 1, appVersion: '0.1.0-beta.1', ...revision,
     sourceCandidate: { dirty: files.some(f => f.status !== 'base'), manifestSha256: sha256(JSON.stringify(files)), files },
     toolchain: { node: process.versions.node, npm: '11.16.0', producer: 'scripts/beta/package.mjs', producerSha256: sha256(await readFile(fileURLToPath(import.meta.url))) },
     supportedNode: { major: 24, min: '24.18.0', maxExclusive: '24.18.1' }, supportedWindows: ['Windows 11 Pro 10.0.26300 x64'], supportedBrowsers: [{ name: 'Chrome', minVersion: '155.0.8059.82' }, { name: 'Edge', minVersion: '155.0.4283.45' }],
@@ -94,21 +107,23 @@ export async function packageBeta(buildPath, outputPath, { documentation = true 
     runtimeDependencies: Object.entries(packages).filter(([p]) => p).map(([p, e]) => ({ name: p.slice(13), version: e.version, integrity: e.integrity })),
     allowedLifecycleScripts: [], offlineExternalOrigins: [], createdAt: new Date().toISOString(),
   };
-  if (manifest.baseCommit !== 'b5c53916cbda6f8bcd2f42f9d9772ef181c1adee' || manifest.sourceBranch !== 'codex/public-beta-0.1') throw new Error('BTA_SOURCE_INVALID');
+  if (approved && JSON.stringify(files) !== JSON.stringify(approved.files)) throw new Error('BTA_SOURCE_CHANGED');
+  verifyRevision(root, options);
   await writeJson(join(stage, 'beta-manifest.json'), manifest);
   const manifestBytes = await readFile(join(stage, 'beta-manifest.json'));
   const sums = canonicalFiles([...payload, { path: 'beta-manifest.json', sha256: sha256(manifestBytes) }]).map(f => `${f.sha256}  ${f.path}\n`).join('');
   await writeFile(join(stage, 'SHA256SUMS.txt'), sums);
   await verifyArtifact(stage);
-  const zipFiles = {};
-  for (const f of await walk(stage)) zipFiles[VERSION + '/' + f.path] = new Uint8Array(await readFile(join(stage, f.path)));
-  const bytes = zipSync(zipFiles, { level: 6 });
+  const zipFiles = [];
+  for (const f of await walk(stage)) zipFiles.push({ path: VERSION + '/' + f.path, data: new Uint8Array(await readFile(join(stage, f.path))) });
+  const bytes = createBetaZip(zipFiles);
+  if (approved && JSON.stringify(await verifyCommittedSources(root, options)) !== JSON.stringify(approved)) throw new Error('BTA_SOURCE_CHANGED');
   await writeFile(join(output, VERSION + '.zip'), bytes);
   await writeFile(join(output, VERSION + '.zip.sha256'), sha256(bytes) + '  ' + VERSION + '.zip\n');
   await writeJson(join(output, 'closure-evidence.json'), { imports, external: [...external], bundledElkScopedRequire: 'Browserify internal, workerUrl unused; packaged Browser layout test required', documentation, supportMatrix: 'QA pending' });
   return stage;
 }
 if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
-  try { await packageBeta(process.argv[2], process.argv[3], { documentation: !process.argv.includes('--preflight') }); console.log('{"code":"BTA_PACKAGED"}'); }
+  try { await packageBeta(process.argv[2], process.argv[3], packageOptions(process.argv.slice(4))); console.log('{"code":"BTA_PACKAGED"}'); }
   catch (e) { console.log(JSON.stringify({ code: /^BTA_/.test(e.message) ? e.message : 'BTA_PACKAGE_FAILED' })); process.exitCode = 5; }
 }
